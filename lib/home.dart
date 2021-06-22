@@ -13,29 +13,33 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   static List<int> pascalVOCLabelColors = [
     Color.fromARGB(255, 0, 0, 0).value, // background
-    Color.fromARGB(255, 128, 0, 0).value, // aeroplane
-    Color.fromARGB(255, 0, 128, 0).value, // biyclce
-    Color.fromARGB(255, 128, 128, 0).value, // bird
-    Color.fromARGB(255, 0, 0, 128).value, // boat
-    Color.fromARGB(255, 128, 0, 128).value, // bottle
-    Color.fromARGB(255, 0, 128, 128).value, // bus
-    Color.fromARGB(255, 128, 128, 128).value, // car
-    Color.fromARGB(255, 64, 0, 0).value, // cat
-    Color.fromARGB(255, 192, 0, 0).value, // chair
-    Color.fromARGB(255, 64, 128, 0).value, // cow
-    Color.fromARGB(255, 192, 128, 0).value, // diningtable
-    Color.fromARGB(255, 64, 0, 128).value, // dog
-    Color.fromARGB(255, 192, 0, 128).value, // horse
-    Color.fromARGB(255, 64, 128, 128).value, // motorbike
-    Color.fromARGB(255, 192, 128, 128).value, // person
-    Color.fromARGB(255, 0, 64, 0).value, // potted plant
-    Color.fromARGB(255, 128, 64, 0).value, // sheep
-    Color.fromARGB(255, 0, 192, 0).value, // sofa
-    Color.fromARGB(255, 128, 192, 0).value, // train
-    Color.fromARGB(255, 0, 64, 128).value, // tv-monitor
-    Color.fromARGB(255, 128, 64, 64).value, // HELLA
-    Color.fromARGB(255, 64, 64, 64).value, // TEST
-    Color.fromARGB(255, 64, 192, 192).value, // TU CONNAIS
+    Color.fromARGB(255, 128, 0, 0).value, // leafy_greens
+    Color.fromARGB(255, 0, 128, 0).value, // stem_vegetables
+    Color.fromARGB(255, 128, 128, 0).value, // non-starchy_roots
+    Color.fromARGB(255, 0, 0, 128).value, // vegetables | other
+    Color.fromARGB(255, 128, 0, 128).value, // fruits
+    Color.fromARGB(255, 0, 128, 128).value, // protein | meat
+    Color.fromARGB(255, 128, 128, 128).value, // protein | poultry
+    Color.fromARGB(255, 64, 0, 0).value, // protein | seafood
+    Color.fromARGB(255, 192, 0, 0).value, // protein | eggs
+    Color.fromARGB(255, 64, 128, 0).value, // protein | beans/nuts
+    Color.fromARGB(255, 192, 128, 0).value, // starches/grains | baked_goods
+    Color.fromARGB(255, 64, 0, 128)
+        .value, // starches/grains | rice/grains/cereals
+    Color.fromARGB(255, 192, 0, 128).value, // starches/grains | noodles/pasta
+    Color.fromARGB(255, 255, 64, 64)
+        .value, // starches/grains | starchy_vegetables
+    Color.fromARGB(255, 192, 128, 128).value, // starches/grains | other
+    Color.fromARGB(255, 0, 64, 0).value, // soups/stews
+    Color.fromARGB(255, 128, 64, 0).value, // herbs/spices
+    Color.fromARGB(255, 0, 192, 0).value, // dairy
+    Color.fromARGB(255, 128, 192, 0).value, // snacks
+    Color.fromARGB(255, 0, 64, 128).value, // sweets/desserts
+    Color.fromARGB(255, 128, 64, 64).value, // beverages
+    Color.fromARGB(255, 64, 64, 128).value, // fats/oils/sauces
+    Color.fromARGB(255, 64, 64, 64).value, // food_containers
+    Color.fromARGB(255, 192, 192, 192).value, // dining_tools
+    Color.fromARGB(255, 192, 64, 64).value, // other_food
   ];
 
   bool _loading = true;
@@ -70,7 +74,7 @@ class _HomeState extends State<Home> {
     setState(() {
       _output = output;
       _loading = false;
-      inspect(_output);
+      print(_output.length);
     });
   }
 
@@ -137,16 +141,22 @@ class _HomeState extends State<Home> {
                           child: Column(
                             children: [
                               Container(
-                                height: 250,
-                                width: 250,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(30),
-                                  child: Image.memory(
-                                    _output,
-                                    fit: BoxFit.fill,
-                                  ),
-                                ),
-                              ),
+                                  height: 250,
+                                  width: 250,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      image: DecorationImage(
+                                          image: MemoryImage(_output),
+                                          fit: BoxFit.fill)),
+                                  child: Opacity(
+                                      opacity: 0.3,
+                                      child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          child: Image.file(
+                                            _image,
+                                            fit: BoxFit.fill,
+                                          )))),
                               Divider(
                                 height: 25,
                                 thickness: 1,
