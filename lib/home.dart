@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:tflite/tflite.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:ui' show Color;
 
 class Home extends StatefulWidget {
   @override
@@ -9,9 +11,36 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  static List<int> pascalVOCLabelColors = [
+    Color.fromARGB(255, 0, 0, 0).value, // background
+    Color.fromARGB(255, 128, 0, 0).value, // aeroplane
+    Color.fromARGB(255, 0, 128, 0).value, // biyclce
+    Color.fromARGB(255, 128, 128, 0).value, // bird
+    Color.fromARGB(255, 0, 0, 128).value, // boat
+    Color.fromARGB(255, 128, 0, 128).value, // bottle
+    Color.fromARGB(255, 0, 128, 128).value, // bus
+    Color.fromARGB(255, 128, 128, 128).value, // car
+    Color.fromARGB(255, 64, 0, 0).value, // cat
+    Color.fromARGB(255, 192, 0, 0).value, // chair
+    Color.fromARGB(255, 64, 128, 0).value, // cow
+    Color.fromARGB(255, 192, 128, 0).value, // diningtable
+    Color.fromARGB(255, 64, 0, 128).value, // dog
+    Color.fromARGB(255, 192, 0, 128).value, // horse
+    Color.fromARGB(255, 64, 128, 128).value, // motorbike
+    Color.fromARGB(255, 192, 128, 128).value, // person
+    Color.fromARGB(255, 0, 64, 0).value, // potted plant
+    Color.fromARGB(255, 128, 64, 0).value, // sheep
+    Color.fromARGB(255, 0, 192, 0).value, // sofa
+    Color.fromARGB(255, 128, 192, 0).value, // train
+    Color.fromARGB(255, 0, 64, 128).value, // tv-monitor
+    Color.fromARGB(255, 128, 64, 64).value, // HELLA
+    Color.fromARGB(255, 64, 64, 64).value, // TEST
+    Color.fromARGB(255, 64, 192, 192).value, // TU CONNAIS
+  ];
+
   bool _loading = true;
   File _image;
-  List _output;
+  var _output;
   final picker = ImagePicker(); //allows us to pick image from gallery or camera
 
   @override
@@ -32,23 +61,23 @@ class _HomeState extends State<Home> {
 
   classifyImage(File image) async {
     //this function runs the model on the image
-    var output = await Tflite.runModelOnImage(
+    var output = await Tflite.runSegmentationOnImage(
       path: image.path,
-      numResults: 36, //the amout of categories our neural network can predict
-      threshold: 0.5,
-      imageMean: 127.5,
-      imageStd: 127.5,
+      imageMean: 0.0,
+      imageStd: 255.0,
+      labelColors: pascalVOCLabelColors,
     );
     setState(() {
       _output = output;
       _loading = false;
+      inspect(_output);
     });
   }
 
   loadModel() async {
     //this function loads our model
     await Tflite.loadModel(
-        model: 'assets/model.tflite', labels: 'assets/labels.txt');
+        model: 'assets/segmenter.tflite', labels: 'assets/labels.txt');
   }
 
   pickImage() async {
@@ -79,7 +108,7 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Text(
-          'Fruits and Veggies Neural Network',
+          'NYU Diet Vision App',
           style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w200,
@@ -112,8 +141,8 @@ class _HomeState extends State<Home> {
                                 width: 250,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(30),
-                                  child: Image.file(
-                                    _image,
+                                  child: Image.memory(
+                                    _output,
                                     fit: BoxFit.fill,
                                   ),
                                 ),
@@ -124,7 +153,7 @@ class _HomeState extends State<Home> {
                               ),
                               _output != null
                                   ? Text(
-                                      'The object is: ${_output[0]['label']}!',
+                                      'Here is your segmentation mask !',
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 18,

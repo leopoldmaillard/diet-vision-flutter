@@ -1,36 +1,26 @@
-apple
-banana
-beetroot
-bell pepper
-cabbage
-capsicum
-carrot
-cauliflower
-chilli pepper
-corn
-cucumber
-eggplant
-garlic
-ginger
-grapes
-jalepeno
-kiwi
-lemon
-lettuce
-mango
-onion
-orange
-paprika
-pear
-peas
-pineapple
-pomegranate
-potato
-raddish
-soy beans
-spinach
-sweetcorn
-sweetpotato
-tomato
-turnip
-watermelon
+background
+vegetables | leafy_greens
+vegetables | stem_vegetables
+vegetables | non-starchy_roots
+vegetables | other
+fruits
+protein | meat
+protein | poultry
+protein | seafood
+protein | eggs
+protein | beans/nuts
+starches/grains | baked_goods
+starches/grains | rice/grains/cereals
+starches/grains | noodles/pasta
+starches/grains | starchy_vegetables
+starches/grains | other
+soups/stews
+herbs/spices
+dairy
+snacks
+sweets/desserts
+beverages
+fats/oils/sauces
+food_containers
+dining_tools
+other_food
