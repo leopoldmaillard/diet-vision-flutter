@@ -1,18 +1,28 @@
-import 'package:flutter/material.dart';
-import 'home.dart';
+import 'dart:async';
 
-void main() {
-  runApp(MyApp());
+import 'package:camera/camera.dart';
+import 'package:flutter/material.dart';
+import 'package:transfer_learning_fruit_veggies/home.dart';
+
+List<CameraDescription> cameras = [];
+
+Future<Null> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
+  runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Fruit Recognition',
-      home: Home(),
+    return new MaterialApp(
+      title: "WhatsApp",
+      theme: new ThemeData(
+        primaryColor: new Color(0xff8C33FF),
+      ),
       debugShowCheckedModeBanner: false,
+      home: new Home(),
+      // home: new Home(cameras: cameras),
     );
   }
 }
