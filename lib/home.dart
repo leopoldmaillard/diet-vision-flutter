@@ -7,8 +7,8 @@ import 'package:transfer_learning_fruit_veggies/pages/page3.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page4.dart';
 
 class Home extends StatefulWidget {
-  // final List<CameraDescription> cameras;
-  // Home({this.cameras});
+  final List<CameraDescription> cameras;
+  Home({required this.cameras});
 
   @override
   _HomeState createState() => _HomeState();
@@ -67,8 +67,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         controller: _tabController,
         children: <Widget>[
           /* Navigation au sein de l'appli*/
-          //CameraScreen(widget.cameras),
-          CameraScreen(),
+          CameraScreen(widget.cameras),
+          //CameraScreen(),
           Page2(),
           Page3(),
           Page4(),

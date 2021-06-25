@@ -21,8 +21,8 @@ class MyApp extends StatelessWidget {
         primaryColor: new Color(0xff8C33FF),
       ),
       debugShowCheckedModeBanner: false,
-      home: new Home(),
-      // home: new Home(cameras: cameras),
+      //home: new Home(),
+      home: new Home(cameras: cameras),
     );
   }
 }
