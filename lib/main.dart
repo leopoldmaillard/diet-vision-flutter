@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: "WhatsApp",
+      title: "DietVision",
       theme: new ThemeData(
         primaryColor: new Color(0xff8C33FF),
       ),
