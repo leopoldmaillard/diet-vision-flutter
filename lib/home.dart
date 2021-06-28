@@ -41,6 +41,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: Text("Diet Vision"),
         elevation: 0.7,
+        brightness: Brightness.dark,
       ),
       bottomNavigationBar: BottomAppBar(
         child: TabBar(
