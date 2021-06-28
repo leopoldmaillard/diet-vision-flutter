@@ -1,10 +1,12 @@
 // ignore: import_of_legacy_library_into_null_safe
+import 'package:flutter_point_tab_bar/pointTabIndicator.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page2.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page3.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page4.dart';
+import 'package:transfer_learning_fruit_veggies/pages/page5.dart';
 
 class Home extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -22,7 +24,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _tabController = TabController(vsync: this, initialIndex: 1, length: 4);
+    _tabController = TabController(vsync: this, initialIndex: 1, length: 5);
     _tabController.addListener(() {
       if (_tabController.index == 1) {
         showFab = true;
@@ -39,39 +41,38 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: Text("Diet Vision"),
         elevation: 0.7,
-        bottom: TabBar(
+        brightness: Brightness.dark,
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicator: PointTabIndicator(
+            position: PointTabIndicatorPosition.bottom,
+            color: Colors.white,
+            insets: EdgeInsets.only(bottom: 6),
+          ),
           tabs: <Widget>[
             /* Icone  sur la barre de nav*/
+            Tab(icon: Icon(Icons.menu_book)),
+            Tab(icon: Icon(Icons.restaurant)),
             Tab(icon: Icon(Icons.camera_alt)),
-            Tab(text: "Icone2"),
-            Tab(
-              text: "Icon3",
-            ),
-            Tab(
-              text: "Icon4",
-            ),
+            Tab(icon: Icon(Icons.query_stats)),
+            Tab(icon: Icon(Icons.account_circle)),
           ],
         ),
-        // actions: <Widget>[
-        //   /* Icone au bout à droite de la barre de nav*/
-        //   Icon(Icons.search),
-        //   Padding(
-        //     padding: const EdgeInsets.symmetric(horizontal: 5.0),
-        //   ),
-        //   Icon(Icons.more_vert)
-        // ],
+        color: Theme.of(context).primaryColor,
+        elevation: 0.0,
       ),
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[
           /* Navigation au sein de l'appli*/
-          CameraScreen(widget.cameras),
           //CameraScreen(),
           Page2(),
           Page3(),
+          CameraScreen(widget.cameras),
           Page4(),
+          Page5(),
         ],
       ),
     );
