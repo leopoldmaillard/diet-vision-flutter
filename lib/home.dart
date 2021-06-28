@@ -6,6 +6,7 @@ import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page2.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page3.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page4.dart';
+import 'package:transfer_learning_fruit_veggies/pages/page5.dart';
 
 class Home extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -23,7 +24,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _tabController = TabController(vsync: this, initialIndex: 1, length: 4);
+    _tabController = TabController(vsync: this, initialIndex: 1, length: 5);
     _tabController.addListener(() {
       if (_tabController.index == 1) {
         showFab = true;
@@ -51,14 +52,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ),
           tabs: <Widget>[
             /* Icone  sur la barre de nav*/
+            Tab(icon: Icon(Icons.menu_book)),
+            Tab(icon: Icon(Icons.restaurant)),
             Tab(icon: Icon(Icons.camera_alt)),
-            Tab(text: "Icone2"),
-            Tab(
-              text: "Icon3",
-            ),
-            Tab(
-              text: "Icon4",
-            ),
+            Tab(icon: Icon(Icons.query_stats)),
+            Tab(icon: Icon(Icons.account_circle)),
           ],
         ),
         color: Theme.of(context).primaryColor,
@@ -68,11 +66,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         controller: _tabController,
         children: <Widget>[
           /* Navigation au sein de l'appli*/
-          CameraScreen(widget.cameras),
           //CameraScreen(),
           Page2(),
           Page3(),
+          CameraScreen(widget.cameras),
           Page4(),
+          Page5(),
         ],
       ),
     );
