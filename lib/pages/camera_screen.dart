@@ -12,7 +12,6 @@ import 'dart:io';
 //   }
 // }
 
-import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -61,7 +60,8 @@ class CameraScreenState extends State<CameraScreen> {
         child: new CameraPreview(controller),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.grey,
+        backgroundColor: Theme.of(context).primaryColor,
+        child: const Icon(Icons.circle_outlined),
         // Provide an onPressed callback.
         onPressed: () async {
           // Take the Picture in a try / catch block. If anything goes wrong,
