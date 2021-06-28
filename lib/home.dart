@@ -1,4 +1,5 @@
 // ignore: import_of_legacy_library_into_null_safe
+import 'package:flutter_point_tab_bar/pointTabIndicator.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
@@ -39,9 +40,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       appBar: AppBar(
         title: Text("Diet Vision"),
         elevation: 0.7,
-        bottom: TabBar(
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: TabBar(
           controller: _tabController,
-          indicatorColor: Colors.white,
+          indicator: PointTabIndicator(
+            position: PointTabIndicatorPosition.bottom,
+            color: Colors.white,
+            insets: EdgeInsets.only(bottom: 6),
+          ),
           tabs: <Widget>[
             /* Icone  sur la barre de nav*/
             Tab(icon: Icon(Icons.camera_alt)),
@@ -54,14 +61,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ),
           ],
         ),
-        // actions: <Widget>[
-        //   /* Icone au bout à droite de la barre de nav*/
-        //   Icon(Icons.search),
-        //   Padding(
-        //     padding: const EdgeInsets.symmetric(horizontal: 5.0),
-        //   ),
-        //   Icon(Icons.more_vert)
-        // ],
+        color: Theme.of(context).primaryColor,
+        elevation: 0.0,
       ),
       body: TabBarView(
         controller: _tabController,
