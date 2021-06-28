@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return new MaterialApp(
       title: "DietVision",
       theme: new ThemeData(
-        primaryColor: new Color(0xff8C33FF),
+        primaryColor: new Color(0xff590fD0),
       ),
       debugShowCheckedModeBanner: false,
       //home: new Home(),
