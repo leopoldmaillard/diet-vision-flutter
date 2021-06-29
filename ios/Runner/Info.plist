@@ -23,9 +23,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Need Camera</string>
+	<string>Can I use the camera please?</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Need Microphone</string>
+	<string>Can I use the mic please?</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Need Photo</string>
 	<key>UILaunchStoryboardName</key>

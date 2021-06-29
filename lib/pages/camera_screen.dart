@@ -12,7 +12,6 @@ import 'dart:io';
 //   }
 // }
 
-import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -45,7 +44,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    controller?.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -54,14 +53,31 @@ class CameraScreenState extends State<CameraScreen> {
     if (!controller.value.isInitialized) {
       return new Container();
     }
+
+    var size = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      body: AspectRatio(
-        // aspectRatio: controller.value.aspectRatio,
-        aspectRatio: 3 / 3,
-        child: new CameraPreview(controller),
+      body: Container(
+        width: size,
+        height: size,
+        child: ClipRect(
+          child: OverflowBox(
+            alignment: Alignment.center,
+            child: FittedBox(
+              fit: BoxFit.fitWidth,
+              child: Container(
+                width: size / controller.value.aspectRatio,
+                height: size,
+                child:
+                    new CameraPreview(controller), // this is my CameraPreview
+              ),
+            ),
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.grey,
+        backgroundColor: Theme.of(context).primaryColor,
+        child: const Icon(Icons.circle_outlined),
         // Provide an onPressed callback.
         onPressed: () async {
           // Take the Picture in a try / catch block. If anything goes wrong,
