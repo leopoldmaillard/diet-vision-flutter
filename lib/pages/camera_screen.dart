@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'dart:io';
+import 'package:image/image.dart' as IMG;
+import 'dart:math';
+
 // class CameraScreen extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
@@ -100,13 +104,23 @@ class CameraScreenState extends State<CameraScreen> {
             // where it was saved.
             final image = await controller.takePicture();
 
+            ImageProperties properties =
+                await FlutterNativeImage.getImageProperties(image.path);
+
+            int width = properties.width as int;
+            int heigth = properties.height as int;
+            var offset = (heigth - width);
+
+            File croppedFile = await FlutterNativeImage.cropImage(
+                image.path, 0, (offset / 2).round(), width, width);
+
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => DisplayPictureScreen(
                   // Pass the automatically generated path to
                   // the DisplayPictureScreen widget.
-                  imagePath: image.path,
+                  imagePath: croppedFile.path,
                 ),
               ),
             );
