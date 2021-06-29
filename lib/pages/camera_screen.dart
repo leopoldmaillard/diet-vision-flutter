@@ -57,23 +57,33 @@ class CameraScreenState extends State<CameraScreen> {
     var size = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: Container(
-        width: size,
-        height: size,
-        child: ClipRect(
-          child: OverflowBox(
-            alignment: Alignment.center,
-            child: FittedBox(
-              fit: BoxFit.fitWidth,
-              child: Container(
-                width: size / controller.value.aspectRatio,
-                height: size,
-                child:
-                    new CameraPreview(controller), // this is my CameraPreview
+      body: Stack(
+        alignment: Alignment.bottomRight,
+        children: <Widget>[
+          Container(
+            width: size,
+            height: size,
+            child: ClipRect(
+              child: OverflowBox(
+                alignment: Alignment.center,
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Container(
+                    width: size / controller.value.aspectRatio,
+                    height: size,
+                    child: new CameraPreview(
+                        controller), // this is my CameraPreview
+                  ),
+                ),
               ),
             ),
           ),
-        ),
+          Container(
+            width: size / 5,
+            height: size / 5,
+            color: Theme.of(context).primaryColor.withOpacity(0.4),
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
