@@ -44,7 +44,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    controller?.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -53,11 +53,27 @@ class CameraScreenState extends State<CameraScreen> {
     if (!controller.value.isInitialized) {
       return new Container();
     }
+
+    var size = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      body: AspectRatio(
-        // aspectRatio: controller.value.aspectRatio,
-        aspectRatio: 3 / 3,
-        child: new CameraPreview(controller),
+      body: Container(
+        width: size,
+        height: size,
+        child: ClipRect(
+          child: OverflowBox(
+            alignment: Alignment.center,
+            child: FittedBox(
+              fit: BoxFit.fitWidth,
+              child: Container(
+                width: size / controller.value.aspectRatio,
+                height: size,
+                child:
+                    new CameraPreview(controller), // this is my CameraPreview
+              ),
+            ),
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
