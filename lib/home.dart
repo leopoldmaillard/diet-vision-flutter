@@ -6,7 +6,7 @@ import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page2.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page3.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page4.dart';
-import 'package:transfer_learning_fruit_veggies/pages/page5.dart';
+import 'package:transfer_learning_fruit_veggies/pages/Profile.dart';
 
 class Home extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -72,7 +72,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           Page3(),
           CameraScreen(widget.cameras),
           Page4(),
-          Page5(),
+          Profile(),
         ],
       ),
     );
