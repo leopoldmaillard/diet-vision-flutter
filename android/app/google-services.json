@@ -1,0 +1,97 @@
+{
+  "project_info": {
+    "project_number": "688691121315",
+    "project_id": "fir-flutter-codelab-6ec00",
+    "storage_bucket": "fir-flutter-codelab-6ec00.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688691121315:android:d1b76b1fcee6fb54148316",
+        "android_client_info": {
+          "package_name": "com.example.gtk_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "688691121315-4p9cangnmfcnne794i10e8tuautph1qa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgO-nsswu1D_NcGrWbRkIGQNMMvOfSlQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "688691121315-4p9cangnmfcnne794i10e8tuautph1qa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688691121315:android:4a425caa27ce7f46148316",
+        "android_client_info": {
+          "package_name": "com.example.page_identification"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "688691121315-4p9cangnmfcnne794i10e8tuautph1qa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgO-nsswu1D_NcGrWbRkIGQNMMvOfSlQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "688691121315-4p9cangnmfcnne794i10e8tuautph1qa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:688691121315:android:33803b16a8dcfc54148316",
+        "android_client_info": {
+          "package_name": "com.example.transfer_learning_fruit_veggies"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "688691121315-4p9cangnmfcnne794i10e8tuautph1qa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgO-nsswu1D_NcGrWbRkIGQNMMvOfSlQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "688691121315-4p9cangnmfcnne794i10e8tuautph1qa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

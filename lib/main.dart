@@ -1,28 +1,12 @@
-import 'dart:async';
-
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:transfer_learning_fruit_veggies/home.dart';
 
-List<CameraDescription> cameras = [];
+import 'package:firebase_core/firebase_core.dart'; // new
+import 'package:firebase_auth/firebase_auth.dart'; // new
 
-Future<Null> main() async {
+import 'src/fapp.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  cameras = await availableCameras();
-  runApp(new MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: "DietVision",
-      theme: new ThemeData(
-        primaryColor: new Color(0xff8C33FF),
-      ),
-      debugShowCheckedModeBanner: false,
-      //home: new Home(),
-      home: new Home(cameras: cameras),
-    );
-  }
+  await Firebase.initializeApp();
+  runApp(FApp());
 }
