@@ -109,10 +109,17 @@ class CameraScreenState extends State<CameraScreen> {
 
             int width = properties.width as int;
             int heigth = properties.height as int;
-            var offset = (heigth - width);
+            var offset = (heigth - width).abs();
 
-            File croppedFile = await FlutterNativeImage.cropImage(
-                image.path, 0, (offset / 2).round(), width, width);
+            File croppedFile;
+
+            if (width > heigth) {
+              croppedFile = await FlutterNativeImage.cropImage(
+                  image.path, (offset / 2).round(), 0, heigth, heigth);
+            } else {
+              croppedFile = await FlutterNativeImage.cropImage(
+                  image.path, 0, (offset / 2).round(), width, width);
+            }
 
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
