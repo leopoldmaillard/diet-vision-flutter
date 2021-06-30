@@ -61,32 +61,56 @@ class CameraScreenState extends State<CameraScreen> {
     var size = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: Stack(
-        alignment: Alignment.bottomRight,
-        children: <Widget>[
-          Container(
-            width: size,
-            height: size,
-            child: ClipRect(
-              child: OverflowBox(
-                alignment: Alignment.center,
-                child: FittedBox(
-                  fit: BoxFit.fitWidth,
-                  child: Container(
-                    width: size / controller.value.aspectRatio,
-                    height: size,
-                    child: new CameraPreview(
-                        controller), // this is my CameraPreview
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: <Widget>[
+              Container(
+                width: size,
+                height: size,
+                child: ClipRect(
+                  child: OverflowBox(
+                    alignment: Alignment.center,
+                    child: FittedBox(
+                      fit: BoxFit.fitWidth,
+                      child: Container(
+                        width: size / controller.value.aspectRatio,
+                        height: size,
+                        child: new CameraPreview(
+                            controller), // this is my CameraPreview
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
+              Container(
+                width: size / 5,
+                height: size / 5,
+                color: Theme.of(context).primaryColor.withOpacity(0.4),
+              )
+            ],
           ),
           Container(
-            width: size / 5,
-            height: size / 5,
-            color: Theme.of(context).primaryColor.withOpacity(0.4),
-          )
+            child: Text(
+              "🍽️ Center your meal & put the fiducial marker in the area 🪙",
+              textAlign: TextAlign.center,
+            ),
+          ),
+          ElevatedButton.icon(
+            icon: Icon(Icons.image),
+            label: Text('Chose from Gallery'),
+            onPressed: () {
+              print('Pressed');
+            },
+            style: ElevatedButton.styleFrom(
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(50.0),
+              ),
+              primary: Theme.of(context).primaryColor,
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
