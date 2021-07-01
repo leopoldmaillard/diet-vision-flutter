@@ -92,12 +92,14 @@ class CameraScreenState extends State<CameraScreen> {
               )
             ],
           ),
+          SizedBox(height: 5),
           Container(
             child: Text(
-              "🍽️ Center your meal & put the fiducial marker in the area 🪙",
+              "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
               textAlign: TextAlign.center,
             ),
           ),
+          SizedBox(height: 40),
           ElevatedButton.icon(
             icon: Icon(Icons.image),
             label: Text('Chose from Gallery'),
