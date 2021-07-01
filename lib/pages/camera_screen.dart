@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'dart:io';
+import 'package:image/image.dart' as IMG;
+import 'dart:math';
+
 // class CameraScreen extends StatelessWidget {
 //   @override
 //   Widget build(BuildContext context) {
@@ -57,23 +61,59 @@ class CameraScreenState extends State<CameraScreen> {
     var size = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: Container(
-        width: size,
-        height: size,
-        child: ClipRect(
-          child: OverflowBox(
-            alignment: Alignment.center,
-            child: FittedBox(
-              fit: BoxFit.fitWidth,
-              child: Container(
-                width: size / controller.value.aspectRatio,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: <Widget>[
+              Container(
+                width: size,
                 height: size,
-                child:
-                    new CameraPreview(controller), // this is my CameraPreview
+                child: ClipRect(
+                  child: OverflowBox(
+                    alignment: Alignment.center,
+                    child: FittedBox(
+                      fit: BoxFit.fitWidth,
+                      child: Container(
+                        width: size / controller.value.aspectRatio,
+                        height: size,
+                        child: new CameraPreview(
+                            controller), // this is my CameraPreview
+                      ),
+                    ),
+                  ),
+                ),
               ),
+              Container(
+                width: size / 5,
+                height: size / 5,
+                color: Theme.of(context).primaryColor.withOpacity(0.4),
+              )
+            ],
+          ),
+          SizedBox(height: 5),
+          Container(
+            child: Text(
+              "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
+              textAlign: TextAlign.center,
             ),
           ),
-        ),
+          SizedBox(height: 40),
+          ElevatedButton.icon(
+            icon: Icon(Icons.image),
+            label: Text('Chose from Gallery'),
+            onPressed: () {
+              print('Pressed');
+            },
+            style: ElevatedButton.styleFrom(
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(50.0),
+              ),
+              primary: Theme.of(context).primaryColor,
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
@@ -90,13 +130,30 @@ class CameraScreenState extends State<CameraScreen> {
             // where it was saved.
             final image = await controller.takePicture();
 
+            ImageProperties properties =
+                await FlutterNativeImage.getImageProperties(image.path);
+
+            int width = properties.width as int;
+            int heigth = properties.height as int;
+            var offset = (heigth - width).abs();
+
+            File croppedFile;
+
+            if (width > heigth) {
+              croppedFile = await FlutterNativeImage.cropImage(
+                  image.path, (offset / 2).round(), 0, heigth, heigth);
+            } else {
+              croppedFile = await FlutterNativeImage.cropImage(
+                  image.path, 0, (offset / 2).round(), width, width);
+            }
+
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => DisplayPictureScreen(
                   // Pass the automatically generated path to
                   // the DisplayPictureScreen widget.
-                  imagePath: image.path,
+                  imagePath: croppedFile.path,
                 ),
               ),
             );

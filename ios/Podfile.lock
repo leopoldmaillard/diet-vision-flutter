@@ -2,6 +2,8 @@ PODS:
   - camera (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - flutter_native_image (0.0.1):
+    - Flutter
   - image_picker (0.0.1):
     - Flutter
   - TensorFlowLiteC (2.2.0)
@@ -12,6 +14,7 @@ PODS:
 DEPENDENCIES:
   - camera (from `.symlinks/plugins/camera/ios`)
   - Flutter (from `Flutter`)
+  - flutter_native_image (from `.symlinks/plugins/flutter_native_image/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - tflite (from `.symlinks/plugins/tflite/ios`)
 
@@ -24,6 +27,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/camera/ios"
   Flutter:
     :path: Flutter
+  flutter_native_image:
+    :path: ".symlinks/plugins/flutter_native_image/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
   tflite:
@@ -32,6 +37,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   camera: 3164201dc344383e62282964016528c4f5a9ad50
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  flutter_native_image: 9c0b7451838484458e5b0fae007b86a4c2d4bdfe
   image_picker: 9c3312491f862b28d21ecd8fdf0ee14e601b3f09
   TensorFlowLiteC: b3ab9e867b0b71052ca102a32a786555b330b02e
   tflite: f0403a894740019d63ab5662253bba5b2dd37296
