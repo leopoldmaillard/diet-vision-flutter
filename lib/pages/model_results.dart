@@ -17,3 +17,20 @@ class DisplayPictureScreen extends StatelessWidget {
     );
   }
 }
+
+class DisplayPictureScreenCoin extends StatelessWidget {
+  final Image myImg;
+
+  const DisplayPictureScreenCoin({Key? key, required this.myImg})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Display the Picture')),
+      // The image is stored as a file on the device. Use the `Image.file`
+      // constructor with the given path to display the image.
+      body: myImg,
+    );
+  }
+}

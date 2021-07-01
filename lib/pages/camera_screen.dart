@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:image/image.dart' as IMG;
 import 'dart:math';
 import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
+import 'package:opencv/opencv.dart';
 
 // class CameraScreen extends StatelessWidget {
 //   @override
@@ -32,6 +33,8 @@ class CameraScreen extends StatefulWidget {
 
 class CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
+  Image imageNew = Image.asset('assets/temp.png');
+  dynamic res;
 
   @override
   void initState() {
@@ -166,14 +169,25 @@ class CameraScreenState extends State<CameraScreen> {
               croppedFile = await FlutterNativeImage.cropImage(
                   image.path, 0, (offset / 2).round(), width, width);
             }
-
+            File file2 = await dOHoughCircle(croppedFileCoin);
+            print("hello");
+            print(file2.path);
+            print("hello");
+            print("hello");
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
+                // builder: (context) => DisplayPictureScreen(
+                //   // Pass the automatically generated path to
+                //   // the DisplayPictureScreen widget.
+                //   //imagePath: croppedFileCoin.path,
+                //   imagePath: file2.path,
+                // ),
+                builder: (context) => DisplayPictureScreenCoin(
                   // Pass the automatically generated path to
                   // the DisplayPictureScreen widget.
-                  imagePath: croppedFileCoin.path,
+                  //imagePath: croppedFileCoin.path,
+                  myImg: imageNew,
                 ),
               ),
             );
@@ -185,5 +199,22 @@ class CameraScreenState extends State<CameraScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  Future<File> dOHoughCircle(File file) async {
+    res = await ImgProc.cvtColor(await file.readAsBytes(), 6);
+    res = await ImgProc.houghCircles(await res,
+        method: 3,
+        dp: 2.1,
+        minDist: 0.1,
+        param1: 150,
+        param2: 100,
+        minRadius: 0,
+        maxRadius: 0);
+
+    setState(() {
+      imageNew = Image.memory(res);
+    });
+    return File.fromRawPath(res);
   }
 }
