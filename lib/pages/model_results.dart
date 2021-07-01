@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:tflite/tflite.dart';
+import 'package:image/image.dart' as IMG;
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
@@ -61,7 +64,8 @@ class _SegmentationState extends State<Segmentation> {
   ];
 
   bool _loading = true;
-  var _output;
+  var _outputPNG;
+  var _outputRAW;
 
   @override
   void initState() {
@@ -89,9 +93,14 @@ class _SegmentationState extends State<Segmentation> {
       imageMean: 0.0,
       imageStd: 255.0,
       labelColors: pascalVOCLabelColors,
+      outputType: 'png',
     );
+    //var outimg = await decodeImageFromList(Uint8List.fromList(output));
     setState(() {
-      _output = output;
+      _outputPNG = output;
+      _outputRAW = IMG.decodePng(output);
+      if (_outputRAW != null)
+        _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
       _loading = false;
     });
   }
@@ -116,17 +125,13 @@ class _SegmentationState extends State<Segmentation> {
           : Container(
               height: size,
               width: size,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: MemoryImage(_output),
-                  fit: BoxFit.fill,
-                ),
-              ),
-              child: Opacity(
-                opacity: 0.3,
-                child: Image.file(File(widget.imagePath)),
-              ),
-            ),
+              child: Stack(
+                children: [
+                  Image.memory(_outputPNG),
+                  Opacity(
+                      opacity: 0.3, child: Image.file(File(widget.imagePath))),
+                ],
+              )),
     );
   }
 }
