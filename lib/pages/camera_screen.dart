@@ -138,12 +138,31 @@ class CameraScreenState extends State<CameraScreen> {
             int heigth = properties.height as int;
             var offset = (heigth - width).abs();
 
+            File croppedFileCoin;
             File croppedFile;
-
             if (width > heigth) {
+              // croppedFile = await FlutterNativeImage.cropImage(
+              //     image.path, (offset / 2).round(), 0, heigth, heigth);
+              croppedFileCoin = await FlutterNativeImage.cropImage(
+                  image.path,
+                  (heigth * (4 / 5)).toInt() - (offset / 3).round() + 3,
+                  (width * (4 / 5)).toInt(),
+                  heigth ~/ 5,
+                  heigth ~/ 5);
+
               croppedFile = await FlutterNativeImage.cropImage(
                   image.path, (offset / 2).round(), 0, heigth, heigth);
             } else {
+              /* FOR CLASSIC MOBILE PHONE IT'S HERE */
+              // croppedFile = await FlutterNativeImage.cropImage(
+              //     image.path, 0, (offset / 2).round(), width, width);
+              croppedFileCoin = await FlutterNativeImage.cropImage(
+                  image.path,
+                  (width * (4 / 5)).toInt(),
+                  (heigth * (4 / 5)).toInt() - (offset / 3).round() + 3,
+                  width ~/ 5,
+                  width ~/ 5);
+
               croppedFile = await FlutterNativeImage.cropImage(
                   image.path, 0, (offset / 2).round(), width, width);
             }
@@ -154,7 +173,7 @@ class CameraScreenState extends State<CameraScreen> {
                 builder: (context) => DisplayPictureScreen(
                   // Pass the automatically generated path to
                   // the DisplayPictureScreen widget.
-                  imagePath: croppedFile.path,
+                  imagePath: croppedFileCoin.path,
                 ),
               ),
             );
