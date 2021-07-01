@@ -3,6 +3,7 @@ import 'package:flutter_native_image/flutter_native_image.dart';
 import 'dart:io';
 import 'package:image/image.dart' as IMG;
 import 'dart:math';
+import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
 
 // class CameraScreen extends StatelessWidget {
 //   @override
@@ -164,23 +165,6 @@ class CameraScreenState extends State<CameraScreen> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-}
-
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-
-  const DisplayPictureScreen({Key? key, required this.imagePath})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
-      // The image is stored as a file on the device. Use the `Image.file`
-      // constructor with the given path to display the image.
-      body: AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
   }
 }
