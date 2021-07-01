@@ -102,7 +102,17 @@ class _SegmentationState extends State<Segmentation> {
 
     return Container(
       child: _loading == true
-          ? null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor),
+                  SizedBox(height: 10),
+                  Text('Cooking...'),
+                ],
+              ),
+            )
           : Container(
               height: size,
               width: size,
