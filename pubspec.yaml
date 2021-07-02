@@ -40,6 +40,7 @@ dev_dependencies:
   firebase_auth: # ^1.0.0   # new
   provider: ^5.0.0        # new
   firebase_core:
+  fluttertoast: ^8.0.7
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
