@@ -35,7 +35,6 @@ class CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
   Image imageNew = Image.asset('assets/temp.png');
   dynamic res;
-
   @override
   void initState() {
     super.initState();
@@ -169,11 +168,7 @@ class CameraScreenState extends State<CameraScreen> {
               croppedFile = await FlutterNativeImage.cropImage(
                   image.path, 0, (offset / 2).round(), width, width);
             }
-            File file2 = await dOHoughCircle(croppedFileCoin);
-            print("hello");
-            print(file2.path);
-            print("hello");
-            print("hello");
+            File file2 = await dOHoughCircle(croppedFileCoin, width);
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
               MaterialPageRoute(
@@ -201,16 +196,18 @@ class CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  Future<File> dOHoughCircle(File file) async {
+  Future<File> dOHoughCircle(File file, int widthSquare) async {
+    print(widthSquare);
     res = await ImgProc.cvtColor(await file.readAsBytes(), 6);
+    res = await ImgProc.gaussianBlur(await res, [3, 3], 0);
     res = await ImgProc.houghCircles(await res,
         method: 3,
         dp: 2.1,
-        minDist: 0.1,
-        param1: 150,
-        param2: 100,
-        minRadius: 0,
-        maxRadius: 0);
+        minDist: 100,
+        param1: 10,
+        param2: 30,
+        minRadius: 10,
+        maxRadius: widthSquare - 40);
 
     setState(() {
       imageNew = Image.memory(res);
