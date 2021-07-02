@@ -200,6 +200,7 @@ class CameraScreenState extends State<CameraScreen> {
     print(widthSquare);
     res = await ImgProc.cvtColor(await file.readAsBytes(), 6);
     res = await ImgProc.gaussianBlur(await res, [3, 3], 0);
+    print("test");
     res = await ImgProc.houghCircles(await res,
         method: 3,
         dp: 2.1,
@@ -207,7 +208,7 @@ class CameraScreenState extends State<CameraScreen> {
         param1: 10,
         param2: 30,
         minRadius: 10,
-        maxRadius: widthSquare - 40);
+        maxRadius: widthSquare - 20);
 
     setState(() {
       imageNew = Image.memory(res);
