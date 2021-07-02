@@ -171,16 +171,26 @@ class _SegmentationState extends State<Segmentation> {
                 ],
               ),
             )
-          : Container(
-              height: size,
-              width: size,
-              child: Stack(
-                children: [
-                  Image.memory(_outputPNG),
-                  Opacity(
-                      opacity: 0.3, child: Image.file(File(widget.imagePath))),
-                ],
-              )),
+          : Column(
+              children: [
+                Container(
+                  height: size,
+                  width: size,
+                  child: Stack(
+                    children: [
+                      Image.memory(_outputPNG),
+                      Opacity(
+                          opacity: 0.3,
+                          child: Image.file(File(widget.imagePath))),
+                    ],
+                  ),
+                ),
+                Column(
+                    children: output_classes.entries.map((e) {
+                  return Center(child: Text(e.key));
+                }).toList())
+              ],
+            ),
     );
   }
 }
