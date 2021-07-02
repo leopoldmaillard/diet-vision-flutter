@@ -116,6 +116,20 @@ class CameraScreenState extends State<CameraScreen> {
               primary: Theme.of(context).primaryColor,
             ),
           ),
+          SizedBox(height: 40),
+          ElevatedButton.icon(
+            icon: Icon(Icons.image),
+            label: Text('Chose your Beverage'),
+            onPressed: () {
+              print('Beverage pressed');
+            },
+            style: ElevatedButton.styleFrom(
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(50.0),
+              ),
+              primary: Theme.of(context).primaryColor,
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -158,6 +172,11 @@ class CameraScreenState extends State<CameraScreen> {
               /* FOR CLASSIC MOBILE PHONE IT'S HERE */
               // croppedFile = await FlutterNativeImage.cropImage(
               //     image.path, 0, (offset / 2).round(), width, width);
+              print("BEFORE THE CROPPEDCOINFILE");
+              print("WIDTH CLASSIC IMAGE : ");
+              print(width);
+              print("WIDTH IMAGE CROPPED FOR COIN :");
+              print(width ~/ 5);
               croppedFileCoin = await FlutterNativeImage.cropImage(
                   image.path,
                   (width * (4 / 5)).toInt(),
@@ -168,7 +187,7 @@ class CameraScreenState extends State<CameraScreen> {
               croppedFile = await FlutterNativeImage.cropImage(
                   image.path, 0, (offset / 2).round(), width, width);
             }
-            File file2 = await dOHoughCircle(croppedFileCoin, width);
+            File file2 = await dOHoughCircle(croppedFileCoin, width ~/ 5);
             // If the picture was taken, display it on a new screen.
             await Navigator.of(context).push(
               MaterialPageRoute(
@@ -209,7 +228,16 @@ class CameraScreenState extends State<CameraScreen> {
         param2: 30,
         minRadius: 10,
         maxRadius: widthSquare - 20);
-
+    print("HELLO HELLO");
+    print("HELLO HELLO");
+    print(res);
+    print("WIDTHSQUARE");
+    print(widthSquare);
+    print("First value of res tab");
+    print(res[0]);
+    print("SIZE OF RES TAB");
+    print(res.length); //  nb of pixel corresponding to the Coin
+    print("HELLO HELLO");
     setState(() {
       imageNew = Image.memory(res);
     });
