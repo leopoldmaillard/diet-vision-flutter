@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:quiver/collection.dart';
 import 'dart:io';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
@@ -97,6 +98,7 @@ class _SegmentationState extends State<Segmentation> {
   bool _loading = true;
   var _outputPNG;
   var _outputRAW;
+  Map output_classes = Map();
 
   @override
   void initState() {
@@ -134,17 +136,20 @@ class _SegmentationState extends State<Segmentation> {
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
 
       Iterable<List<int>> pixels = partition(_outputRAW, 4);
-      Map map = Map();
+      var keys = classes.keys.toList();
+      var values = classes.values.toList();
 
       pixels.forEach((element) {
         String e = element.toString();
-        if (!map.containsKey(e)) {
-          map[e] = 1;
+        var i = keys.indexOf(e);
+        var c = values[i];
+        if (!output_classes.containsKey(c)) {
+          output_classes[c] = 1;
         } else {
-          map[e] += 1;
+          output_classes[c] += 1;
         }
       });
-      print(map);
+      print(output_classes);
       _loading = false;
     });
   }
