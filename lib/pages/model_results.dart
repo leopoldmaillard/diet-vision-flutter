@@ -67,32 +67,32 @@ class _SegmentationState extends State<Segmentation> {
   ];
 
   static var classes = {
-    '[0, 0, 0, 255]': 'background',
-    '[128, 0, 0, 255]': 'leafy_greens',
-    '[0, 128, 0, 255]': 'stem_vegetables',
-    '[128, 128, 0, 255]': 'non-starchy_roots',
-    '[0, 0, 128, 255]': 'vegetables | other',
-    '[128, 0, 128, 255]': 'fruits',
-    '[0, 128, 128, 255]': 'protein | meat',
-    '[128, 128, 128, 255]': 'protein | poultry',
-    '[64, 0, 0, 255]': 'protein | seafood',
-    '[192, 0, 0, 255]': 'protein | eggs',
-    '[64, 128, 0, 255]': 'protein | beans/nuts',
-    '[192, 128, 0, 255]': 'starches/grains | baked_goods',
-    '[64, 0, 128, 255]': 'starches/grains | rice/grains/cereals',
-    '[192, 0, 128, 255]': 'starches/grains | noodles/pasta',
-    '[255, 64, 64, 255]': 'starches/grains | starchy_vegetables',
-    '[192, 128, 128, 255]': 'starches/grains | other',
-    '[0, 64, 0, 255]': 'soups/stews',
-    '[128, 64, 0, 255]': 'herbs/spices',
-    '[0, 192, 0, 255]': 'dairy',
-    '[128, 192, 0, 255]': 'snacks',
-    '[0, 64, 128, 255]': 'sweets/desserts',
-    '[128, 64, 64, 255]': 'beverages',
-    '[64, 64, 128, 255]': 'fats/oils/sauces',
-    '[64, 64, 64, 255]': 'food_containers',
-    '[192, 192, 192, 255]': 'dining_tools',
-    '[192, 64, 64, 255]': 'other_food'
+    '[0, 0, 0, 255]': 'Background 🏞️',
+    '[128, 0, 0, 255]': 'Leafy Greens 🥬',
+    '[0, 128, 0, 255]': 'stem_vegetables 🥦',
+    '[128, 128, 0, 255]': 'non-starchy_roots 🍅',
+    '[0, 0, 128, 255]': 'vegetables | other 🌽',
+    '[128, 0, 128, 255]': 'fruits 🍓',
+    '[0, 128, 128, 255]': 'protein | meat 🥩',
+    '[128, 128, 128, 255]': 'protein | poultry 🍗',
+    '[64, 0, 0, 255]': 'protein | seafood 🐟',
+    '[192, 0, 0, 255]': 'protein | eggs 🍳',
+    '[64, 128, 0, 255]': 'protein | beans/nuts 🥜',
+    '[192, 128, 0, 255]': 'starches/grains | baked_goods 🥐',
+    '[64, 0, 128, 255]': 'starches/grains | rice/grains/cereals 🍚',
+    '[192, 0, 128, 255]': 'starches/grains | noodles/pasta 🍝',
+    '[255, 64, 64, 255]': 'starches/grains | starchy_vegetables 🥔',
+    '[192, 128, 128, 255]': 'starches/grains | other 🌾',
+    '[0, 64, 0, 255]': 'soups/stews 🥣',
+    '[128, 64, 0, 255]': 'herbs/spices 🌿',
+    '[0, 192, 0, 255]': 'dairy 🥛',
+    '[128, 192, 0, 255]': 'snacks 🍫',
+    '[0, 64, 128, 255]': 'sweets/desserts 🍰',
+    '[128, 64, 64, 255]': 'beverages 🥤',
+    '[64, 64, 128, 255]': 'fats/oils/sauces 🥫',
+    '[64, 64, 64, 255]': 'food_containers 🍽️',
+    '[192, 192, 192, 255]': 'dining_tools 🍴',
+    '[192, 64, 64, 255]': 'other_food ❓'
   };
 
   bool _loading = true;
@@ -185,10 +185,12 @@ class _SegmentationState extends State<Segmentation> {
                     ],
                   ),
                 ),
-                Column(
-                    children: output_classes.entries.map((e) {
-                  return Center(child: Text(e.key));
-                }).toList())
+                Expanded(
+                    child: ListView(
+                        children: output_classes.entries.map((e) {
+                  return Container(
+                      child: Text(e.key + " : " + e.value.toString()));
+                }).toList())),
               ],
             ),
     );
