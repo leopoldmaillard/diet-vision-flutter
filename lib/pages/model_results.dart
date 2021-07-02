@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
+import 'package:quiver/iterables.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
@@ -63,6 +65,35 @@ class _SegmentationState extends State<Segmentation> {
     Color.fromARGB(255, 192, 64, 64).value, // other_food
   ];
 
+  static var classes = {
+    '[0, 0, 0, 255]': 'background',
+    '[128, 0, 0, 255]': 'leafy_greens',
+    '[0, 128, 0, 255]': 'stem_vegetables',
+    '[128, 128, 0, 255]': 'non-starchy_roots',
+    '[0, 0, 128, 255]': 'vegetables | other',
+    '[128, 0, 128, 255]': 'fruits',
+    '[0, 128, 128, 255]': 'protein | meat',
+    '[128, 128, 128, 255]': 'protein | poultry',
+    '[64, 0, 0, 255]': 'protein | seafood',
+    '[192, 0, 0, 255]': 'protein | eggs',
+    '[64, 128, 0, 255]': 'protein | beans/nuts',
+    '[192, 128, 0, 255]': 'starches/grains | baked_goods',
+    '[64, 0, 128, 255]': 'starches/grains | rice/grains/cereals',
+    '[192, 0, 128, 255]': 'starches/grains | noodles/pasta',
+    '[255, 64, 64, 255]': 'starches/grains | starchy_vegetables',
+    '[192, 128, 128, 255]': 'starches/grains | other',
+    '[0, 64, 0, 255]': 'soups/stews',
+    '[128, 64, 0, 255]': 'herbs/spices',
+    '[0, 192, 0, 255]': 'dairy',
+    '[128, 192, 0, 255]': 'snacks',
+    '[0, 64, 128, 255]': 'sweets/desserts',
+    '[128, 64, 64, 255]': 'beverages',
+    '[64, 64, 128, 255]': 'fats/oils/sauces',
+    '[64, 64, 64, 255]': 'food_containers',
+    '[192, 192, 192, 255]': 'dining_tools',
+    '[192, 64, 64, 255]': 'other_food'
+  };
+
   bool _loading = true;
   var _outputPNG;
   var _outputRAW;
@@ -101,6 +132,19 @@ class _SegmentationState extends State<Segmentation> {
       _outputRAW = IMG.decodePng(output);
       if (_outputRAW != null)
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
+
+      Iterable<List<int>> pixels = partition(_outputRAW, 4);
+      Map map = Map();
+
+      pixels.forEach((element) {
+        String e = element.toString();
+        if (!map.containsKey(e)) {
+          map[e] = 1;
+        } else {
+          map[e] += 1;
+        }
+      });
+      print(map);
       _loading = false;
     });
   }
