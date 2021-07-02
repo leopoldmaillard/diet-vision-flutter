@@ -46,6 +46,7 @@ android {
         applicationId "com.example.transfer_learning_fruit_veggies"
         minSdkVersion 21
         targetSdkVersion 29
+        multiDexEnabled true // to use firestore cloud
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -66,4 +67,5 @@ flutter {
 dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0' // new: able to authentificate
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.android.support:multidex:1.0.3' // new to use cloud firestore
 }
