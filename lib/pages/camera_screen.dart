@@ -217,28 +217,55 @@ class CameraScreenState extends State<CameraScreen> {
 
   Future<File> dOHoughCircle(File file, int widthSquare) async {
     print(widthSquare);
-
+    print("Taille avant conversion");
+    print(await file.length());
+    print(file.runtimeType);
     res = await ImgProc.cvtColor(await file.readAsBytes(), 6);
-    print("Taille avant houghcircles");
-    print(res.length);
+    print("Taille avant gaussian Blur");
+    print(await res.length);
+    print(file.runtimeType);
+    print(res);
     res = await ImgProc.gaussianBlur(await res, [3, 3], 0);
+    print("Taille avant houghCircle");
+    print(await res.length);
+    print(await res);
     res = await ImgProc.houghCircles(await res,
         method: 3,
         dp: 2.1,
-        minDist: 100,
-        param1: 10,
-        param2: 30,
+        minDist: 200,
+        param1: 100,
+        param2: 50,
         minRadius: 10,
-        maxRadius: widthSquare - 20);
+        maxRadius: 380,
+        circleColor: "#000000");
+    //         minDist: 200,
+    // param1: 10,
+    // param2: 30,
+    // minRadius: 10,
+
     print("HELLO HELLO");
     print("HELLO HELLO");
+    print("Taille apres houghcircle");
+    print(res.length);
     print(res);
+    print(file.runtimeType);
+    int count = 0;
+    print("[");
+    for (var i = 0; i < res.length; i++) {
+      if (res[i] == 0) {
+        print(res[i]);
+        print(",");
+        count++;
+      }
+    }
+    print("]");
+    print("count of black is : ");
+    print(count);
     print("WIDTHSQUARE");
     print(widthSquare);
     print("First value of res tab");
     print(res[0]);
-    print("SIZE OF RES TAB");
-    print(res.length); //  nb of pixel corresponding to the Coin
+    //  nb of pixel corresponding to the Coin
     print("HELLO HELLO");
     setState(() {
       imageNew = Image.memory(res);
