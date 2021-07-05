@@ -180,13 +180,17 @@ class _SegmentationState extends State<Segmentation> {
                 Container(
                   height: size,
                   width: size,
-                  child: Stack(
-                    children: [
-                      Image.memory(_outputPNG),
-                      Opacity(
-                          opacity: 0.3,
-                          child: Image.file(File(widget.imagePath))),
-                    ],
+                  child: Opacity(
+                      opacity: 0.3,
+                      child: Image.file(
+                        File(widget.imagePath),
+                        fit: BoxFit.fill,
+                      )),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: MemoryImage(_outputPNG),
+                      fit: BoxFit.fill,
+                    ),
                   ),
                 ),
                 Expanded(
