@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:image/image.dart' as IMG;
 import 'dart:math';
 import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
+import 'package:image_picker/image_picker.dart';
 
 // class CameraScreen extends StatelessWidget {
 //   @override
@@ -32,6 +33,7 @@ class CameraScreen extends StatefulWidget {
 
 class CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
+  final picker = ImagePicker();
 
   @override
   void initState() {
@@ -51,6 +53,20 @@ class CameraScreenState extends State<CameraScreen> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  pickGalleryImage() async {
+    var image = await picker.getImage(source: ImageSource.gallery);
+    if (image == null) return null;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DisplayPictureScreen(
+          // Pass the automatically generated path to
+          // the DisplayPictureScreen widget.
+          imagePath: image.path,
+        ),
+      ),
+    );
   }
 
   @override
@@ -105,7 +121,7 @@ class CameraScreenState extends State<CameraScreen> {
             icon: Icon(Icons.image),
             label: Text('Chose from Gallery'),
             onPressed: () {
-              print('Pressed');
+              pickGalleryImage();
             },
             style: ElevatedButton.styleFrom(
               shape: new RoundedRectangleBorder(
