@@ -69,30 +69,30 @@ class _SegmentationState extends State<Segmentation> {
   static var classes = {
     '[0, 0, 0, 255]': 'Background 🏞️',
     '[128, 0, 0, 255]': 'Leafy Greens 🥬',
-    '[0, 128, 0, 255]': 'stem_vegetables 🥦',
-    '[128, 128, 0, 255]': 'non-starchy_roots 🍅',
-    '[0, 0, 128, 255]': 'vegetables | other 🌽',
-    '[128, 0, 128, 255]': 'fruits 🍓',
-    '[0, 128, 128, 255]': 'protein | meat 🥩',
-    '[128, 128, 128, 255]': 'protein | poultry 🍗',
-    '[64, 0, 0, 255]': 'protein | seafood 🐟',
-    '[192, 0, 0, 255]': 'protein | eggs 🍳',
-    '[64, 128, 0, 255]': 'protein | beans/nuts 🥜',
-    '[192, 128, 0, 255]': 'starches/grains | baked_goods 🥐',
-    '[64, 0, 128, 255]': 'starches/grains | rice/grains/cereals 🍚',
-    '[192, 0, 128, 255]': 'starches/grains | noodles/pasta 🍝',
-    '[255, 64, 64, 255]': 'starches/grains | starchy_vegetables 🥔',
-    '[192, 128, 128, 255]': 'starches/grains | other 🌾',
-    '[0, 64, 0, 255]': 'soups/stews 🥣',
-    '[128, 64, 0, 255]': 'herbs/spices 🌿',
-    '[0, 192, 0, 255]': 'dairy 🥛',
-    '[128, 192, 0, 255]': 'snacks 🍫',
-    '[0, 64, 128, 255]': 'sweets/desserts 🍰',
-    '[128, 64, 64, 255]': 'beverages 🥤',
-    '[64, 64, 128, 255]': 'fats/oils/sauces 🥫',
-    '[64, 64, 64, 255]': 'food_containers 🍽️',
-    '[192, 192, 192, 255]': 'dining_tools 🍴',
-    '[192, 64, 64, 255]': 'other_food ❓'
+    '[0, 128, 0, 255]': 'Stem Vegetables 🥦',
+    '[128, 128, 0, 255]': 'Non-starchy Roots 🍅',
+    '[0, 0, 128, 255]': 'Vegetables | Other 🌽',
+    '[128, 0, 128, 255]': 'Fruits 🍓',
+    '[0, 128, 128, 255]': 'Protein | Meat 🥩',
+    '[128, 128, 128, 255]': 'Protein | Poultry 🍗',
+    '[64, 0, 0, 255]': 'Protein | Seafood 🐟',
+    '[192, 0, 0, 255]': 'Protein | Eggs 🍳',
+    '[64, 128, 0, 255]': 'Protein | Beans/nuts 🥜',
+    '[192, 128, 0, 255]': 'Starches/grains | Baked Goods 🥐',
+    '[64, 0, 128, 255]': 'Starches/grains | rice/grains/cereals 🍚',
+    '[192, 0, 128, 255]': 'Starches/grains | Noodles/pasta 🍝',
+    '[255, 64, 64, 255]': 'Starches/grains | Starchy Vegetables 🥔',
+    '[192, 128, 128, 255]': 'Starches/grains | Other 🌾',
+    '[0, 64, 0, 255]': 'Soups/stews 🥣',
+    '[128, 64, 0, 255]': 'Herbs/spices 🌿',
+    '[0, 192, 0, 255]': 'Dairy 🥛',
+    '[128, 192, 0, 255]': 'Snacks 🍫',
+    '[0, 64, 128, 255]': 'Sweets/desserts 🍰',
+    '[128, 64, 64, 255]': 'Beverages 🥤',
+    '[64, 64, 128, 255]': 'Fats/oils/sauces 🥫',
+    '[64, 64, 64, 255]': 'Food Containers 🍽️',
+    '[192, 192, 192, 255]': 'Dining Tools 🍴',
+    '[192, 64, 64, 255]': 'Other Food ❓'
   };
 
   bool _loading = true;
@@ -149,7 +149,6 @@ class _SegmentationState extends State<Segmentation> {
           output_classes[c] += 1;
         }
       });
-      print(output_classes);
       _loading = false;
     });
   }
@@ -157,6 +156,8 @@ class _SegmentationState extends State<Segmentation> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
+    int outputSize = 513 * 513;
+    var categories = classes.values.toList();
 
     return Container(
       child: _loading == true
@@ -188,8 +189,27 @@ class _SegmentationState extends State<Segmentation> {
                 Expanded(
                     child: ListView(
                         children: output_classes.entries.map((e) {
-                  return Container(
-                      child: Text(e.key + " : " + e.value.toString()));
+                  int percent = ((e.value / outputSize) * 100).round();
+                  if (percent >= 1) {
+                    int index = categories.indexOf(e.key);
+                    int color = pascalVOCLabelColors[index];
+                    print(color);
+                    return ActionChip(
+                        onPressed: () {},
+                        avatar: CircleAvatar(
+                          backgroundColor: Colors.white,
+                          child: Text(percent.toString() + "%",
+                              style:
+                                  TextStyle(color: Color(color), fontSize: 10)),
+                        ),
+                        backgroundColor: Color(color),
+                        label: Text(
+                          e.key,
+                          style: const TextStyle(color: Colors.white),
+                        ));
+                  } else {
+                    return Container();
+                  }
                 }).toList())),
               ],
             ),
