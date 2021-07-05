@@ -217,9 +217,11 @@ class CameraScreenState extends State<CameraScreen> {
 
   Future<File> dOHoughCircle(File file, int widthSquare) async {
     print(widthSquare);
+
     res = await ImgProc.cvtColor(await file.readAsBytes(), 6);
+    print("Taille avant houghcircles");
+    print(res.length);
     res = await ImgProc.gaussianBlur(await res, [3, 3], 0);
-    print("test");
     res = await ImgProc.houghCircles(await res,
         method: 3,
         dp: 2.1,
