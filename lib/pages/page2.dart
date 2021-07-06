@@ -5,7 +5,7 @@ class Page2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Center(
       child: new Text(
-        "Page2",
+        "Recipe page. Recipe recommendations that fit the user's taste could be displayed here thanks to Shaun's website.",
         style: new TextStyle(fontSize: 20.0),
       ),
     );
