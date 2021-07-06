@@ -88,7 +88,6 @@ class _LoginScreenState extends State<LoginScreen> {
   _signin(String _email, String _password) async {
     try {
       await auth.signInWithEmailAndPassword(email: _email, password: _password);
-
       //Success
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => FHomeScreen()));
