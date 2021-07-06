@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
@@ -160,6 +161,9 @@ class _SegmentationState extends State<Segmentation> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
     int outputSize = 513 * 513;
+    double coinPixels = pi * (513 / 16) * (513 / 16); // 3230 pixels
+    const double surface2euros = pi * 12.875 * 12.875; // 521 mm2
+
     var categories = classes.values.toList();
 
     return Container(
@@ -198,6 +202,8 @@ class _SegmentationState extends State<Segmentation> {
                         children: output_classes.entries.map((e) {
                   int percent = ((e.value / outputSize) * 100).round();
                   if (percent >= 1) {
+                    int surface =
+                        (e.value * surface2euros / coinPixels / 100).round();
                     int index = categories.indexOf(e.key);
                     int color = pascalVOCLabelColors[index];
                     print(color);
@@ -211,7 +217,7 @@ class _SegmentationState extends State<Segmentation> {
                         ),
                         backgroundColor: Color(color),
                         label: Text(
-                          e.key,
+                          e.key + '   ' + surface.toString() + 'cm²',
                           style: const TextStyle(color: Colors.white),
                         ));
                   } else {
