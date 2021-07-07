@@ -5,7 +5,7 @@ class Page5 extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Center(
       child: new Text(
-        "Page5",
+        "User's profile. He will be able to manage his account, set up his informations (height, age, weight, tastes etc.) as well as some preferences such as the fiducial marker or the metric used in the app.",
         style: new TextStyle(fontSize: 20.0),
       ),
     );

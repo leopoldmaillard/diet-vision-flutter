@@ -5,7 +5,7 @@ class Page4 extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Center(
       child: new Text(
-        "Page4",
+        "Statistics page. User will be able to follow his food habits (calories, food categories etc.) with plots and numbers.",
         style: new TextStyle(fontSize: 20.0),
       ),
     );
