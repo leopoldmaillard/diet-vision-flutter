@@ -22,8 +22,9 @@ import 'package:camera/camera.dart';
 
 class CameraScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
+  final int nbPictureLeft;
 
-  CameraScreen(this.cameras);
+  CameraScreen(this.cameras, this.nbPictureLeft);
 
   @override
   CameraScreenState createState() {
@@ -64,6 +65,8 @@ class CameraScreenState extends State<CameraScreen> {
           // Pass the automatically generated path to
           // the DisplayPictureScreen widget.
           imagePath: image.path,
+          nbPictureLeft: widget.nbPictureLeft,
+          cameras: widget.cameras,
         ),
       ),
     );
@@ -74,7 +77,8 @@ class CameraScreenState extends State<CameraScreen> {
     if (!controller.value.isInitialized) {
       return new Container();
     }
-
+    print("nb PictureLeft");
+    print(widget.nbPictureLeft);
     var size = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -157,13 +161,13 @@ class CameraScreenState extends State<CameraScreen> {
 
             ImageProperties properties =
                 await FlutterNativeImage.getImageProperties(image.path);
+            int newNbPictureLeft = widget.nbPictureLeft - 1;
 
             int width = properties.width as int;
             int heigth = properties.height as int;
             var offset = (heigth - width).abs();
 
             File croppedFile;
-
             if (width > heigth) {
               croppedFile = await FlutterNativeImage.cropImage(
                   image.path, (offset / 2).round(), 0, heigth, heigth);
@@ -173,12 +177,15 @@ class CameraScreenState extends State<CameraScreen> {
             }
 
             // If the picture was taken, display it on a new screen.
+
             await Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => DisplayPictureScreen(
                   // Pass the automatically generated path to
                   // the DisplayPictureScreen widget.
                   imagePath: croppedFile.path,
+                  nbPictureLeft: newNbPictureLeft,
+                  cameras: widget.cameras,
                 ),
               ),
             );

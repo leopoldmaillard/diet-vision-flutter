@@ -70,7 +70,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           //CameraScreen(),
           Page2(),
           Page3(),
-          CameraScreen(widget.cameras),
+          CameraScreen(widget.cameras, 2),
           Page4(),
           Page5(),
         ],

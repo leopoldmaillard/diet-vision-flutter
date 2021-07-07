@@ -7,15 +7,27 @@ import 'dart:io';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
+import 'package:camera/camera.dart';
+import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
+  int nbPictureLeft;
+  final List<CameraDescription> cameras;
 
-  const DisplayPictureScreen({Key? key, required this.imagePath})
+  DisplayPictureScreen(
+      {Key? key,
+      required this.imagePath,
+      required this.nbPictureLeft,
+      required this.cameras})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    int pictureLeft = this.nbPictureLeft;
+    if (this.nbPictureLeft == 0) {
+      this.nbPictureLeft = 2;
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Meal'),
@@ -23,15 +35,69 @@ class DisplayPictureScreen extends StatelessWidget {
       ),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Segmentation(imagePath: this.imagePath),
+      body: pictureLeft > 0
+          ? Segmentation(
+              imagePath: this.imagePath,
+              nbPictureLeftSeg: this.nbPictureLeft,
+              cameras: this.cameras)
+          : ComputeVolumeDisplay(
+              nbPictureLeftSeg: this.nbPictureLeft, cameras: this.cameras),
       //AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
   }
 }
 
+/*************************** Display Volume Page ***************************** */
+
+class ComputeVolumeDisplay extends StatefulWidget {
+  final int nbPictureLeftSeg;
+  final List<CameraDescription> cameras;
+
+  ComputeVolumeDisplay({required this.nbPictureLeftSeg, required this.cameras});
+
+  @override
+  _ComputeVolumeDisplayState createState() => _ComputeVolumeDisplayState();
+}
+
+class _ComputeVolumeDisplayState extends State<ComputeVolumeDisplay> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Center(
+        child: new Scaffold(
+            body: Column(
+          children: [
+            Text("You have taken 2 picture, here is the nutritional page"),
+            Text("click on the button to take picture for a new meal"),
+            new FloatingActionButton(
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CameraScreen(widget.cameras, widget.nbPictureLeftSeg),
+                  ),
+                );
+              },
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
+          ],
+        )),
+      ),
+    );
+  }
+}
+
+/******************************************************************************/
+
 class Segmentation extends StatefulWidget {
   final String imagePath;
-  Segmentation({required this.imagePath});
+  final int nbPictureLeftSeg;
+  final List<CameraDescription> cameras;
+
+  Segmentation(
+      {required this.imagePath,
+      required this.nbPictureLeftSeg,
+      required this.cameras});
 
   @override
   _SegmentationState createState() => _SegmentationState();
@@ -99,8 +165,8 @@ class _SegmentationState extends State<Segmentation> {
   };
 
   bool _loading = true;
-  var _outputPNG;
-  var _outputRAW;
+  var _outputPNG; // png image with all masks (compressé)
+  var _outputRAW; // array de pixel avec 4 valeurs par pixel
   Map output_classes = Map();
 
   @override
@@ -161,6 +227,7 @@ class _SegmentationState extends State<Segmentation> {
     var size = MediaQuery.of(context).size.width;
     int outputSize = 513 * 513;
     var categories = classes.values.toList();
+    int paramToKeep = 1;
 
     return Container(
       child: _loading == true
@@ -180,12 +247,15 @@ class _SegmentationState extends State<Segmentation> {
                 Container(
                   height: size,
                   width: size,
+                  /* Image of backgroud */
                   child: Opacity(
-                      opacity: 0.3,
-                      child: Image.file(
-                        File(widget.imagePath),
-                        fit: BoxFit.fill,
-                      )),
+                    opacity: 0.3,
+                    child: Image.file(
+                      File(widget.imagePath),
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                  /* Mask */
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: MemoryImage(_outputPNG),
@@ -193,31 +263,46 @@ class _SegmentationState extends State<Segmentation> {
                     ),
                   ),
                 ),
+                /* List of category of food present inside the plate*/
                 Expanded(
-                    child: ListView(
-                        children: output_classes.entries.map((e) {
-                  int percent = ((e.value / outputSize) * 100).round();
-                  if (percent >= 1) {
-                    int index = categories.indexOf(e.key);
-                    int color = pascalVOCLabelColors[index];
-                    print(color);
-                    return ActionChip(
-                        onPressed: () {},
-                        avatar: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Text(percent.toString() + "%",
-                              style:
-                                  TextStyle(color: Color(color), fontSize: 10)),
-                        ),
-                        backgroundColor: Color(color),
-                        label: Text(
-                          e.key,
-                          style: const TextStyle(color: Colors.white),
-                        ));
-                  } else {
-                    return Container();
-                  }
-                }).toList())),
+                  child: ListView(
+                    children: output_classes.entries.map((e) {
+                      int percent = ((e.value / outputSize) * 100).round();
+                      if (percent >= 1) {
+                        int index = categories.indexOf(e.key);
+                        int color = pascalVOCLabelColors[index];
+                        print(color);
+                        return ActionChip(
+                          onPressed: () {},
+                          avatar: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: Text(percent.toString() + "%",
+                                style: TextStyle(
+                                    color: Color(color), fontSize: 10)),
+                          ),
+                          backgroundColor: Color(color),
+                          label: Text(
+                            e.key,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    }).toList(),
+                  ),
+                ),
+                new FloatingActionButton(
+                  onPressed: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CameraScreen(
+                            widget.cameras, widget.nbPictureLeftSeg),
+                      ),
+                    );
+                  },
+                  backgroundColor: Theme.of(context).primaryColor,
+                ),
               ],
             ),
     );
