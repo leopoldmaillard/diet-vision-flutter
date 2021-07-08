@@ -146,26 +146,35 @@ class _SegmentationState extends State<Segmentation> {
 
     final fixedFile =
         await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
+    var outputFixed;
 
-    var outputFixed = await Tflite.runSegmentationOnImage(
-      path: fixedFile.path,
-      imageMean: 0.0,
-      imageStd: 255.0,
-      labelColors: pascalVOCLabelColors,
-      outputType: 'png',
-    );
-
-    // var output = await Tflite.runSegmentationOnImage(
-    //   path: imagePath,
-    //   imageMean: 0.0,
-    //   imageStd: 255.0,
-    //   labelColors: pascalVOCLabelColors,
-    //   outputType: 'png',
-    // );
+    if (widget.isSamsung) {
+      outputFixed = await Tflite.runSegmentationOnImage(
+        path: fixedFile.path,
+        imageMean: 0.0,
+        imageStd: 255.0,
+        labelColors: pascalVOCLabelColors,
+        outputType: 'png',
+      );
+    }
+    var output;
+    if (!widget.isSamsung) {
+      output = await Tflite.runSegmentationOnImage(
+        path: imagePath,
+        imageMean: 0.0,
+        imageStd: 255.0,
+        labelColors: pascalVOCLabelColors,
+        outputType: 'png',
+      );
+    }
 
     //var outimg = await decodeImageFromList(Uint8List.fromList(output));
     setState(() {
-      _outputPNG = outputFixed;
+      if (widget.isSamsung) {
+        _outputPNG = outputFixed;
+      } else {
+        _outputPNG = output;
+      }
       _outputRAW = IMG.decodePng(outputFixed);
       if (_outputRAW != null)
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
