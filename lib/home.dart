@@ -69,7 +69,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           /* Navigation au sein de l'appli*/
           //CameraScreen(),
           Page2(),
-          Page3(),
+          Geoloc(),
           CameraScreen(widget.cameras),
           Page4(),
           Profile(),

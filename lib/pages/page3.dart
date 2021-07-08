@@ -3,70 +3,64 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
-class Page3 extends StatelessWidget {
+class Geoloc extends StatefulWidget {
+  @override
+  _GeolocState createState() => _GeolocState();
+}
+
+class _GeolocState extends State<Geoloc> {
+  String latitude = '';
+  String longitude = '';
+  String position = '';
+  var locationMessage = '';
+
+  //Function for getting the current location
+  // Before, we need the permission
+
+  void getCurrentLocation() async {
+    var position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    //get latitude and longitude
+    var lat = position.latitude;
+    var long = position.longitude;
+    //passing this to the lat/long variable (string)
+    longitude = "$long";
+    latitude = "$lat";
+  }
+
+  // France sud/Nord
+  void getFrancePosition() async {
+    getCurrentLocation();
+    int lati = int.parse(latitude.split(".")[0]);
+    int longi = int.parse(longitude.split(".")[0]);
+    print(lati);
+    print(longi);
+    if (lati <= 52 && lati >= 47) {
+      if (longi < 10 && longi >= 4)
+        position = 'Vous êtes dans le nord de la france';
+    }
+    if (lati < 47 && lati >= 42) {
+      if (longi <= 10 && longi >= 1)
+        position = 'Vous êtes dans le sud de la france';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<Position> position = getLocation();
-
+    // getCurrentLocation();
+    getFrancePosition();
     return new Center(
-      child: Text('Vous voulez la position?'),
-      //position == null ? print('') : Text('position : $position'),
-      // child: new RaisedButton(
-      //   onPressed: () async {
-      //     Position position = await Geolocator.getCurrentPosition(
-      //         desiredAccuracy: LocationAccuracy.high);
-      //     print('I write the position:');
-      //     print(position);
-      //   },
-      // ),
+      child: Column(
+        children: [
+          Text('Vous voulez la position?'),
+          Text(
+            "Voici la latitude: $latitude et la longitude: $longitude",
+            style: TextStyle(fontSize: 27),
+          ),
+          Text('Donc : $position'),
+        ],
+      ),
     );
   }
-
-  Future<Position> getLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    print('I write the position:');
-    print(position);
-    return position;
-  }
-
-  /*void getValuePosition() async {
-    final position = await getLocation();
-  }*/
-
-  /* Future<Position> _determinePosition() async {
-    bool serviceEnabled = false;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
-  }*/
 }
