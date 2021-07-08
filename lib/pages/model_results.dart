@@ -156,18 +156,18 @@ class _SegmentationState extends State<Segmentation> {
       outputType: 'png',
     );
 
-    var output = await Tflite.runSegmentationOnImage(
-      path: imagePath,
-      imageMean: 0.0,
-      imageStd: 255.0,
-      labelColors: pascalVOCLabelColors,
-      outputType: 'png',
-    );
+    // var output = await Tflite.runSegmentationOnImage(
+    //   path: imagePath,
+    //   imageMean: 0.0,
+    //   imageStd: 255.0,
+    //   labelColors: pascalVOCLabelColors,
+    //   outputType: 'png',
+    // );
 
     //var outimg = await decodeImageFromList(Uint8List.fromList(output));
     setState(() {
       _outputPNG = outputFixed;
-      _outputRAW = IMG.decodePng(output);
+      _outputRAW = IMG.decodePng(outputFixed);
       if (_outputRAW != null)
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
 
