@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:camera/camera.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +9,18 @@ import 'dart:io';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
+import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
   final bool isSamsung;
+  final List<CameraDescription> cameras;
 
   const DisplayPictureScreen(
-      {Key? key, required this.imagePath, required this.isSamsung})
+      {Key? key,
+      required this.imagePath,
+      required this.isSamsung,
+      required this.cameras})
       : super(key: key);
 
   @override
@@ -26,7 +32,11 @@ class DisplayPictureScreen extends StatelessWidget {
       ),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Segmentation(imagePath: this.imagePath, isSamsung: this.isSamsung),
+      body: Segmentation(
+        imagePath: this.imagePath,
+        isSamsung: this.isSamsung,
+        cameras: this.cameras,
+      ),
       //AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
   }
@@ -35,7 +45,11 @@ class DisplayPictureScreen extends StatelessWidget {
 class Segmentation extends StatefulWidget {
   final String imagePath;
   final bool isSamsung;
-  Segmentation({required this.imagePath, required this.isSamsung});
+  final List<CameraDescription> cameras;
+  Segmentation(
+      {required this.imagePath,
+      required this.isSamsung,
+      required this.cameras});
 
   @override
   _SegmentationState createState() => _SegmentationState();
@@ -257,6 +271,26 @@ class _SegmentationState extends State<Segmentation> {
                     return Container();
                   }
                 }).toList())),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.panorama_photosphere),
+                  label: Text('Get Volume Estimation'),
+                  onPressed: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => SecondPictureScreen(
+                          cameras: widget.cameras,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: new RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(50.0),
+                    ),
+                    primary: Theme.of(context).primaryColor,
+                  ),
+                ),
+                SizedBox(height: 25),
               ],
             ),
     );

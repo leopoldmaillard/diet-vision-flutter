@@ -111,13 +111,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_exif_rotation:
-    dependency: "direct main"
-    description:
-      name: flutter_exif_rotation
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.4.1"
   flutter_native_image:
     dependency: "direct main"
     description:
