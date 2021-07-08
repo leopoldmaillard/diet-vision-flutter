@@ -8,7 +8,6 @@ import 'dart:io';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
-import 'package:exif/exif.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;

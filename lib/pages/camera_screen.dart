@@ -5,7 +5,6 @@ import 'package:image/image.dart' as IMG;
 import 'dart:math';
 import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:exif/exif.dart';
 
 // class CameraScreen extends StatelessWidget {
 //   @override
