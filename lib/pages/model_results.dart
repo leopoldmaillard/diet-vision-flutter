@@ -128,27 +128,24 @@ class _SegmentationState extends State<Segmentation> {
   }
 
   segmentImage(String imagePath) async {
-    final originalFile = File(imagePath);
-    List<int> imageBytes = await originalFile.readAsBytes();
-
-    final originalImage = IMG.decodeImage(imageBytes);
-    final height = originalImage!.height;
-    final width = originalImage.width;
-    print("the height is : ");
-    print(height);
-    print("the height is : ");
-    print(width);
-    //final exifData = await readExifFromBytes(imageBytes);
-    IMG.Image fixedImage = IMG.copyRotate(originalImage, 0);
-    if (widget.isSamsung) {
-      fixedImage = IMG.copyRotate(originalImage, 90);
-    }
-
-    final fixedFile =
-        await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
+    var output;
     var outputFixed;
-
     if (widget.isSamsung) {
+      final originalFile = File(imagePath);
+      List<int> imageBytes = await originalFile.readAsBytes();
+
+      final originalImage = IMG.decodeImage(imageBytes);
+      final height = originalImage!.height;
+      final width = originalImage.width;
+      print("the height is : ");
+      print(height);
+      print("the height is : ");
+      print(width);
+      //final exifData = await readExifFromBytes(imageBytes);
+      IMG.Image fixedImage = IMG.copyRotate(originalImage, 90);
+      final fixedFile =
+          await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
+
       outputFixed = await Tflite.runSegmentationOnImage(
         path: fixedFile.path,
         imageMean: 0.0,
@@ -156,9 +153,7 @@ class _SegmentationState extends State<Segmentation> {
         labelColors: pascalVOCLabelColors,
         outputType: 'png',
       );
-    }
-    var output;
-    if (!widget.isSamsung) {
+    } else {
       output = await Tflite.runSegmentationOnImage(
         path: imagePath,
         imageMean: 0.0,
