@@ -20,6 +20,23 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:camera/camera.dart';
 
+/* Json Format variable for the drop down List button of beverage */
+List<Map> _myJson = [
+  {
+    "id": '1',
+    "image": "assets/images/beverage.png",
+    "name": "Select your drink"
+  },
+  {"id": '2', "image": "assets/images/coke.jpg", "name": "Coke"},
+  {"id": '3', "image": "assets/images/IcedTea.png", "name": "IcedTea"},
+  {"id": '4', "image": "assets/images/water.jpg", "name": "Water"},
+  {"id": '5', "image": "assets/images/beer.png", "name": "Beer"},
+  {"id": '6', "image": "assets/images/wine.png", "name": "Wine"},
+  {"id": '7', "image": "assets/images/whiskey.png", "name": "Whiskey"},
+  {"id": '8', "image": "assets/images/vodka.jpg", "name": "Vodka"},
+];
+String dropdownValue = "1";
+
 class CameraScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
 
@@ -138,6 +155,8 @@ class CameraScreenState extends State<CameraScreen> {
               primary: Theme.of(context).primaryColor,
             ),
           ),
+          // Drinks
+          Expanded(child: MyStatefulWidget()),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -189,6 +208,54 @@ class CameraScreenState extends State<CameraScreen> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+}
+
+/* Class for the Beverage Button, It's a child in the main page of camera */
+class MyStatefulWidget extends StatefulWidget {
+  const MyStatefulWidget({Key? key}) : super(key: key);
+
+  @override
+  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+}
+
+/* This is the private State class that goes with MyStatefulWidget. */
+class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: dropdownValue,
+      icon: const Icon(Icons.arrow_downward),
+      iconSize: 24,
+      elevation: 16,
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          dropdownValue = newValue!;
+        });
+      },
+      items: _myJson.map((Map map) {
+        return new DropdownMenuItem<String>(
+          value: map["id"].toString(),
+          // value: _mySelection,
+          child: Row(
+            children: <Widget>[
+              Image.asset(
+                map["image"],
+                width: 25,
+                height: 25,
+              ),
+              Container(
+                  margin: EdgeInsets.only(left: 10), child: Text(map["name"])),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }
