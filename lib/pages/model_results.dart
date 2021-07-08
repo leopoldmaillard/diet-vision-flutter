@@ -11,8 +11,10 @@ import 'package:quiver/iterables.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
+  final bool isSamsung;
 
-  const DisplayPictureScreen({Key? key, required this.imagePath})
+  const DisplayPictureScreen(
+      {Key? key, required this.imagePath, required this.isSamsung})
       : super(key: key);
 
   @override
@@ -24,7 +26,7 @@ class DisplayPictureScreen extends StatelessWidget {
       ),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Segmentation(imagePath: this.imagePath),
+      body: Segmentation(imagePath: this.imagePath, isSamsung: this.isSamsung),
       //AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
   }
@@ -32,7 +34,8 @@ class DisplayPictureScreen extends StatelessWidget {
 
 class Segmentation extends StatefulWidget {
   final String imagePath;
-  Segmentation({required this.imagePath});
+  final bool isSamsung;
+  Segmentation({required this.imagePath, required this.isSamsung});
 
   @override
   _SegmentationState createState() => _SegmentationState();
@@ -125,17 +128,46 @@ class _SegmentationState extends State<Segmentation> {
   }
 
   segmentImage(String imagePath) async {
-    var output = await Tflite.runSegmentationOnImage(
-      path: imagePath,
-      imageMean: 0.0,
-      imageStd: 255.0,
-      labelColors: pascalVOCLabelColors,
-      outputType: 'png',
-    );
+    var output;
+    var outputFixed;
+    if (widget.isSamsung) {
+      final originalFile = File(imagePath);
+      List<int> imageBytes = await originalFile.readAsBytes();
+
+      final originalImage = IMG.decodeImage(imageBytes);
+      final height = originalImage!.height;
+      final width = originalImage.width;
+
+      IMG.Image fixedImage = IMG.copyRotate(originalImage, 90);
+      final fixedFile =
+          await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
+
+      outputFixed = await Tflite.runSegmentationOnImage(
+        path: fixedFile.path,
+        imageMean: 0.0,
+        imageStd: 255.0,
+        labelColors: pascalVOCLabelColors,
+        outputType: 'png',
+      );
+    } else {
+      output = await Tflite.runSegmentationOnImage(
+        path: imagePath,
+        imageMean: 0.0,
+        imageStd: 255.0,
+        labelColors: pascalVOCLabelColors,
+        outputType: 'png',
+      );
+    }
+
     //var outimg = await decodeImageFromList(Uint8List.fromList(output));
     setState(() {
-      _outputPNG = output;
-      _outputRAW = IMG.decodePng(output);
+      if (widget.isSamsung) {
+        _outputPNG = outputFixed;
+        _outputRAW = IMG.decodePng(outputFixed);
+      } else {
+        _outputPNG = output;
+        _outputRAW = IMG.decodePng(output);
+      }
       if (_outputRAW != null)
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
 
@@ -166,6 +198,7 @@ class _SegmentationState extends State<Segmentation> {
 
     var categories = classes.values.toList();
 
+    print(size);
     return Container(
       child: _loading == true
           ? Center(
