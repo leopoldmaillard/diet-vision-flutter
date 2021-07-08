@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page2.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page3.dart';
-import 'package:transfer_learning_fruit_veggies/pages/page4.dart';
+import 'package:transfer_learning_fruit_veggies/pages/statistics.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page5.dart';
 
 class Home extends StatefulWidget {
@@ -71,7 +71,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           Page2(),
           Page3(),
           CameraScreen(widget.cameras),
-          Page4(),
+          Statistics(),
           Page5(),
         ],
       ),

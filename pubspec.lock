@@ -85,6 +85,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -92,6 +99,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
+  fl_chart:
+    dependency: "direct main"
+    description:
+      name: fl_chart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.36.2"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -123,6 +137,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  graphic:
+    dependency: "direct main"
+    description:
+      name: graphic
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   http:
     dependency: transitive
     description:
@@ -158,6 +179,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.1"
+  intl:
+    dependency: transitive
+    description:
+      name: intl
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.16.1"
   matcher:
     dependency: transitive
     description:
