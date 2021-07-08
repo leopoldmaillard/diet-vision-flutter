@@ -25,15 +25,16 @@ List<Map> _myJson = [
   {
     "id": '1',
     "image": "assets/images/beverage.png",
-    "name": "Select your drink"
+    "name": "Select your drink  "
   },
-  {"id": '2', "image": "assets/images/coke.jpg", "name": "Coke"},
-  {"id": '3', "image": "assets/images/IcedTea.png", "name": "IcedTea"},
-  {"id": '4', "image": "assets/images/water.jpg", "name": "Water"},
-  {"id": '5', "image": "assets/images/beer.png", "name": "Beer"},
-  {"id": '6', "image": "assets/images/wine.png", "name": "Wine"},
-  {"id": '7', "image": "assets/images/whiskey.png", "name": "Whiskey"},
-  {"id": '8', "image": "assets/images/vodka.jpg", "name": "Vodka"},
+  {"id": '2', "image": "assets/images/coke.png", "name": "Soda"},
+  {"id": '3', "image": "assets/images/IcedTea.png", "name": "Iced Tea"},
+  {"id": '4', "image": "assets/images/water.png", "name": "Water"},
+  {"id": '5', "image": "assets/images/juice.png", "name": "Juice"},
+  {"id": '6', "image": "assets/images/beer.png", "name": "Beer"},
+  {"id": '7', "image": "assets/images/wine.png", "name": "Wine"},
+  {"id": '8', "image": "assets/images/whiskey.png", "name": "Whiskey"},
+  {"id": '9', "image": "assets/images/hard.png", "name": "Cocktail"},
 ];
 String dropdownValue = "1";
 
@@ -156,7 +157,7 @@ class CameraScreenState extends State<CameraScreen> {
             ),
           ),
           // Drinks
-          Expanded(child: MyStatefulWidget()),
+          DrinksButton(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -213,26 +214,29 @@ class CameraScreenState extends State<CameraScreen> {
 }
 
 /* Class for the Beverage Button, It's a child in the main page of camera */
-class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({Key? key}) : super(key: key);
+class DrinksButton extends StatefulWidget {
+  const DrinksButton({Key? key}) : super(key: key);
 
   @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+  State<DrinksButton> createState() => _DrinksButtonState();
 }
 
 /* This is the private State class that goes with MyStatefulWidget. */
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+class _DrinksButtonState extends State<DrinksButton> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
       value: dropdownValue,
-      icon: const Icon(Icons.arrow_downward),
+      icon: Icon(
+        Icons.arrow_downward,
+        color: Theme.of(context).primaryColor,
+      ),
       iconSize: 24,
       elevation: 16,
-      style: const TextStyle(color: Colors.deepPurple),
+      style: TextStyle(color: Theme.of(context).primaryColor),
       underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
+        height: 0,
+        color: Theme.of(context).primaryColor,
       ),
       onChanged: (String? newValue) {
         setState(() {
