@@ -137,11 +137,7 @@ class _SegmentationState extends State<Segmentation> {
       final originalImage = IMG.decodeImage(imageBytes);
       final height = originalImage!.height;
       final width = originalImage.width;
-      print("the height is : ");
-      print(height);
-      print("the height is : ");
-      print(width);
-      //final exifData = await readExifFromBytes(imageBytes);
+
       IMG.Image fixedImage = IMG.copyRotate(originalImage, 90);
       final fixedFile =
           await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
@@ -167,10 +163,11 @@ class _SegmentationState extends State<Segmentation> {
     setState(() {
       if (widget.isSamsung) {
         _outputPNG = outputFixed;
+        _outputRAW = IMG.decodePng(outputFixed);
       } else {
         _outputPNG = output;
+        _outputRAW = IMG.decodePng(output);
       }
-      _outputRAW = IMG.decodePng(outputFixed);
       if (_outputRAW != null)
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
 
