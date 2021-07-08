@@ -8,11 +8,14 @@ import 'dart:io';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
+import 'package:exif/exif.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
+  final bool isSamsung;
 
-  const DisplayPictureScreen({Key? key, required this.imagePath})
+  const DisplayPictureScreen(
+      {Key? key, required this.imagePath, required this.isSamsung})
       : super(key: key);
 
   @override
@@ -24,7 +27,7 @@ class DisplayPictureScreen extends StatelessWidget {
       ),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Segmentation(imagePath: this.imagePath),
+      body: Segmentation(imagePath: this.imagePath, isSamsung: this.isSamsung),
       //AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
   }
@@ -32,7 +35,8 @@ class DisplayPictureScreen extends StatelessWidget {
 
 class Segmentation extends StatefulWidget {
   final String imagePath;
-  Segmentation({required this.imagePath});
+  final bool isSamsung;
+  Segmentation({required this.imagePath, required this.isSamsung});
 
   @override
   _SegmentationState createState() => _SegmentationState();
@@ -125,6 +129,33 @@ class _SegmentationState extends State<Segmentation> {
   }
 
   segmentImage(String imagePath) async {
+    final originalFile = File(imagePath);
+    List<int> imageBytes = await originalFile.readAsBytes();
+
+    final originalImage = IMG.decodeImage(imageBytes);
+    final height = originalImage!.height;
+    final width = originalImage.width;
+    print("the height is : ");
+    print(height);
+    print("the height is : ");
+    print(width);
+    //final exifData = await readExifFromBytes(imageBytes);
+    IMG.Image fixedImage = IMG.copyRotate(originalImage, 0);
+    if (widget.isSamsung) {
+      fixedImage = IMG.copyRotate(originalImage, 90);
+    }
+
+    final fixedFile =
+        await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
+
+    var outputFixed = await Tflite.runSegmentationOnImage(
+      path: fixedFile.path,
+      imageMean: 0.0,
+      imageStd: 255.0,
+      labelColors: pascalVOCLabelColors,
+      outputType: 'png',
+    );
+
     var output = await Tflite.runSegmentationOnImage(
       path: imagePath,
       imageMean: 0.0,
@@ -132,9 +163,10 @@ class _SegmentationState extends State<Segmentation> {
       labelColors: pascalVOCLabelColors,
       outputType: 'png',
     );
+
     //var outimg = await decodeImageFromList(Uint8List.fromList(output));
     setState(() {
-      _outputPNG = output;
+      _outputPNG = outputFixed;
       _outputRAW = IMG.decodePng(output);
       if (_outputRAW != null)
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
@@ -166,6 +198,7 @@ class _SegmentationState extends State<Segmentation> {
 
     var categories = classes.values.toList();
 
+    print(size);
     return Container(
       child: _loading == true
           ? Center(

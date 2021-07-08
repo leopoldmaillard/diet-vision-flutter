@@ -5,6 +5,7 @@ import 'package:image/image.dart' as IMG;
 import 'dart:math';
 import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:exif/exif.dart';
 
 // class CameraScreen extends StatelessWidget {
 //   @override
@@ -81,6 +82,7 @@ class CameraScreenState extends State<CameraScreen> {
           // Pass the automatically generated path to
           // the DisplayPictureScreen widget.
           imagePath: image.path,
+          isSamsung: false,
         ),
       ),
     );
@@ -93,7 +95,7 @@ class CameraScreenState extends State<CameraScreen> {
     }
 
     var size = MediaQuery.of(context).size.width;
-
+    bool isSamsung = false;
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -178,14 +180,58 @@ class CameraScreenState extends State<CameraScreen> {
                 await FlutterNativeImage.getImageProperties(image.path);
 
             int width = properties.width as int;
-            int heigth = properties.height as int;
-            var offset = (heigth - width).abs();
+            int height = properties.height as int;
+            var offset = (height - width).abs();
+
+            /******* Correction bug for mobile that force rotation of picture */
+            // final originalFile = File(image.path);
+            // List<int> imageBytes = await originalFile.readAsBytes();
+
+            // final originalImage = IMG.decodeImage(imageBytes);
+            // final Originalheight = originalImage!.height;
+            // final Originalwidth = originalImage.width;
+
+            // final exifData = await readExifFromBytes(imageBytes);
+
+            // IMG.Image fixedImage = IMG.copyRotate(originalImage, 45);
+
+            // if (height < width) {
+            //   print("height : ");
+            //   print(height);
+            //   print("width : ");
+            //   print(width);
+
+            //   // rotate
+            //   if (exifData['Image Orientation']!
+            //       .printable
+            //       .contains('Horizontal')) {
+            //     print("000000000000000");
+            //     fixedImage = IMG.copyRotate(originalImage, 90);
+            //   } else if (exifData['Image Orientation']!
+            //       .printable
+            //       .contains('180')) {
+            //     print("1111111111111111");
+            //     fixedImage = IMG.copyRotate(originalImage, -90);
+            //   } else if (exifData['Image Orientation']!
+            //       .printable
+            //       .contains('CCW')) {
+            //     print("2222222222222");
+            //     fixedImage = IMG.copyRotate(originalImage, 180);
+            //   } else {
+            //     print("3333333333333333");
+            //     fixedImage = IMG.copyRotate(originalImage, 0);
+            //   }
+            // }
+            // final fixedFile =
+            //     await originalFile.writeAsBytes(IMG.encodeJpg(fixedImage));
+            /********************************************************** */
 
             File croppedFile;
 
-            if (width > heigth) {
+            if (width > height) {
               croppedFile = await FlutterNativeImage.cropImage(
-                  image.path, (offset / 2).round(), 0, heigth, heigth);
+                  image.path, (offset / 2).round(), 0, height, height);
+              isSamsung = true;
             } else {
               croppedFile = await FlutterNativeImage.cropImage(
                   image.path, 0, (offset / 2).round(), width, width);
@@ -198,6 +244,7 @@ class CameraScreenState extends State<CameraScreen> {
                   // Pass the automatically generated path to
                   // the DisplayPictureScreen widget.
                   imagePath: croppedFile.path,
+                  isSamsung: isSamsung,
                 ),
               ),
             );
