@@ -103,8 +103,8 @@ class _SegmentationState extends State<Segmentation> {
   };
 
   bool _loading = true;
-  var _outputPNG;
-  var _outputRAW;
+  var _outputPNG; // Mask
+  var _outputRAW; // classic picture taken
   Map output_classes = Map();
 
   @override
@@ -135,10 +135,11 @@ class _SegmentationState extends State<Segmentation> {
       List<int> imageBytes = await originalFile.readAsBytes();
 
       final originalImage = IMG.decodeImage(imageBytes);
-      final height = originalImage!.height;
+      final height = originalImage!.height; // if we delete this we have errors
       final width = originalImage.width;
 
-      IMG.Image fixedImage = IMG.copyRotate(originalImage, 90);
+      IMG.Image fixedImage =
+          IMG.copyRotate(originalImage, 90); // turn 90° the image for samsung
       final fixedFile =
           await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
 
@@ -151,6 +152,7 @@ class _SegmentationState extends State<Segmentation> {
       );
     } else {
       output = await Tflite.runSegmentationOnImage(
+        // Segmentation for regular Mobile Phone
         path: imagePath,
         imageMean: 0.0,
         imageStd: 255.0,
@@ -159,7 +161,6 @@ class _SegmentationState extends State<Segmentation> {
       );
     }
 
-    //var outimg = await decodeImageFromList(Uint8List.fromList(output));
     setState(() {
       if (widget.isSamsung) {
         _outputPNG = outputFixed;
@@ -171,20 +172,23 @@ class _SegmentationState extends State<Segmentation> {
       if (_outputRAW != null)
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
 
+      /* separate each pixel in the format of 4 value rgb+jesaispluquoi */
       Iterable<List<int>> pixels = partition(_outputRAW, 4);
-      var keys = classes.keys.toList();
-      var values = classes.values.toList();
+      var keys = classes.keys.toList(); //pixels
+      var values = classes.values.toList(); //name of classes
 
-      pixels.forEach((element) {
-        String e = element.toString();
-        var i = keys.indexOf(e);
-        var c = values[i];
-        if (!output_classes.containsKey(c)) {
-          output_classes[c] = 1;
-        } else {
-          output_classes[c] += 1;
-        }
-      });
+      pixels.forEach(
+        (element) {
+          String e = element.toString();
+          var i = keys.indexOf(e); // return idx of e in keys, -1 else
+          var c = values[i];
+          if (!output_classes.containsKey(c)) {
+            output_classes[c] = 1;
+          } else {
+            output_classes[c] += 1; // increment the nb of pixel of the class
+          }
+        },
+      );
       _loading = false;
     });
   }
@@ -231,32 +235,44 @@ class _SegmentationState extends State<Segmentation> {
                   ),
                 ),
                 Expanded(
-                    child: ListView(
-                        children: output_classes.entries.map((e) {
-                  int percent = ((e.value / outputSize) * 100).round();
-                  if (percent >= 1) {
-                    int surface =
-                        (e.value * surface2euros / coinPixels / 100).round();
-                    int index = categories.indexOf(e.key);
-                    int color = pascalVOCLabelColors[index];
-                    print(color);
-                    return ActionChip(
-                        onPressed: () {},
-                        avatar: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Text(percent.toString() + "%",
-                              style:
-                                  TextStyle(color: Color(color), fontSize: 10)),
-                        ),
-                        backgroundColor: Color(color),
-                        label: Text(
-                          e.key + '   ' + surface.toString() + 'cm²',
-                          style: const TextStyle(color: Colors.white),
-                        ));
-                  } else {
-                    return Container();
-                  }
-                }).toList())),
+                  child: ListView(
+                    children: output_classes.entries.map(
+                      (e) {
+                        int percent = ((e.value / outputSize) * 100).round();
+                        if (percent >= 1) {
+                          /**
+                     * e.value  | coinPixels
+                     * e Surface| Coin Surface (2euros)
+                     */
+                          int surface =
+                              (e.value * surface2euros / coinPixels / 100)
+                                  .round();
+                          int index = categories.indexOf(e.key);
+                          int color = pascalVOCLabelColors[index];
+                          print(color);
+                          return ActionChip(
+                            onPressed: () {},
+                            avatar: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              child: Text(
+                                percent.toString() + "%",
+                                style: TextStyle(
+                                    color: Color(color), fontSize: 10),
+                              ),
+                            ),
+                            backgroundColor: Color(color),
+                            label: Text(
+                              e.key + '   ' + surface.toString() + 'cm²',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ).toList(),
+                  ),
+                ),
               ],
             ),
     );
