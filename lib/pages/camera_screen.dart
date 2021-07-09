@@ -86,6 +86,7 @@ class CameraScreenState extends State<CameraScreen> {
           isSamsung: false,
           cameras: cameras,
           volume: false,
+          surfaces: new Map(),
         ),
       ),
     );
@@ -207,6 +208,7 @@ class CameraScreenState extends State<CameraScreen> {
                   isSamsung: isSamsung,
                   cameras: cameras,
                   volume: false,
+                  surfaces: new Map(),
                 ),
               ),
             );

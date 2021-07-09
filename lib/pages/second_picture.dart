@@ -9,7 +9,12 @@ import 'package:camera/camera.dart';
 
 class SecondPictureScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
-  SecondPictureScreen({required this.cameras});
+  final Map surfaces;
+
+  SecondPictureScreen({
+    required this.cameras,
+    required this.surfaces,
+  });
 
   @override
   _SecondPictureScreenState createState() => _SecondPictureScreenState();
@@ -147,6 +152,7 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   isSamsung: isSamsung,
                   cameras: widget.cameras,
                   volume: true,
+                  surfaces: widget.surfaces,
                 ),
               ),
             );

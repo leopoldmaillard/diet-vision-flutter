@@ -16,14 +16,16 @@ class DisplayPictureScreen extends StatelessWidget {
   final bool isSamsung;
   final List<CameraDescription> cameras;
   final bool volume;
+  final Map surfaces;
 
-  const DisplayPictureScreen(
-      {Key? key,
-      required this.imagePath,
-      required this.isSamsung,
-      required this.cameras,
-      required this.volume})
-      : super(key: key);
+  const DisplayPictureScreen({
+    Key? key,
+    required this.imagePath,
+    required this.isSamsung,
+    required this.cameras,
+    required this.volume,
+    required this.surfaces,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class DisplayPictureScreen extends StatelessWidget {
         isSamsung: this.isSamsung,
         cameras: this.cameras,
         volume: this.volume,
+        surfaces: this.surfaces,
       ),
       //AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
@@ -50,11 +53,13 @@ class Segmentation extends StatefulWidget {
   final bool isSamsung;
   final List<CameraDescription> cameras;
   final bool volume;
+  final Map surfaces;
   Segmentation({
     required this.imagePath,
     required this.isSamsung,
     required this.cameras,
     required this.volume,
+    required this.surfaces,
   });
 
   @override
@@ -219,8 +224,8 @@ class _SegmentationState extends State<Segmentation> {
     const double surface2euros = pi * 12.875 * 12.875; // 521 mm2
 
     var categories = classes.values.toList();
+    Map surfaceSaved = Map();
 
-    print(size);
     return Container(
       child: _loading == true
           ? Center(
@@ -253,32 +258,56 @@ class _SegmentationState extends State<Segmentation> {
                   ),
                 ),
                 Expanded(
-                    child: ListView(
-                        children: output_classes.entries.map((e) {
-                  int percent = ((e.value / outputSize) * 100).round();
-                  if (percent >= 1) {
-                    int surface =
-                        (e.value * surface2euros / coinPixels / 100).round();
-                    int index = categories.indexOf(e.key);
-                    int color = pascalVOCLabelColors[index];
-                    print(color);
-                    return ActionChip(
-                        onPressed: () {},
-                        avatar: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: Text(percent.toString() + "%",
-                              style:
-                                  TextStyle(color: Color(color), fontSize: 10)),
-                        ),
-                        backgroundColor: Color(color),
-                        label: Text(
-                          e.key + '   ' + surface.toString() + 'cm²',
-                          style: const TextStyle(color: Colors.white),
-                        ));
-                  } else {
-                    return Container();
-                  }
-                }).toList())),
+                  child: !widget.volume
+                      ? ListView(
+                          children: output_classes.entries.map((e) {
+                          int percent = ((e.value / outputSize) * 100).round();
+                          if (percent >= 1) {
+                            int surface =
+                                (e.value * surface2euros / coinPixels / 100)
+                                    .round();
+                            int index = categories.indexOf(e.key);
+                            int color = pascalVOCLabelColors[index];
+                            surfaceSaved[e.key] = surface;
+                            return ActionChip(
+                                onPressed: () {},
+                                avatar: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  child: Text(percent.toString() + "%",
+                                      style: TextStyle(
+                                          color: Color(color), fontSize: 10)),
+                                ),
+                                backgroundColor: Color(color),
+                                label: Text(
+                                  e.key + '   ' + surface.toString() + 'cm²',
+                                  style: const TextStyle(color: Colors.white),
+                                ));
+                          } else {
+                            return Container();
+                          }
+                        }).toList())
+
+                      // If we display the volume
+                      : ListView(
+                          children: widget.surfaces.entries.map((e) {
+                          int topSurface = e.value;
+                          int angleSurface = (output_classes.values.toList()[
+                                      output_classes.keys
+                                          .toList()
+                                          .indexOf(e.key)] *
+                                  surface2euros /
+                                  coinPixels /
+                                  100)
+                              .round();
+                          return ActionChip(
+                            onPressed: () {},
+                            label: Text('Top surface : ' +
+                                topSurface.toString() +
+                                ', Angle surface : ' +
+                                angleSurface.toString()),
+                          );
+                        }).toList()),
+                ),
                 !widget.volume
                     ? ElevatedButton.icon(
                         icon: Icon(Icons.panorama_photosphere),
@@ -288,6 +317,7 @@ class _SegmentationState extends State<Segmentation> {
                             MaterialPageRoute(
                               builder: (context) => SecondPictureScreen(
                                 cameras: widget.cameras,
+                                surfaces: surfaceSaved,
                               ),
                             ),
                           );
