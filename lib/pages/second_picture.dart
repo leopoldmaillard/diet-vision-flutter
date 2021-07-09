@@ -146,6 +146,7 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   imagePath: croppedFile.path,
                   isSamsung: isSamsung,
                   cameras: widget.cameras,
+                  volume: true,
                 ),
               ),
             );

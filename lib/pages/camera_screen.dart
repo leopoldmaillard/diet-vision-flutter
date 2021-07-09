@@ -85,6 +85,7 @@ class CameraScreenState extends State<CameraScreen> {
           imagePath: image.path,
           isSamsung: false,
           cameras: cameras,
+          volume: false,
         ),
       ),
     );
@@ -205,6 +206,7 @@ class CameraScreenState extends State<CameraScreen> {
                   imagePath: croppedFile.path,
                   isSamsung: isSamsung,
                   cameras: cameras,
+                  volume: false,
                 ),
               ),
             );

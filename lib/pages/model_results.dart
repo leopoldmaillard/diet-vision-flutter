@@ -15,12 +15,14 @@ class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
   final bool isSamsung;
   final List<CameraDescription> cameras;
+  final bool volume;
 
   const DisplayPictureScreen(
       {Key? key,
       required this.imagePath,
       required this.isSamsung,
-      required this.cameras})
+      required this.cameras,
+      required this.volume})
       : super(key: key);
 
   @override
@@ -36,6 +38,7 @@ class DisplayPictureScreen extends StatelessWidget {
         imagePath: this.imagePath,
         isSamsung: this.isSamsung,
         cameras: this.cameras,
+        volume: this.volume,
       ),
       //AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
@@ -46,10 +49,13 @@ class Segmentation extends StatefulWidget {
   final String imagePath;
   final bool isSamsung;
   final List<CameraDescription> cameras;
-  Segmentation(
-      {required this.imagePath,
-      required this.isSamsung,
-      required this.cameras});
+  final bool volume;
+  Segmentation({
+    required this.imagePath,
+    required this.isSamsung,
+    required this.cameras,
+    required this.volume,
+  });
 
   @override
   _SegmentationState createState() => _SegmentationState();
@@ -207,7 +213,9 @@ class _SegmentationState extends State<Segmentation> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
     int outputSize = 513 * 513;
-    double coinPixels = pi * (513 / 16) * (513 / 16); // 3230 pixels
+    double coinPixels = widget.volume
+        ? pi * (513 / 16) * sin(pi / 4) * (513 / 16)
+        : pi * (513 / 16) * (513 / 16); // 3230 pixels
     const double surface2euros = pi * 12.875 * 12.875; // 521 mm2
 
     var categories = classes.values.toList();
@@ -271,25 +279,27 @@ class _SegmentationState extends State<Segmentation> {
                     return Container();
                   }
                 }).toList())),
-                ElevatedButton.icon(
-                  icon: Icon(Icons.panorama_photosphere),
-                  label: Text('Get Volume Estimation'),
-                  onPressed: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => SecondPictureScreen(
-                          cameras: widget.cameras,
+                !widget.volume
+                    ? ElevatedButton.icon(
+                        icon: Icon(Icons.panorama_photosphere),
+                        label: Text('Get Volume Estimation'),
+                        onPressed: () async {
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => SecondPictureScreen(
+                                cameras: widget.cameras,
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(50.0),
+                          ),
+                          primary: Theme.of(context).primaryColor,
                         ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: new RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(50.0),
-                    ),
-                    primary: Theme.of(context).primaryColor,
-                  ),
-                ),
+                      )
+                    : Container(),
                 SizedBox(height: 25),
               ],
             ),
