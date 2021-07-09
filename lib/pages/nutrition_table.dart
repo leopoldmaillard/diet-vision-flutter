@@ -83,27 +83,27 @@ List<Map> foodNutritionJson = [
   {
     "id": '6',
     "name": "Protein | Meat",
-    "cal": "53000",
-    "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
-  }, // boeuf
+    "cal": "231000",
+    "nutriscore": "D",
+    "glucide": "0.24",
+    "eq": "165.19"
+  }, // viande boeuf haché
   {
     "id": '7',
     "name": "Protein | Poultry",
-    "cal": "53000",
-    "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
-  },
+    "cal": "188000",
+    "nutriscore": "C",
+    "glucide": "0.7",
+    "eq": "46.5"
+  }, //viande poulet haché
   {
     "id": '8',
     "name": "Protein | Seafood",
-    "cal": "53000",
-    "nutriscore": "A",
-    "glucide": "11.40",
+    "cal": "136000",
+    "nutriscore": "B",
+    "glucide": "0.1",
     "eq": "215"
-  },
+  }, // thon en boite
   {
     "id": '9',
     "name": "Protein | Eggs",
