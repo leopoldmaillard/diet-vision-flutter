@@ -10,6 +10,7 @@ import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
+import 'package:transfer_learning_fruit_veggies/pages/arkit_screen.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
@@ -315,10 +316,7 @@ class _SegmentationState extends State<Segmentation> {
                         onPressed: () async {
                           await Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => SecondPictureScreen(
-                                cameras: widget.cameras,
-                                surfaces: surfaceSaved,
-                              ),
+                              builder: (context) => DistanceTrackingPage(),
                             ),
                           );
                         },
