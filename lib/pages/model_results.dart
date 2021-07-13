@@ -132,6 +132,9 @@ class _SegmentationState extends State<Segmentation> {
   var _outputRAW;
   Map output_classes = Map();
 
+  List<List<List<int>>> output_classes_Volume = [];
+  Map output_classes_height = Map();
+
   @override
   void initState() {
     super.initState();
@@ -200,28 +203,90 @@ class _SegmentationState extends State<Segmentation> {
       var keys = classes.keys.toList();
       var values = classes.values.toList();
 
-      pixels.forEach((element) {
-        String e = element.toString();
-        var i = keys.indexOf(e);
-        var c = values[i];
-        if (!output_classes.containsKey(c)) {
-          output_classes[c] = 1;
-        } else {
-          output_classes[c] += 1;
+      if (!widget.volume) {
+        pixels.forEach((element) {
+          String e = element.toString();
+          var i = keys.indexOf(e);
+          var c = values[i];
+          if (!output_classes.containsKey(c)) {
+            output_classes[c] = 1;
+          } else {
+            output_classes[c] += 1;
+          }
+        });
+      } else {
+        for (int k = 0; k < classes.length; k++) {
+          output_classes_Volume.add([]);
         }
-      });
+        int forEachCount = 0;
+        pixels.forEach(
+          (element) {
+            //surface
+            String e = element.toString();
+            var i = keys.indexOf(e);
+            var c = values[i];
+            if (!output_classes.containsKey(c)) {
+              output_classes[c] = 1;
+            } else {
+              output_classes[c] += 1;
+            }
+            //concatene la list [jsaipaskwa, r,g,b] et [i,j]
+            output_classes_Volume[i].add(
+                element + [(forEachCount / 513).round(), forEachCount % 513]);
+            forEachCount++;
+          },
+        );
+        List<int> elemHeight = [];
+        for (int l = 0; l < 26; l++) {
+          if (output_classes_Volume[l].length != 0) {
+            elemHeight = elemHeight + //du premier pixel de la classe d'indice l
+                [output_classes_Volume[l][0][0]] + //transparence
+                [output_classes_Volume[l][0][1]] + //r
+                [output_classes_Volume[l][0][2]] + //g
+                [output_classes_Volume[l][0][3]]; //b
+            String e = elemHeight.toString(); //[t,r,g,b] en string
+            var i = keys.indexOf(e);
+            var c = values[i];
+
+            output_classes_height[c] =
+                getAvgHeightOneClass(output_classes_Volume[l]);
+            elemHeight = [];
+          }
+        }
+      }
       _loading = false;
     });
+  }
+
+  int getAvgHeightOneClass(List<List<int>> typeOfClassPixels) {
+    if (typeOfClassPixels.length == 0) {
+      return 0;
+    }
+    print("class in the avg function");
+    print(typeOfClassPixels[0]);
+    List<int> listX = []; // correspond aux i cad lignes
+    List<int> listY = []; // correspond aux j cad colonnes
+    for (int k = 0; k < typeOfClassPixels.length; k++) {
+      listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
+      listY.add(typeOfClassPixels[k][5]); //[t,r,g,b,i,j] donc j
+    }
+    listX.sort();
+    listY.sort();
+    int firstEtimationX = (listX.last - listX.first).round();
+    int firstEtimationY = (listY.last - listY.first).round();
+    //         listOfVerticalThickness
+    // .add(coordXForOneColomn.last - coordXForOneColomn.first);
+    return firstEtimationX;
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
     int outputSize = 513 * 513;
-    double coinPixels = widget.volume
-        ? pi * (513 / 16) * sin(pi / 4) * (513 / 16)
-        : pi * (513 / 16) * (513 / 16); // 3230 pixels
+    double coinPixels = pi * (513 / 16) * (513 / 16); // 3230 pixels
     const double surface2euros = pi * 12.875 * 12.875; // 521 mm2
+    double coinDiameterPixels = (513 / 16) * 2;
+    double coinDiameterIRLCM = 1.2875 * 2;
 
     var categories = classes.values.toList();
     Map surfaceSaved = Map();
@@ -289,24 +354,26 @@ class _SegmentationState extends State<Segmentation> {
 
                       // If we display the volume
                       : ListView(
-                          children: widget.surfaces.entries.map((e) {
-                          int topSurface = e.value;
-                          int angleSurface = (output_classes.values.toList()[
-                                      output_classes.keys
-                                          .toList()
-                                          .indexOf(e.key)] *
-                                  surface2euros /
-                                  coinPixels /
-                                  100)
-                              .round();
-                          return ActionChip(
-                            onPressed: () {},
-                            label: Text('Top surface : ' +
-                                topSurface.toString() +
-                                ', Angle surface : ' +
-                                angleSurface.toString()),
-                          );
-                        }).toList()),
+                          children: output_classes_height.entries.map(
+                            (e) {
+                              int thickness = (e.value *
+                                      coinDiameterIRLCM /
+                                      coinDiameterPixels)
+                                  .round();
+                              int index = categories.indexOf(e.key);
+                              int color = pascalVOCLabelColors[index];
+                              print(color);
+                              return ActionChip(
+                                onPressed: () {},
+                                backgroundColor: Color(color),
+                                label: Text(
+                                  e.key + '   ' + thickness.toString() + 'cm',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              );
+                            },
+                          ).toList(),
+                        ),
                 ),
                 !widget.volume
                     ? ElevatedButton.icon(
