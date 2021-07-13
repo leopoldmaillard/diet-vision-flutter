@@ -316,7 +316,7 @@ class _SegmentationState extends State<Segmentation> {
                         onPressed: () async {
                           await Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => DistanceTrackingPage(),
+                              builder: (context) => MeasurePage(),
                             ),
                           );
                         },
