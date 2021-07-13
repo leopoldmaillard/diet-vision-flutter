@@ -214,8 +214,10 @@ class _SegmentationState extends State<Segmentation> {
             output_classes[c] += 1;
           }
         });
+
+        // WE COMPUTE THE THICKNESS HERE
       } else {
-        for (int k = 0; k < classes.length; k++) {
+        for (int k = 0; k < widget.surfaces.length; k++) {
           output_classes_Volume.add([]);
         }
         int forEachCount = 0;
@@ -225,19 +227,23 @@ class _SegmentationState extends State<Segmentation> {
             String e = element.toString();
             var i = keys.indexOf(e);
             var c = values[i];
-            if (!output_classes.containsKey(c)) {
-              output_classes[c] = 1;
-            } else {
-              output_classes[c] += 1;
+            if (widget.surfaces.containsKey(c)) {
+              i = widget.surfaces.keys.toList().indexOf(c);
+              if (!output_classes.containsKey(c)) {
+                output_classes[c] = 1;
+              } else {
+                output_classes[c] += 1;
+              }
+
+              //concatene list [jsaipaskwa, r,g,b] et [i,j]
+              output_classes_Volume[i].add(
+                  element + [(forEachCount / 513).round(), forEachCount % 513]);
+              forEachCount++;
             }
-            //concatene la list [jsaipaskwa, r,g,b] et [i,j]
-            output_classes_Volume[i].add(
-                element + [(forEachCount / 513).round(), forEachCount % 513]);
-            forEachCount++;
           },
         );
         List<int> elemHeight = [];
-        for (int l = 0; l < 26; l++) {
+        for (int l = 0; l < widget.surfaces.length; l++) {
           if (output_classes_Volume[l].length != 0) {
             elemHeight = elemHeight + //du premier pixel de la classe d'indice l
                 [output_classes_Volume[l][0][0]] + //transparence
@@ -274,8 +280,7 @@ class _SegmentationState extends State<Segmentation> {
     listY.sort();
     int firstEtimationX = (listX.last - listX.first).round();
     int firstEtimationY = (listY.last - listY.first).round();
-    //         listOfVerticalThickness
-    // .add(coordXForOneColomn.last - coordXForOneColomn.first);
+
     return firstEtimationX;
   }
 
@@ -362,12 +367,22 @@ class _SegmentationState extends State<Segmentation> {
                                   .round();
                               int index = categories.indexOf(e.key);
                               int color = pascalVOCLabelColors[index];
-                              print(color);
+
+                              int item =
+                                  widget.surfaces.keys.toList().indexOf(e.key);
+                              int surf = widget.surfaces.values.toList()[item];
+                              int volume = thickness * surf;
+
                               return ActionChip(
                                 onPressed: () {},
                                 backgroundColor: Color(color),
                                 label: Text(
-                                  e.key + '   ' + thickness.toString() + 'cm',
+                                  e.key +
+                                      '   ' +
+                                      thickness.toString() +
+                                      'cm | Vol. ' +
+                                      volume.toString() +
+                                      'cm³',
                                   style: const TextStyle(color: Colors.white),
                                 ),
                               );
