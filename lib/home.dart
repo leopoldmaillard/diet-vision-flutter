@@ -3,6 +3,7 @@ import 'package:flutter_point_tab_bar/pointTabIndicator.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
+import 'package:transfer_learning_fruit_veggies/pages/measurment.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page2.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page3.dart';
 import 'package:transfer_learning_fruit_veggies/pages/statistics.dart';
@@ -68,7 +69,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         children: <Widget>[
           /* Navigation au sein de l'appli*/
           //CameraScreen(),
-          Page2(),
+          MeasurementScreen(),
           Page3(),
           CameraScreen(widget.cameras),
           Statistics(),
