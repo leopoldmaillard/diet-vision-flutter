@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -134,6 +135,7 @@ class _SegmentationState extends State<Segmentation> {
 
   List<List<List<int>>> output_classes_Volume = [];
   Map output_classes_height = Map();
+  List<List<int>> minMax = [];
 
   @override
   void initState() {
@@ -268,20 +270,30 @@ class _SegmentationState extends State<Segmentation> {
     if (typeOfClassPixels.length == 0) {
       return 0;
     }
-    print("class in the avg function");
-    print(typeOfClassPixels[0]);
+
     List<int> listX = []; // correspond aux i cad lignes
     List<int> listY = []; // correspond aux j cad colonnes
     for (int k = 0; k < typeOfClassPixels.length; k++) {
       listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
       listY.add(typeOfClassPixels[k][5]); //[t,r,g,b,i,j] donc j
     }
-    listX.sort();
-    listY.sort();
-    int firstEtimationX = (listX.last - listX.first).round();
-    int firstEtimationY = (listY.last - listY.first).round();
+    int xmin = listX.reduce(math.min);
+    int idxmin = listX.indexOf(xmin);
+    int ymin = listY[idxmin];
 
-    return firstEtimationX;
+    int xmax = listX.reduce(math.max);
+    int idxmax = listX.indexOf(xmax);
+    int ymax = ymin;
+
+    //listX.sort();
+    //listY.sort();
+    //int firstEtimationX = (listX.last - listX.first).round();
+    //int firstEtimationY = (listY.last - listY.first).round();
+
+    minMax.add([xmin, ymin, xmax, ymax]);
+    print(minMax);
+
+    return (xmax - xmin).round();
   }
 
   @override
@@ -311,21 +323,49 @@ class _SegmentationState extends State<Segmentation> {
             )
           : Column(
               children: [
-                Container(
-                  height: size,
-                  width: size,
-                  child: Opacity(
-                      opacity: 0.3,
-                      child: Image.file(
-                        File(widget.imagePath),
-                        fit: BoxFit.fill,
-                      )),
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: MemoryImage(_outputPNG),
-                      fit: BoxFit.fill,
+                Stack(
+                  children: [
+                    Container(
+                      height: size,
+                      width: size,
+                      child: Opacity(
+                          opacity: 0.3,
+                          child: Image.file(
+                            File(widget.imagePath),
+                            fit: BoxFit.fill,
+                          )),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: MemoryImage(_outputPNG),
+                          fit: BoxFit.fill,
+                        ),
+                      ),
                     ),
-                  ),
+                    widget.volume
+                        ? Positioned(
+                            top: minMax[2][0] / 513 * size - 5,
+                            left: minMax[2][1] / 513 * size - 5,
+                            child: Container(
+                              height: 10,
+                              width: 10,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle, color: Colors.red),
+                            ),
+                          )
+                        : Container(),
+                    widget.volume
+                        ? Positioned(
+                            top: minMax[2][2] / 513 * size - 5,
+                            left: minMax[2][3] / 513 * size - 5,
+                            child: Container(
+                              height: 10,
+                              width: 10,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle, color: Colors.red),
+                            ),
+                          )
+                        : Container(),
+                  ],
                 ),
                 Expanded(
                   child: !widget.volume
