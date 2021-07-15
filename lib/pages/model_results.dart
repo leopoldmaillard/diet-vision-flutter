@@ -446,6 +446,18 @@ class _SegmentationState extends State<Segmentation> {
                           ).toList(),
                         ),
                 ),
+                widget.volume
+                    ? Slider(
+                        value: minMax[2][0].toDouble(),
+                        min: 0,
+                        max: 513,
+                        onChanged: (double value) {
+                          setState(() {
+                            minMax[2][0] = value.toInt();
+                          });
+                        },
+                      )
+                    : Container(),
                 !widget.volume
                     ? ElevatedButton.icon(
                         icon: Icon(Icons.panorama_photosphere),
