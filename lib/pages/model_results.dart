@@ -296,6 +296,39 @@ class _SegmentationState extends State<Segmentation> {
     return (xmax - xmin).round();
   }
 
+  // This widget return a stack of all the min and max  point of each class
+  Widget thickness() {
+    var size = MediaQuery.of(context).size.width;
+    final points = <Widget>[];
+    minMax.forEach((element) {
+      // random color to distinguish classes
+      Color col = Colors.primaries[Random().nextInt(Colors.primaries.length)];
+      points.add(
+        Positioned(
+          top: element[0] / 513 * size - 5,
+          left: element[1] / 513 * size - 5,
+          child: Container(
+            height: 10,
+            width: 10,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: col),
+          ),
+        ),
+      );
+      points.add(
+        Positioned(
+          top: element[2] / 513 * size - 5,
+          left: element[3] / 513 * size - 5,
+          child: Container(
+            height: 10,
+            width: 10,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: col),
+          ),
+        ),
+      );
+    });
+    return Stack(children: points);
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
@@ -342,27 +375,10 @@ class _SegmentationState extends State<Segmentation> {
                       ),
                     ),
                     widget.volume
-                        ? Positioned(
-                            top: minMax[2][0] / 513 * size - 5,
-                            left: minMax[2][1] / 513 * size - 5,
-                            child: Container(
-                              height: 10,
-                              width: 10,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle, color: Colors.red),
-                            ),
-                          )
-                        : Container(),
-                    widget.volume
-                        ? Positioned(
-                            top: minMax[2][2] / 513 * size - 5,
-                            left: minMax[2][3] / 513 * size - 5,
-                            child: Container(
-                              height: 10,
-                              width: 10,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle, color: Colors.red),
-                            ),
+                        ? Container(
+                            height: size,
+                            width: size,
+                            child: thickness(),
                           )
                         : Container(),
                   ],
