@@ -11,6 +11,7 @@ import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
+import 'package:flutter_dash/flutter_dash.dart';
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
@@ -296,39 +297,6 @@ class _SegmentationState extends State<Segmentation> {
     return (xmax - xmin).round();
   }
 
-  // This widget return a stack of all the min and max  point of each class
-  Widget thickness() {
-    var size = MediaQuery.of(context).size.width;
-    final points = <Widget>[];
-    minMax.forEach((element) {
-      // random color to distinguish classes
-      Color col = Colors.primaries[Random().nextInt(Colors.primaries.length)];
-      points.add(
-        Positioned(
-          top: element[0] / 513 * size - 5,
-          left: element[1] / 513 * size - 5,
-          child: Container(
-            height: 10,
-            width: 10,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: col),
-          ),
-        ),
-      );
-      points.add(
-        Positioned(
-          top: element[2] / 513 * size - 5,
-          left: element[3] / 513 * size - 5,
-          child: Container(
-            height: 10,
-            width: 10,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: col),
-          ),
-        ),
-      );
-    });
-    return Stack(children: points);
-  }
-
   Widget thick(int selectedClass) {
     var size = MediaQuery.of(context).size.width;
     final points = <Widget>[];
@@ -354,6 +322,21 @@ class _SegmentationState extends State<Segmentation> {
           width: 10,
           decoration: BoxDecoration(
               shape: BoxShape.circle, color: Theme.of(context).primaryColor),
+        ),
+      ),
+    );
+    points.add(
+      Positioned(
+        top: minMax[selectedClass][0] / 513 * size + 5,
+        left: minMax[selectedClass][1] / 513 * size,
+        child: Dash(
+          direction: Axis.vertical,
+          length: (minMax[selectedClass][2] / 513 * size - 10) -
+              (minMax[selectedClass][0] / 513 * size),
+          dashColor: Theme.of(context).primaryColor,
+          dashLength: 4,
+          dashBorderRadius: 8,
+          dashGap: 5,
         ),
       ),
     );
