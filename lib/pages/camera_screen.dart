@@ -127,16 +127,11 @@ class CameraScreenState extends State<CameraScreen> {
               ),
               Align(
                 child: Container(
-                  width: size / 7.5,
-                  height: size / 7.5,
-                  alignment: Alignment.topLeft,
-                  child: Container(
-                    width: size / 8,
-                    height: size / 8,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(context).primaryColor.withOpacity(0.4),
-                    ),
+                  width: size / 8,
+                  height: size / 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).primaryColor.withOpacity(0.4),
                   ),
                 ),
               ),
