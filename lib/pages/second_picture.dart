@@ -81,16 +81,19 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   ),
                 ),
               ),
-              Container(
-                width: size / 7.5,
-                height: size / 7.5,
-                alignment: Alignment.topLeft,
+              Align(
                 child: Container(
-                  width: size / 8,
-                  height: size / 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).primaryColor.withOpacity(0.4),
+                  width: size / 7.5,
+                  height: size / 7.5 * sin(pi / 4),
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    width: size / 8,
+                    height: (size / 8) * sin(pi / 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.elliptical(
+                          size / 8, (size / 8) * sin(pi / 4))),
+                      color: Theme.of(context).primaryColor.withOpacity(0.4),
+                    ),
                   ),
                 ),
               ),
