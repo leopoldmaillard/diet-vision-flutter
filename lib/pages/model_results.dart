@@ -136,6 +136,7 @@ class _SegmentationState extends State<Segmentation> {
   List<List<List<int>>> output_classes_Volume = [];
   Map output_classes_height = Map();
   List<List<int>> minMax = [];
+  int selectedClass = 0;
 
   @override
   void initState() {
@@ -291,7 +292,6 @@ class _SegmentationState extends State<Segmentation> {
     //int firstEtimationY = (listY.last - listY.first).round();
 
     minMax.add([xmin, ymin, xmax, ymax]);
-    print(minMax);
 
     return (xmax - xmin).round();
   }
@@ -430,8 +430,20 @@ class _SegmentationState extends State<Segmentation> {
                               int volume = thickness * surf;
 
                               return ActionChip(
-                                onPressed: () {},
+                                onPressed: () {
+                                  setState(() {
+                                    selectedClass = item;
+                                  });
+                                },
                                 backgroundColor: Color(color),
+                                shape: StadiumBorder(
+                                  side: BorderSide(
+                                    color: item == selectedClass
+                                        ? Theme.of(context).primaryColor
+                                        : Color(color),
+                                    width: 2.0,
+                                  ),
+                                ),
                                 label: Text(
                                   e.key +
                                       '   ' +
@@ -448,12 +460,13 @@ class _SegmentationState extends State<Segmentation> {
                 ),
                 widget.volume
                     ? Slider(
-                        value: minMax[2][0].toDouble(),
+                        value: minMax[selectedClass][0].toDouble(),
                         min: 0,
                         max: 513,
+                        activeColor: Theme.of(context).primaryColor,
                         onChanged: (double value) {
                           setState(() {
-                            minMax[2][0] = value.toInt();
+                            minMax[selectedClass][0] = value.toInt();
                           });
                         },
                       )
