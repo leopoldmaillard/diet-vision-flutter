@@ -297,6 +297,9 @@ class _SegmentationState extends State<Segmentation> {
     return (xmax - xmin).round();
   }
 
+  /*
+  Placing the thickness dots and dashline between them function.
+  */
   Widget thick(int selectedClass) {
     var size = MediaQuery.of(context).size.width;
     final points = <Widget>[];
@@ -341,6 +344,55 @@ class _SegmentationState extends State<Segmentation> {
       ),
     );
     return Stack(children: points);
+  }
+
+  Widget volumeList() {
+    final chips = <Widget>[];
+    double coinDiameterPixels = (513 / 16) * 2;
+    double coinDiameterIRLCM = 1.2875 * 2;
+    var categories = classes.values.toList();
+
+    for (int i = 0; i < widget.surfaces.length; i++) {
+      int thickpixels = minMax[i][2] - minMax[i][0];
+      int thickness =
+          (thickpixels * coinDiameterIRLCM / coinDiameterPixels).round();
+
+      int index = categories.indexOf(widget.surfaces.keys.toList()[i]);
+      int color = pascalVOCLabelColors[index];
+
+      int item = widget.surfaces.keys
+          .toList()
+          .indexOf(widget.surfaces.keys.toList()[i]);
+      int surf = widget.surfaces.values.toList()[item];
+      int volume = thickness * surf;
+
+      chips.add(ActionChip(
+        onPressed: () {
+          setState(() {
+            selectedClass = item;
+          });
+        },
+        backgroundColor: Color(color),
+        shape: StadiumBorder(
+          side: BorderSide(
+            color: item == selectedClass
+                ? Theme.of(context).primaryColor
+                : Color(color),
+            width: 2.0,
+          ),
+        ),
+        label: Text(
+          widget.surfaces.keys.toList()[i] +
+              '   ' +
+              thickness.toString() +
+              'cm | Vol. ' +
+              volume.toString() +
+              'cm³',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ));
+    }
+    return ListView(children: chips);
   }
 
   @override
@@ -428,49 +480,7 @@ class _SegmentationState extends State<Segmentation> {
                         }).toList())
 
                       // If we display the volume
-                      : ListView(
-                          children: output_classes_height.entries.map(
-                            (e) {
-                              int thickness = (e.value *
-                                      coinDiameterIRLCM /
-                                      coinDiameterPixels)
-                                  .round();
-                              int index = categories.indexOf(e.key);
-                              int color = pascalVOCLabelColors[index];
-
-                              int item =
-                                  widget.surfaces.keys.toList().indexOf(e.key);
-                              int surf = widget.surfaces.values.toList()[item];
-                              int volume = thickness * surf;
-
-                              return ActionChip(
-                                onPressed: () {
-                                  setState(() {
-                                    selectedClass = item;
-                                  });
-                                },
-                                backgroundColor: Color(color),
-                                shape: StadiumBorder(
-                                  side: BorderSide(
-                                    color: item == selectedClass
-                                        ? Theme.of(context).primaryColor
-                                        : Color(color),
-                                    width: 2.0,
-                                  ),
-                                ),
-                                label: Text(
-                                  e.key +
-                                      '   ' +
-                                      thickness.toString() +
-                                      'cm | Vol. ' +
-                                      volume.toString() +
-                                      'cm³',
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              );
-                            },
-                          ).toList(),
-                        ),
+                      : volumeList(),
                 ),
                 widget.volume
                     ? Slider(
