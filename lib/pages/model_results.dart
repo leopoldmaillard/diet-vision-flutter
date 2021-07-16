@@ -329,6 +329,37 @@ class _SegmentationState extends State<Segmentation> {
     return Stack(children: points);
   }
 
+  Widget thick(int selectedClass) {
+    var size = MediaQuery.of(context).size.width;
+    final points = <Widget>[];
+
+    points.add(
+      Positioned(
+        top: minMax[selectedClass][0] / 513 * size - 5,
+        left: minMax[selectedClass][1] / 513 * size - 5,
+        child: Container(
+          height: 10,
+          width: 10,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle, color: Theme.of(context).primaryColor),
+        ),
+      ),
+    );
+    points.add(
+      Positioned(
+        top: minMax[selectedClass][2] / 513 * size - 5,
+        left: minMax[selectedClass][3] / 513 * size - 5,
+        child: Container(
+          height: 10,
+          width: 10,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle, color: Theme.of(context).primaryColor),
+        ),
+      ),
+    );
+    return Stack(children: points);
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
@@ -378,7 +409,7 @@ class _SegmentationState extends State<Segmentation> {
                         ? Container(
                             height: size,
                             width: size,
-                            child: thickness(),
+                            child: thick(selectedClass),
                           )
                         : Container(),
                   ],
