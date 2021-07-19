@@ -141,8 +141,8 @@ class _SegmentationState extends State<Segmentation> {
   Map surfaceSaved = Map();
 
   bool _loading = true;
-  var _outputPNG;
-  var _outputRAW;
+  var _outputPNG; // Mask
+  var _outputRAW; // classic picture taken
   Map output_classes = Map();
 
   List<List<List<int>>> output_classes_Volume = [];
@@ -178,10 +178,11 @@ class _SegmentationState extends State<Segmentation> {
       List<int> imageBytes = await originalFile.readAsBytes();
 
       final originalImage = IMG.decodeImage(imageBytes);
-      final height = originalImage!.height;
+      final height = originalImage!.height; // if we delete this we have errors
       final width = originalImage.width;
 
-      IMG.Image fixedImage = IMG.copyRotate(originalImage, 90);
+      IMG.Image fixedImage =
+          IMG.copyRotate(originalImage, 90); // turn 90° the image for samsung
       final fixedFile =
           await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
 
@@ -194,6 +195,7 @@ class _SegmentationState extends State<Segmentation> {
       );
     } else {
       output = await Tflite.runSegmentationOnImage(
+        // Segmentation for regular Mobile Phone
         path: imagePath,
         imageMean: 0.0,
         imageStd: 255.0,
@@ -201,7 +203,6 @@ class _SegmentationState extends State<Segmentation> {
         outputType: 'png',
       );
     }
-    //var outimg = await decodeImageFromList(Uint8List.fromList(output));
     setState(() {
       if (widget.isSamsung) {
         _outputPNG = outputFixed;
@@ -213,6 +214,7 @@ class _SegmentationState extends State<Segmentation> {
       if (_outputRAW != null)
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
 
+      /* separate each pixel in the format of 4 value rgb+jesaispluquoi */
       Iterable<List<int>> pixels = partition(_outputRAW, 4);
       for (int k = 0; k < widget.surfaces.length; k++) {
         output_classes_Volume.add([]);
@@ -244,7 +246,6 @@ class _SegmentationState extends State<Segmentation> {
         output_classes_height =
             Compute_output_classes_height(output_classes_Volume);
       }
-
       _loading = false;
     });
   }
