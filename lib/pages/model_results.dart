@@ -13,7 +13,7 @@ import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 
-/*** globals variables */
+// globals variables
 
 int OUTPUTSIZE = 513 * 513;
 double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
@@ -424,7 +424,7 @@ class _SegmentationState extends State<Segmentation> {
         ? Slider(
             value: minMax[selectedClass][0].toDouble(),
             min: 0,
-            max: 513,
+            max: minMax[selectedClass][2].toDouble(),
             activeColor: Theme.of(context).primaryColor,
             onChanged: (double value) {
               setState(() {
