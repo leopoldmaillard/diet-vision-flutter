@@ -126,8 +126,8 @@ List<Map> foodNutritionJson = [
   {
     "id": '11',
     "name": "Starches/grains | Baked Goods",
-    "cal": "53000",
-    "nutriscore": "A",
+    "cal": "298",
+    "nutriscore": "D",
     "glucide": "11.40",
     "eq": "215"
   },
@@ -205,7 +205,7 @@ List<Map> foodNutritionJson = [
     "nutriscore": "A",
     "glucide": "11.40",
     "eq": "215"
-  },
+  }, //
   {
     "id": '21',
     "name": "Sweets/desserts",
@@ -213,23 +213,23 @@ List<Map> foodNutritionJson = [
     "nutriscore": "A",
     "glucide": "11.40",
     "eq": "215"
-  },
+  }, //on prendra aussi le donut ?
   {
     "id": '22',
     "name": "Beverages",
-    "cal": "53000",
+    "cal": "0",
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
-  },
+    "glucide": "0",
+    "eq": "0"
+  }, // cf la partie boisson
   {
     "id": '23',
     "name": "Fats/oils/sauces",
-    "cal": "53000",
-    "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
-  },
+    "cal": "900",
+    "nutriscore": "D",
+    "glucide": "0.0",
+    "eq": "109"
+  }, //vegetal oil
 
   // {"id": '7', "name": "Seafood", "cal": "143000"}, //
   //{"id": '8', "name": "Dairy", "cal": "129000"}, //
