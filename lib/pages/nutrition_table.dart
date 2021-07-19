@@ -43,7 +43,7 @@ List<Map> foodNutritionJson = [
   {
     "id": '1',
     "name": "Leafy Greens",
-    "cal": "27000",
+    "cal": "27",
     "nutriscore": "A",
     "glucide": "2.33",
     "eq": "266"
@@ -51,7 +51,7 @@ List<Map> foodNutritionJson = [
   {
     "id": '2',
     "name": "Stem Vegetables",
-    "cal": "27000",
+    "cal": "27",
     "nutriscore": "A",
     "glucide": "2.33",
     "eq": "266"
@@ -59,7 +59,7 @@ List<Map> foodNutritionJson = [
   {
     "id": '3',
     "name": "Non-starchy Roots",
-    "cal": "40000",
+    "cal": "40",
     "nutriscore": "A",
     "glucide": "7.59",
     "eq": "194"
@@ -67,7 +67,7 @@ List<Map> foodNutritionJson = [
   {
     "id": '4',
     "name": "Vegetables | Other",
-    "cal": "37000",
+    "cal": "37",
     "nutriscore": "A",
     "glucide": "2.53",
     "eq": "269"
@@ -75,7 +75,7 @@ List<Map> foodNutritionJson = [
   {
     "id": '5',
     "name": "Fruits",
-    "cal": "53000",
+    "cal": "53",
     "nutriscore": "A",
     "glucide": "11.40",
     "eq": "215"
@@ -83,7 +83,7 @@ List<Map> foodNutritionJson = [
   {
     "id": '6',
     "name": "Protein | Meat",
-    "cal": "231000",
+    "cal": "231",
     "nutriscore": "D",
     "glucide": "0.24",
     "eq": "165.19"
@@ -91,7 +91,7 @@ List<Map> foodNutritionJson = [
   {
     "id": '7',
     "name": "Protein | Poultry",
-    "cal": "188000",
+    "cal": "188",
     "nutriscore": "C",
     "glucide": "0.7",
     "eq": "46.5"
@@ -99,27 +99,30 @@ List<Map> foodNutritionJson = [
   {
     "id": '8',
     "name": "Protein | Seafood",
-    "cal": "136000",
+    "cal": "136",
     "nutriscore": "B",
     "glucide": "0.1",
     "eq": "215"
   }, // thon en boite
+  //**************start from here********* */
   {
     "id": '9',
     "name": "Protein | Eggs",
-    "cal": "53000",
+    "cal": "131",
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "1.1",
+    "eq": "285" //0.35density ==> 100/0.35
   },
+  //http://www.fao.org/3/ap815e/ap815e.pdf
   {
     "id": '10',
     "name": "Protein | Beans/nuts",
-    "cal": "53000",
+    "cal": "488",
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
-  },
+    "glucide": "21",
+    "eq": "166"
+  }, // nut environ 0.63density, greenbean env egal 0.53
+  //on estime à 0.6
   {
     "id": '11',
     "name": "Starches/grains | Baked Goods",
@@ -128,6 +131,9 @@ List<Map> foodNutritionJson = [
     "glucide": "11.40",
     "eq": "215"
   },
+//pour le baked cook j'ai pris les donuts comme ref
+//https://www.livestrong.com/article/289762-how-many-calories-does-a-doughnut-have/
+
   {
     "id": '12',
     "name": "Starches/grains | rice/grains/cereals",
