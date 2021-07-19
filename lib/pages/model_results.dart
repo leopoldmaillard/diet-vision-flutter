@@ -353,7 +353,7 @@ class _SegmentationState extends State<Segmentation> {
     final chips = <Widget>[];
     var categories = classes.values.toList();
 
-    for (int i = 0; i < widget.surfaces.length; i++) {
+    for (int i = 0; i < minMax.length; i++) {
       int thickpixels = minMax[i][2] - minMax[i][0];
       int thickness =
           (thickpixels * COINDIAMETERIRLCM / COINDIAMETERPIXELS).round();
