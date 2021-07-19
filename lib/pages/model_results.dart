@@ -149,7 +149,8 @@ class _SegmentationState extends State<Segmentation> {
   Map output_classes_height = Map();
   List<List<int>> minMax = [];
   int selectedClass = 0;
-
+  List<int> distance = [];
+  Map output_classes_distance = Map();
   @override
   void initState() {
     super.initState();
@@ -216,7 +217,7 @@ class _SegmentationState extends State<Segmentation> {
 
       /* separate each pixel in the format of 4 value rgb+jesaispluquoi */
       Iterable<List<int>> pixels = partition(_outputRAW, 4);
-      for (int k = 0; k < widget.surfaces.length; k++) {
+      for (int k = 0; k < 26; k++) {
         output_classes_Volume.add([]);
       }
 
@@ -232,20 +233,33 @@ class _SegmentationState extends State<Segmentation> {
           } else {
             output_classes[c] += 1;
           }
-          if (widget.surfaces.containsKey(c)) {
-            i = widget.surfaces.keys.toList().indexOf(c);
+          // if (widget.surfaces.containsKey(c)) {
+          //   i = widget.surfaces.keys.toList().indexOf(c);
 
-            //concatene list [jsaipaskwa, r,g,b] et [i,j]
-            output_classes_Volume[i].add(
-                element + [(forEachCount / 513).round(), forEachCount % 513]);
-          }
+          //   //concatene list [jsaipaskwa, r,g,b] et [i,j]
+          //   output_classes_Volume[i].add(
+          //       element + [(forEachCount / 513).round(), forEachCount % 513]);
+          // }
+          output_classes_Volume[i].add(
+              element + [(forEachCount / 513).round(), forEachCount % 513]);
           forEachCount++;
         },
       );
+      if (!widget.volume) {
+        output_classes_distance =
+            Compute_output_classes_distance(output_classes_Volume);
+        print(output_classes_distance);
+      }
       if (widget.volume) {
         output_classes_height =
             Compute_output_classes_height(output_classes_Volume);
+        print(output_classes_distance.length);
+        print(output_classes_distance);
       }
+      /*else {
+       output_classes_distance =
+           Compute_output_classes_distance(output_classes_Volume);
+     }*/
       _loading = false;
     });
   }
@@ -273,6 +287,27 @@ class _SegmentationState extends State<Segmentation> {
     return output_classes_height;
   }
 
+  Map Compute_output_classes_distance(
+      List<List<List<int>>> output_classes_Volume) {
+    Map output_classes_distance = Map();
+    List<int> elemDist = [];
+    for (int l = 0; l < output_classes_Volume.length; l++) {
+      if (output_classes_Volume[l].length != 0) {
+        elemDist = elemDist + //du premier pixel de la classe d'indice l
+            [output_classes_Volume[l][0][0]] + //transparence
+            [output_classes_Volume[l][0][1]] + //r
+            [output_classes_Volume[l][0][2]] + //g
+            [output_classes_Volume[l][0][3]]; //b
+        String e = elemDist.toString(); //[t,r,g,b] en string
+        var i = KEYS.indexOf(e);
+        var c = VALUES[i];
+        output_classes_distance[i] = getDistance(output_classes_Volume[l]);
+        elemDist = [];
+      }
+    }
+    return output_classes_distance;
+  }
+
   int getAvgHeightOneClass(List<List<int>> typeOfClassPixels) {
     if (typeOfClassPixels.length == 0) {
       return 0;
@@ -297,11 +332,28 @@ class _SegmentationState extends State<Segmentation> {
     return (xmax - xmin).round();
   }
 
+  int getDistance(List<List<int>> typeOfClassPixels) {
+    if (typeOfClassPixels.length == 0) {
+      return 0;
+    }
+
+    List<int> listX = []; // correspond aux i cad lignes
+
+    for (int k = 0; k < typeOfClassPixels.length; k++) {
+      listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
+    }
+    int xmax = listX.reduce(math.max);
+    int distancePixel = (513 - 513 / 8 - xmax).round();
+    int distanceCoinFood =
+        (distancePixel * COINDIAMETERIRLCM / COINDIAMETERPIXELS).round();
+    return distanceCoinFood;
+  }
+
   /*
-  Placing the thickness dots and dashline between them function.
-  has to be called after getAvgHeightOneClass
-  minmax = [xmin, ymin, xmax, ymax]
-  */
+ Placing the thickness dots and dashline between them function.
+ has to be called after getAvgHeightOneClass
+ minmax = [xmin, ymin, xmax, ymax]
+ */
   Widget thick(int selectedClass) {
     var SIZEWIDTH = MediaQuery.of(context).size.width;
     final points = <Widget>[];
