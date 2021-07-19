@@ -146,9 +146,11 @@ class _SegmentationState extends State<Segmentation> {
   Map output_classes = Map();
 
   List<List<List<int>>> output_classes_Volume = [];
+  List<List<List<int>>> output_classes_Surface = [];
   Map output_classes_height = Map();
   List<List<int>> minMax = [];
   int selectedClass = 0;
+  Map output_classes_distance = Map();
 
   @override
   void initState() {
@@ -219,6 +221,9 @@ class _SegmentationState extends State<Segmentation> {
       for (int k = 0; k < widget.surfaces.length; k++) {
         output_classes_Volume.add([]);
       }
+      for (int k = 0; k < 26; k++) {
+        output_classes_Surface.add([]);
+      }
 
       int forEachCount = 0;
       pixels.forEach(
@@ -232,6 +237,11 @@ class _SegmentationState extends State<Segmentation> {
           } else {
             output_classes[c] += 1;
           }
+          if (!widget.volume) {
+            output_classes_Surface[i].add(
+                element + [(forEachCount / 513).round(), forEachCount % 513]);
+          }
+
           if (widget.surfaces.containsKey(c)) {
             i = widget.surfaces.keys.toList().indexOf(c);
 
@@ -245,6 +255,10 @@ class _SegmentationState extends State<Segmentation> {
       if (widget.volume) {
         output_classes_height =
             Compute_output_classes_height(output_classes_Volume);
+      } else {
+        output_classes_distance =
+            Compute_output_classes_distance(output_classes_Surface);
+        print(output_classes_distance);
       }
       _loading = false;
     });
@@ -271,6 +285,44 @@ class _SegmentationState extends State<Segmentation> {
       }
     }
     return output_classes_height;
+  }
+
+  Map Compute_output_classes_distance(
+      List<List<List<int>>> output_classes_Surface) {
+    Map output_classes_distance = Map();
+    List<int> elemDist = [];
+    for (int l = 0; l < output_classes_Surface.length; l++) {
+      if (output_classes_Surface[l].length != 0) {
+        elemDist = elemDist + //du premier pixel de la classe d'indice l
+            [output_classes_Surface[l][0][0]] + //transparence
+            [output_classes_Surface[l][0][1]] + //r
+            [output_classes_Surface[l][0][2]] + //g
+            [output_classes_Surface[l][0][3]]; //b
+        String e = elemDist.toString(); //[t,r,g,b] en string
+        var i = KEYS.indexOf(e);
+        var c = VALUES[i];
+        output_classes_distance[i] = getDistance(output_classes_Surface[l]);
+        elemDist = [];
+      }
+    }
+    return output_classes_distance;
+  }
+
+  int getDistance(List<List<int>> typeOfClassPixels) {
+    if (typeOfClassPixels.length == 0) {
+      return 0;
+    }
+
+    List<int> listX = []; // correspond aux i cad lignes
+
+    for (int k = 0; k < typeOfClassPixels.length; k++) {
+      listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
+    }
+    int xmax = listX.reduce(math.max);
+    int distancePixel = (513 - 513 / 8 - xmax).round();
+    int distanceCoinFood =
+        (distancePixel * COINDIAMETERIRLCM / COINDIAMETERPIXELS).round();
+    return distanceCoinFood;
   }
 
   int getAvgHeightOneClass(List<List<int>> typeOfClassPixels) {
