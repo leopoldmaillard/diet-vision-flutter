@@ -13,6 +13,14 @@ import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 
+/*** globals variables */
+
+int OUTPUTSIZE = 513 * 513;
+double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
+const double SURFACE2EUROS = pi * 12.875 * 12.875; // 521 mm2
+double COINDIAMETERPIXELS = (513 / 16) * 2;
+double COINDIAMETERIRLCM = 1.2875 * 2;
+
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
   final bool isSamsung;
@@ -128,6 +136,9 @@ class _SegmentationState extends State<Segmentation> {
     '[192, 192, 192, 255]': 'Dining Tools 🍴',
     '[192, 64, 64, 255]': 'Other Food ❓'
   };
+  var KEYS = classes.keys.toList();
+  var VALUES = classes.values.toList();
+  Map surfaceSaved = Map();
 
   bool _loading = true;
   var _outputPNG;
@@ -190,7 +201,6 @@ class _SegmentationState extends State<Segmentation> {
         outputType: 'png',
       );
     }
-
     //var outimg = await decodeImageFromList(Uint8List.fromList(output));
     setState(() {
       if (widget.isSamsung) {
@@ -204,68 +214,62 @@ class _SegmentationState extends State<Segmentation> {
         _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
 
       Iterable<List<int>> pixels = partition(_outputRAW, 4);
-      var keys = classes.keys.toList();
-      var values = classes.values.toList();
+      for (int k = 0; k < widget.surfaces.length; k++) {
+        output_classes_Volume.add([]);
+      }
 
-      if (!widget.volume) {
-        pixels.forEach((element) {
+      int forEachCount = 0;
+      pixels.forEach(
+        (element) {
+          //surface
           String e = element.toString();
-          var i = keys.indexOf(e);
-          var c = values[i];
+          var i = KEYS.indexOf(e);
+          var c = VALUES[i];
           if (!output_classes.containsKey(c)) {
             output_classes[c] = 1;
           } else {
             output_classes[c] += 1;
           }
-        });
+          if (widget.surfaces.containsKey(c)) {
+            i = widget.surfaces.keys.toList().indexOf(c);
 
-        // WE COMPUTE THE THICKNESS HERE
-      } else {
-        for (int k = 0; k < widget.surfaces.length; k++) {
-          output_classes_Volume.add([]);
-        }
-        int forEachCount = 0;
-        pixels.forEach(
-          (element) {
-            //surface
-            String e = element.toString();
-            var i = keys.indexOf(e);
-            var c = values[i];
-            if (widget.surfaces.containsKey(c)) {
-              i = widget.surfaces.keys.toList().indexOf(c);
-              if (!output_classes.containsKey(c)) {
-                output_classes[c] = 1;
-              } else {
-                output_classes[c] += 1;
-              }
-
-              //concatene list [jsaipaskwa, r,g,b] et [i,j]
-              output_classes_Volume[i].add(
-                  element + [(forEachCount / 513).round(), forEachCount % 513]);
-              forEachCount++;
-            }
-          },
-        );
-        List<int> elemHeight = [];
-        for (int l = 0; l < widget.surfaces.length; l++) {
-          if (output_classes_Volume[l].length != 0) {
-            elemHeight = elemHeight + //du premier pixel de la classe d'indice l
-                [output_classes_Volume[l][0][0]] + //transparence
-                [output_classes_Volume[l][0][1]] + //r
-                [output_classes_Volume[l][0][2]] + //g
-                [output_classes_Volume[l][0][3]]; //b
-            String e = elemHeight.toString(); //[t,r,g,b] en string
-            var i = keys.indexOf(e);
-            var c = values[i];
-
-            output_classes_height[c] =
-                getAvgHeightOneClass(output_classes_Volume[l]);
-            elemHeight = [];
+            //concatene list [jsaipaskwa, r,g,b] et [i,j]
+            output_classes_Volume[i].add(
+                element + [(forEachCount / 513).round(), forEachCount % 513]);
           }
-        }
+          forEachCount++;
+        },
+      );
+      if (widget.volume) {
+        output_classes_height =
+            Compute_output_classes_height(output_classes_Volume);
       }
+
       _loading = false;
     });
+  }
+
+  Map Compute_output_classes_height(
+      List<List<List<int>>> output_classes_Volume) {
+    Map output_classes_height = Map();
+    List<int> elemHeight = [];
+    for (int l = 0; l < widget.surfaces.length; l++) {
+      if (output_classes_Volume[l].length != 0) {
+        elemHeight = elemHeight + //du premier pixel de la classe d'indice l
+            [output_classes_Volume[l][0][0]] + //transparence
+            [output_classes_Volume[l][0][1]] + //r
+            [output_classes_Volume[l][0][2]] + //g
+            [output_classes_Volume[l][0][3]]; //b
+        String e = elemHeight.toString(); //[t,r,g,b] en string
+        var i = KEYS.indexOf(e);
+        var c = VALUES[i];
+
+        output_classes_height[c] =
+            getAvgHeightOneClass(output_classes_Volume[l]);
+        elemHeight = [];
+      }
+    }
+    return output_classes_height;
   }
 
   int getAvgHeightOneClass(List<List<int>> typeOfClassPixels) {
@@ -287,11 +291,6 @@ class _SegmentationState extends State<Segmentation> {
     int idxmax = listX.indexOf(xmax);
     int ymax = ymin;
 
-    //listX.sort();
-    //listY.sort();
-    //int firstEtimationX = (listX.last - listX.first).round();
-    //int firstEtimationY = (listY.last - listY.first).round();
-
     minMax.add([xmin, ymin, xmax, ymax]);
 
     return (xmax - xmin).round();
@@ -299,15 +298,17 @@ class _SegmentationState extends State<Segmentation> {
 
   /*
   Placing the thickness dots and dashline between them function.
+  has to be called after getAvgHeightOneClass
+  minmax = [xmin, ymin, xmax, ymax]
   */
   Widget thick(int selectedClass) {
-    var size = MediaQuery.of(context).size.width;
+    var SIZEWIDTH = MediaQuery.of(context).size.width;
     final points = <Widget>[];
 
     points.add(
       Positioned(
-        top: minMax[selectedClass][0] / 513 * size - 5,
-        left: minMax[selectedClass][1] / 513 * size - 5,
+        top: minMax[selectedClass][0] / 513 * SIZEWIDTH - 5,
+        left: minMax[selectedClass][1] / 513 * SIZEWIDTH - 5,
         child: Container(
           height: 10,
           width: 10,
@@ -318,8 +319,8 @@ class _SegmentationState extends State<Segmentation> {
     );
     points.add(
       Positioned(
-        top: minMax[selectedClass][2] / 513 * size - 5,
-        left: minMax[selectedClass][3] / 513 * size - 5,
+        top: minMax[selectedClass][2] / 513 * SIZEWIDTH - 5,
+        left: minMax[selectedClass][3] / 513 * SIZEWIDTH - 5,
         child: Container(
           height: 10,
           width: 10,
@@ -330,12 +331,12 @@ class _SegmentationState extends State<Segmentation> {
     );
     points.add(
       Positioned(
-        top: minMax[selectedClass][0] / 513 * size + 5,
-        left: minMax[selectedClass][1] / 513 * size,
+        top: minMax[selectedClass][0] / 513 * SIZEWIDTH + 5,
+        left: minMax[selectedClass][1] / 513 * SIZEWIDTH,
         child: Dash(
           direction: Axis.vertical,
-          length: (minMax[selectedClass][2] / 513 * size - 10) -
-              (minMax[selectedClass][0] / 513 * size),
+          length: (minMax[selectedClass][2] / 513 * SIZEWIDTH - 10) -
+              (minMax[selectedClass][0] / 513 * SIZEWIDTH),
           dashColor: Theme.of(context).primaryColor,
           dashLength: 4,
           dashBorderRadius: 8,
@@ -347,22 +348,19 @@ class _SegmentationState extends State<Segmentation> {
   }
 
   Widget volumeList() {
+    List<dynamic> widSurfKey = widget.surfaces.keys.toList();
     final chips = <Widget>[];
-    double coinDiameterPixels = (513 / 16) * 2;
-    double coinDiameterIRLCM = 1.2875 * 2;
     var categories = classes.values.toList();
 
     for (int i = 0; i < widget.surfaces.length; i++) {
       int thickpixels = minMax[i][2] - minMax[i][0];
       int thickness =
-          (thickpixels * coinDiameterIRLCM / coinDiameterPixels).round();
+          (thickpixels * COINDIAMETERIRLCM / COINDIAMETERPIXELS).round();
 
-      int index = categories.indexOf(widget.surfaces.keys.toList()[i]);
+      int index = categories.indexOf(widSurfKey[i]);
       int color = pascalVOCLabelColors[index];
 
-      int item = widget.surfaces.keys
-          .toList()
-          .indexOf(widget.surfaces.keys.toList()[i]);
+      int item = widSurfKey.indexOf(widSurfKey[i]);
       int surf = widget.surfaces.values.toList()[item];
       int volume = thickness * surf;
 
@@ -382,7 +380,7 @@ class _SegmentationState extends State<Segmentation> {
           ),
         ),
         label: Text(
-          widget.surfaces.keys.toList()[i] +
+          widSurfKey[i] +
               '   ' +
               thickness.toString() +
               'cm | Vol. ' +
@@ -395,17 +393,118 @@ class _SegmentationState extends State<Segmentation> {
     return ListView(children: chips);
   }
 
+  Widget displayGetVolumeEstimationButton(bool volume) {
+    return !volume
+        ? ElevatedButton.icon(
+            icon: Icon(Icons.panorama_photosphere),
+            label: Text('Get Volume Estimation'),
+            onPressed: () async {
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SecondPictureScreen(
+                    cameras: widget.cameras,
+                    surfaces: surfaceSaved,
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(50.0),
+              ),
+              primary: Theme.of(context).primaryColor,
+            ),
+          )
+        : Container();
+  }
+
+  Widget displaySlider(bool volume) {
+    return volume
+        ? Slider(
+            value: minMax[selectedClass][0].toDouble(),
+            min: 0,
+            max: 513,
+            activeColor: Theme.of(context).primaryColor,
+            onChanged: (double value) {
+              setState(() {
+                minMax[selectedClass][0] = value.toInt();
+              });
+            },
+          )
+        : Container();
+  }
+
+  Widget displaySurfaceOrVolume(bool volume, List<String> categories) {
+    return !volume
+        ? ListView(
+            children: output_classes.entries.map(
+              (e) {
+                int percent = ((e.value / OUTPUTSIZE) * 100).round();
+                if (percent >= 1) {
+                  int surface =
+                      (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
+                  int index = categories.indexOf(e.key);
+                  int color = pascalVOCLabelColors[index];
+                  surfaceSaved[e.key] = surface;
+                  return ActionChip(
+                      onPressed: () {},
+                      avatar: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child: Text(percent.toString() + "%",
+                            style:
+                                TextStyle(color: Color(color), fontSize: 10)),
+                      ),
+                      backgroundColor: Color(color),
+                      label: Text(
+                        e.key + '   ' + surface.toString() + 'cm²',
+                        style: const TextStyle(color: Colors.white),
+                      ));
+                } else {
+                  return Container();
+                }
+              },
+            ).toList(),
+          )
+
+        // If we display the volume
+        : volumeList();
+  }
+
+  Widget displayPictureWithSegFilter(var SIZEWIDTH) {
+    return Stack(
+      children: [
+        Container(
+          height: SIZEWIDTH,
+          width: SIZEWIDTH,
+          child: Opacity(
+              opacity: 0.3,
+              child: Image.file(
+                File(widget.imagePath),
+                fit: BoxFit.fill,
+              )),
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: MemoryImage(_outputPNG),
+              fit: BoxFit.fill,
+            ),
+          ),
+        ),
+        widget.volume
+            ? Container(
+                height: SIZEWIDTH,
+                width: SIZEWIDTH,
+                child: thick(selectedClass),
+              )
+            : Container(),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size.width;
-    int outputSize = 513 * 513;
-    double coinPixels = pi * (513 / 16) * (513 / 16); // 3230 pixels
-    const double surface2euros = pi * 12.875 * 12.875; // 521 mm2
-    double coinDiameterPixels = (513 / 16) * 2;
-    double coinDiameterIRLCM = 1.2875 * 2;
+    var SIZEWIDTH = MediaQuery.of(context).size.width;
 
     var categories = classes.values.toList();
-    Map surfaceSaved = Map();
 
     return Container(
       child: _loading == true
@@ -422,101 +521,12 @@ class _SegmentationState extends State<Segmentation> {
             )
           : Column(
               children: [
-                Stack(
-                  children: [
-                    Container(
-                      height: size,
-                      width: size,
-                      child: Opacity(
-                          opacity: 0.3,
-                          child: Image.file(
-                            File(widget.imagePath),
-                            fit: BoxFit.fill,
-                          )),
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: MemoryImage(_outputPNG),
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ),
-                    widget.volume
-                        ? Container(
-                            height: size,
-                            width: size,
-                            child: thick(selectedClass),
-                          )
-                        : Container(),
-                  ],
-                ),
+                displayPictureWithSegFilter(SIZEWIDTH),
                 Expanded(
-                  child: !widget.volume
-                      ? ListView(
-                          children: output_classes.entries.map((e) {
-                          int percent = ((e.value / outputSize) * 100).round();
-                          if (percent >= 1) {
-                            int surface =
-                                (e.value * surface2euros / coinPixels / 100)
-                                    .round();
-                            int index = categories.indexOf(e.key);
-                            int color = pascalVOCLabelColors[index];
-                            surfaceSaved[e.key] = surface;
-                            return ActionChip(
-                                onPressed: () {},
-                                avatar: CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  child: Text(percent.toString() + "%",
-                                      style: TextStyle(
-                                          color: Color(color), fontSize: 10)),
-                                ),
-                                backgroundColor: Color(color),
-                                label: Text(
-                                  e.key + '   ' + surface.toString() + 'cm²',
-                                  style: const TextStyle(color: Colors.white),
-                                ));
-                          } else {
-                            return Container();
-                          }
-                        }).toList())
-
-                      // If we display the volume
-                      : volumeList(),
+                  child: displaySurfaceOrVolume(widget.volume, categories),
                 ),
-                widget.volume
-                    ? Slider(
-                        value: minMax[selectedClass][0].toDouble(),
-                        min: 0,
-                        max: 513,
-                        activeColor: Theme.of(context).primaryColor,
-                        onChanged: (double value) {
-                          setState(() {
-                            minMax[selectedClass][0] = value.toInt();
-                          });
-                        },
-                      )
-                    : Container(),
-                !widget.volume
-                    ? ElevatedButton.icon(
-                        icon: Icon(Icons.panorama_photosphere),
-                        label: Text('Get Volume Estimation'),
-                        onPressed: () async {
-                          await Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => SecondPictureScreen(
-                                cameras: widget.cameras,
-                                surfaces: surfaceSaved,
-                              ),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(50.0),
-                          ),
-                          primary: Theme.of(context).primaryColor,
-                        ),
-                      )
-                    : Container(),
+                displaySlider(widget.volume),
+                displayGetVolumeEstimationButton(widget.volume),
                 SizedBox(height: 25),
               ],
             ),
