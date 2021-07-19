@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'lib/source/coinDiameter.dart';
+
 class Geoloc extends StatefulWidget {
   @override
   GeolocState createState() {
