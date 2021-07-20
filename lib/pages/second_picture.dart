@@ -87,7 +87,11 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   height: (size / 4) * sin(pi / 4),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(
-                        Radius.elliptical(size / 4, (size / 4) * sin(pi / 4))),
+                      Radius.elliptical(
+                        size / 4,
+                        (size / 4) * sin(pi / 4),
+                      ),
+                    ),
                     color: Theme.of(context).primaryColor.withOpacity(0.4),
                   ),
                 ),

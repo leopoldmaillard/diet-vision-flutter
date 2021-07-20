@@ -266,42 +266,88 @@ class _SegmentationState extends State<Segmentation> {
         var c = VALUES[i];
 
         output_classes_height[c] =
-            getAvgHeightOneClass(output_classes_Volume[l]);
+            getThicknessprecise(output_classes_Volume[l], c);
         elemHeight = [];
       }
     }
     return output_classes_height;
   }
 
-  int getAvgHeightOneClass(List<List<int>> typeOfClassPixels) {
+  // Not used anymore but we cant keep it just in case for now
+
+  // int getAvgHeightOneClass(List<List<int>> typeOfClassPixels) {
+  //   if (typeOfClassPixels.length == 0) {
+  //     return 0;
+  //   }
+
+  //   List<int> listX = []; // correspond aux i cad lignes
+  //   List<int> listY = []; // correspond aux j cad colonnes
+  //   for (int k = 0; k < typeOfClassPixels.length; k++) {
+  //     listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
+  //     listY.add(typeOfClassPixels[k][5]); //[t,r,g,b,i,j] donc j
+  //   }
+  //   int xmin = listX.reduce(math.min);
+  //   int idxmin = listX.indexOf(xmin);
+  //   int ymin = listY[idxmin];
+
+  //   int xmax = listX.reduce(math.max);
+  //   int idxmax = listX.indexOf(xmax);
+  //   int ymax = ymin;
+
+  //   minMax.add([xmin, ymin, xmax, ymax]);
+
+  //   return (xmax - xmin).round();
+  // }
+
+  /// get an estimation of the thickness
+  int getThicknessprecise(List<List<int>> typeOfClassPixels, String classe) {
     if (typeOfClassPixels.length == 0) {
       return 0;
     }
-
+    var SIZEWIDTH = MediaQuery.of(context).size.width;
     List<int> listX = []; // correspond aux i cad lignes
     List<int> listY = []; // correspond aux j cad colonnes
     for (int k = 0; k < typeOfClassPixels.length; k++) {
-      listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
-      listY.add(typeOfClassPixels[k][5]); //[t,r,g,b,i,j] donc j
+      listY.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
+      listX.add(typeOfClassPixels[k][5]); //[t,r,g,b,i,j] donc j
     }
-    int xmin = listX.reduce(math.min);
-    int idxmin = listX.indexOf(xmin);
-    int ymin = listY[idxmin];
+    double limitDownPlate = (SIZEWIDTH / 4); // big axe of the ellipse
+    /// ymax represent the y at the bottom of the food piece without considering
+    /// the area where the coin is in term of height
+    int yBottomThickness =
+        listY.lastWhere((element) => (element < (513 - limitDownPlate)));
 
-    int xmax = listX.reduce(math.max);
-    int idxmax = listX.indexOf(xmax);
-    int ymax = ymin;
+    int idxBottomThickness = listY.indexOf(yBottomThickness);
+    int xBottomThickness = listX[idxBottomThickness];
 
-    minMax.add([xmin, ymin, xmax, ymax]);
+    int Xmin = listX.reduce(math.min);
+    int idxmin = listX.indexOf(Xmin);
 
-    return (xmax - xmin).round();
+    // y of the point that is at the total left
+    //ie  where the x is the lower
+    int Ymin = listY[idxmin];
+
+    List<int> pixelPossible = [];
+    for (int i = 0; i < typeOfClassPixels.length; i++) {
+      // at the top of the bottom of the thickness
+      // and "not too far" from the X which is at the left limit
+      if (listY[i] < yBottomThickness && (listX[i] - Xmin).abs() < 5) {
+        pixelPossible.add(listY[i]);
+      }
+    }
+
+    // y at the top of the thickness
+    int yTopThickness = pixelPossible.reduce(math.min);
+
+    // (ytop, xbot)  and (ybot xbot)
+    //we dont use xtop in the first coordonnate because we want to draw
+    //a line between the point the hiwer and the lower of the food
+    // and taking the x of the bottom of the thickness is quite better. (Ithink)
+    minMax.add(
+        [yTopThickness, xBottomThickness, yBottomThickness, xBottomThickness]);
+    return (yBottomThickness - yTopThickness).round();
   }
 
-  /*
-  Placing the thickness dots and dashline between them function.
-  has to be called after getAvgHeightOneClass
-  minmax = [xmin, ymin, xmax, ymax]
-  */
   Widget thick(int selectedClass) {
     var SIZEWIDTH = MediaQuery.of(context).size.width;
     final points = <Widget>[];
@@ -355,8 +401,13 @@ class _SegmentationState extends State<Segmentation> {
 
     for (int i = 0; i < minMax.length; i++) {
       int thickpixels = minMax[i][2] - minMax[i][0];
+
       int thickness =
           (thickpixels * COINDIAMETERIRLCM / COINDIAMETERPIXELS).round();
+      // print("BOOOOOOOOOOOOOONNNNNNNNJOUR");
+      // print(classes[i]);
+      // print(thickness);
+      // print("end of thickness");
 
       int index = categories.indexOf(widSurfKey[i]);
       int color = pascalVOCLabelColors[index];
