@@ -402,8 +402,7 @@ class _SegmentationState extends State<Segmentation> {
     for (int i = 0; i < minMax.length; i++) {
       int thickpixels = minMax[i][2] - minMax[i][0];
 
-      int thickness =
-          (thickpixels * COINDIAMETERIRLCM / COINDIAMETERPIXELS).round();
+      double thickness = (thickpixels * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
       // print("BOOOOOOOOOOOOOONNNNNNNNJOUR");
       // print(classes[i]);
       // print(thickness);
@@ -414,7 +413,7 @@ class _SegmentationState extends State<Segmentation> {
 
       int item = widSurfKey.indexOf(widSurfKey[i]);
       int surf = widget.surfaces.values.toList()[item];
-      int volume = thickness * surf;
+      int volume = (thickness * surf).round();
 
       chips.add(ActionChip(
         onPressed: () {
@@ -434,7 +433,7 @@ class _SegmentationState extends State<Segmentation> {
         label: Text(
           widSurfKey[i] +
               '   ' +
-              thickness.toString() +
+              thickness.toStringAsFixed(1) +
               'cm | Vol. ' +
               volume.toString() +
               'cm³',
