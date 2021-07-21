@@ -18,7 +18,7 @@ import 'package:flutter_dash/flutter_dash.dart';
 int OUTPUTSIZE = 513 * 513;
 double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
 const double SURFACE2EUROS = pi * 12.875 * 12.875; // 521 mm2
-double COINDIAMETERPIXELS = (513 / 16) * 2;
+double COINDIAMETERPIXELS = 513 / 4;
 double COINDIAMETERIRLCM = 1.2875 * 2;
 
 class DisplayPictureScreen extends StatelessWidget {
@@ -299,6 +299,7 @@ class _SegmentationState extends State<Segmentation> {
     return output_classes_height;
   }
 
+//[indicede ouput_classes: distance en cm, ......]
   Map Compute_output_classes_distance(
       List<List<List<int>>> output_classes_Surface) {
     Map output_classes_distance = Map();
@@ -331,37 +332,12 @@ class _SegmentationState extends State<Segmentation> {
       listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
     }
     int xmax = listX.reduce(math.max);
-    double distancePixel = (513 - 513 / 16 - xmax);
+    double distancePixel =
+        (513 - 513 / 16 - xmax); // /16 because the middle of the coin
     double distanceCoinFood =
         (distancePixel * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
     return distanceCoinFood;
   }
-
-  // Not used anymore but we cant keep it just in case for now
-
-  // int getAvgHeightOneClass(List<List<int>> typeOfClassPixels) {
-  //   if (typeOfClassPixels.length == 0) {
-  //     return 0;
-  //   }
-
-  //   List<int> listX = []; // correspond aux i cad lignes
-  //   List<int> listY = []; // correspond aux j cad colonnes
-  //   for (int k = 0; k < typeOfClassPixels.length; k++) {
-  //     listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
-  //     listY.add(typeOfClassPixels[k][5]); //[t,r,g,b,i,j] donc j
-  //   }
-  //   int xmin = listX.reduce(math.min);
-  //   int idxmin = listX.indexOf(xmin);
-  //   int ymin = listY[idxmin];
-
-  //   int xmax = listX.reduce(math.max);
-  //   int idxmax = listX.indexOf(xmax);
-  //   int ymax = ymin;
-
-  //   minMax.add([xmin, ymin, xmax, ymax]);
-
-  //   return (xmax - xmin).round();
-  // }
 
   /// get an estimation of the thickness
   int getThicknessprecise(List<List<int>> typeOfClassPixels, String classe) {
@@ -412,10 +388,13 @@ class _SegmentationState extends State<Segmentation> {
     return (yBottomThickness - yTopThickness).round();
   }
 
+//ywithperspective = le nb de pixels de lepaisseur de la deuxieme image (celle déformée)
+//xDistCoinClass = distance en cm
   double getPixelConsideringPerspective(
       double yWithPerspective, double xDistCoinClass) {
     return yWithPerspective + 9 * xDistCoinClass;
   }
+  //thickdeformee = thickReel - 9.33*xdistance
 
 /**************************Partie Widget *********************************** */
   Widget thick(int selectedClass) {
@@ -466,37 +445,33 @@ class _SegmentationState extends State<Segmentation> {
 
   Widget volumeList() {
     List<dynamic> widSurfKey = widget.surfaces.keys.toList();
-    // List<dynamic> widSurfValue = widget.surfaces.values.toList();
     final chips = <Widget>[];
     var categories = classes.values.toList();
     var mykeys = widget.distances.keys.toList();
-    // int idxClass = -1;
-    // int autreidx = -1;
-    // var myvalue = widSurfValue[idxClass];
-    print("surfaces key:");
-    print(widget.surfaces.keys.toList());
-    print("surfaces values:");
-    print(widget.surfaces.values.toList());
+
+    // print("surfaces key:");
+    // print(widget.surfaces.keys.toList());
+    // print("surfaces values:");
+    // print(widget.surfaces.values.toList());
     print(widget.distances);
+
     for (int i = 0; i < minMax.length; i++) {
       double thickpixels = (minMax[i][2] - minMax[i][0]).toDouble();
       int idxClass = classes.values.toList().indexOf(widSurfKey[i]);
       int idxClassDist = widget.distances.keys.toList().indexOf(idxClass);
-      print('the idxClass is $idxClass');
-      print('the idxClassDist is $idxClassDist');
+      print(
+          'the idxClass is $idxClass'); // index in the output_classes of the current classe
+      print(
+          'the idxClassDist is $idxClassDist'); // index in the widget.distance of the current classe
       double distCoinClass = widget.distances.values.toList()[idxClassDist];
       print('the distance coin-class is $distCoinClass');
-      // autreidx = mykeys.indexOf(idxClass.toString());
-      // print('idxCLass $idxClass');
-      // print('value idxClass $myvalue');
-      // print('autreidx $autreidx');
       double thickpixelsReal =
           getPixelConsideringPerspective(thickpixels, distCoinClass);
-
-      print('the real thicknespixel is $thickpixelsReal');
       print('the thicknespixel is $thickpixels');
+      print('the real thicknespixel is $thickpixelsReal');
+
       double thickness =
-          (thickpixelsReal * COINDIAMETERIRLCM / (2 * COINDIAMETERPIXELS));
+          (thickpixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
       print('real thickness in cm : $thickness');
       // print("BOOOOOOOOOOOOOONNNNNNNNJOUR");
       // print(classes[i]);
@@ -508,10 +483,6 @@ class _SegmentationState extends State<Segmentation> {
 
       int item = widSurfKey.indexOf(widSurfKey[i]);
       int surf = widget.surfaces.values.toList()[item];
-      print("voila surface");
-      print(widget.surfaces.values.toList());
-      print("voila surface2");
-      print(widget.surfaces.keys.toList());
       int volume = (thickness * surf).round();
 
       chips.add(ActionChip(
