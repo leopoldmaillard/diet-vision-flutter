@@ -392,7 +392,8 @@ class _SegmentationState extends State<Segmentation> {
 //xDistCoinClass = distance en cm
   double getPixelConsideringPerspective(
       double yWithPerspective, double xDistCoinClass) {
-    return yWithPerspective + 9 * xDistCoinClass;
+    return yWithPerspective *
+        (1 / (1.54 - 0.39 * log(0.94 * xDistCoinClass + 4.00)));
   }
   //thickdeformee = thickReel - 9.33*xdistance
 
