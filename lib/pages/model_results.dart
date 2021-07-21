@@ -376,8 +376,11 @@ class _SegmentationState extends State<Segmentation> {
       }
     }
 
-    // y at the top of the thickness
-    int yTopThickness = pixelPossible.reduce(math.min);
+    int yTopThickness = listY.reduce(math.min);
+    if (pixelPossible.length != 0) {
+      // y at the top of the thickness
+      yTopThickness = pixelPossible.reduce(math.min);
+    }
 
     // (ytop, xbot)  and (ybot xbot)
     //we dont use xtop in the first coordonnate because we want to draw
