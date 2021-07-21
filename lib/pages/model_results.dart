@@ -232,12 +232,14 @@ class _SegmentationState extends State<Segmentation> {
       }
 
       int forEachCount = 0;
+      String e;
+      var i, c;
       pixels.forEach(
         (element) {
           //surface
           String e = element.toString();
-          var i = KEYS.indexOf(e);
-          var c = VALUES[i];
+          i = KEYS.indexOf(e);
+          c = VALUES[i];
           if (!output_classes.containsKey(c)) {
             output_classes[c] = 1;
           } else {
@@ -267,11 +269,11 @@ class _SegmentationState extends State<Segmentation> {
             Compute_output_classes_distance(output_classes_Surface);
         //print(output_classes_distance);
       }
-      if (widget.volume && widget.distances.length != 0) {
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        print(widget.distances);
-        print(widget.distances[0]);
-      }
+      // if (widget.volume && widget.distances.length != 0) {
+      //   print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      //   print(widget.distances);
+      //   print(widget.distances[0]);
+      // }
       _loading = false;
     });
   }
@@ -280,6 +282,8 @@ class _SegmentationState extends State<Segmentation> {
       List<List<List<int>>> output_classes_Volume) {
     Map output_classes_height = Map();
     List<int> elemHeight = [];
+    String e;
+    var i, c;
     for (int l = 0; l < widget.surfaces.length; l++) {
       if (output_classes_Volume[l].length != 0) {
         elemHeight = elemHeight + //du premier pixel de la classe d'indice l
@@ -287,9 +291,9 @@ class _SegmentationState extends State<Segmentation> {
             [output_classes_Volume[l][0][1]] + //r
             [output_classes_Volume[l][0][2]] + //g
             [output_classes_Volume[l][0][3]]; //b
-        String e = elemHeight.toString(); //[t,r,g,b] en string
-        var i = KEYS.indexOf(e);
-        var c = VALUES[i];
+        e = elemHeight.toString(); //[t,r,g,b] en string
+        i = KEYS.indexOf(e);
+        c = VALUES[i];
 
         output_classes_height[c] =
             getThicknessprecise(output_classes_Volume[l], c);
@@ -304,6 +308,8 @@ class _SegmentationState extends State<Segmentation> {
       List<List<List<int>>> output_classes_Surface) {
     Map output_classes_distance = Map();
     List<int> elemDist = [];
+    String e;
+    var i, c;
     for (int l = 0; l < output_classes_Surface.length; l++) {
       if (output_classes_Surface[l].length != 0) {
         elemDist = elemDist + //du premier pixel de la classe d'indice l
@@ -311,9 +317,9 @@ class _SegmentationState extends State<Segmentation> {
             [output_classes_Surface[l][0][1]] + //r
             [output_classes_Surface[l][0][2]] + //g
             [output_classes_Surface[l][0][3]]; //b
-        String e = elemDist.toString(); //[t,r,g,b] en string
-        var i = KEYS.indexOf(e);
-        var c = VALUES[i];
+        e = elemDist.toString(); //[t,r,g,b] en string
+        i = KEYS.indexOf(e);
+        c = VALUES[i];
         output_classes_distance[i] = getDistance(output_classes_Surface[l]);
         elemDist = [];
       }
@@ -321,20 +327,22 @@ class _SegmentationState extends State<Segmentation> {
     return output_classes_distance;
   }
 
+  // distance between the center of the coin and the food item (each class detected) in cm
   double getDistance(List<List<int>> typeOfClassPixels) {
     if (typeOfClassPixels.length == 0) {
       return 0;
     }
-
+    int xmax = 0;
+    double distancePixel = 0.0, distanceCoinFood;
     List<int> listX = []; // correspond aux i cad lignes
 
     for (int k = 0; k < typeOfClassPixels.length; k++) {
       listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
     }
-    int xmax = listX.reduce(math.max);
-    double distancePixel =
+    xmax = listX.reduce(math.max);
+    distancePixel =
         (513 - 513 / 16 - xmax); // /16 because the middle of the coin
-    double distanceCoinFood =
+    distanceCoinFood =
         (distancePixel * COINDIAMETERIRLCM / (COINDIAMETERPIXELS / 2));
     return distanceCoinFood;
   }
@@ -396,7 +404,7 @@ class _SegmentationState extends State<Segmentation> {
   double getPixelConsideringPerspective(
       double yWithPerspective, double xDistCoinClass) {
     return yWithPerspective *
-        (1 / (1.54 - 0.39 * log(0.94 * xDistCoinClass + 4.00)));
+        (1 / (1.54 - 0.39 * log(0.94 * (xDistCoinClass).abs() + 4.00)));
   }
   //thickdeformee = thickReel - 9.33*xdistance
 
