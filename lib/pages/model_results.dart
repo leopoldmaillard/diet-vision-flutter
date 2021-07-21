@@ -141,6 +141,7 @@ class _SegmentationState extends State<Segmentation> {
     '[192, 192, 192, 255]': 'Dining Tools 🍴',
     '[192, 64, 64, 255]': 'Other Food ❓'
   };
+
   var KEYS = classes.keys.toList();
   var VALUES = classes.values.toList();
   Map surfaceSaved = Map();
@@ -232,12 +233,14 @@ class _SegmentationState extends State<Segmentation> {
       }
 
       int forEachCount = 0;
+      String e;
+      var i, c;
       pixels.forEach(
         (element) {
           //surface
-          String e = element.toString();
-          var i = KEYS.indexOf(e);
-          var c = VALUES[i];
+          e = element.toString();
+          i = KEYS.indexOf(e);
+          c = VALUES[i];
           if (!output_classes.containsKey(c)) {
             output_classes[c] = 1;
           } else {
@@ -267,11 +270,11 @@ class _SegmentationState extends State<Segmentation> {
             Compute_output_classes_distance(output_classes_Surface);
         //print(output_classes_distance);
       }
-      if (widget.volume && widget.distances.length != 0) {
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        print(widget.distances);
-        print(widget.distances[0]);
-      }
+      // if (widget.volume && widget.distances.length != 0) {
+      //   print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      //   print(widget.distances);
+      //   print(widget.distances[0]);
+      // }
       _loading = false;
     });
   }
