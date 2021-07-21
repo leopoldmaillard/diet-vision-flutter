@@ -335,7 +335,7 @@ class _SegmentationState extends State<Segmentation> {
     double distancePixel =
         (513 - 513 / 16 - xmax); // /16 because the middle of the coin
     double distanceCoinFood =
-        (distancePixel * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
+        (distancePixel * COINDIAMETERIRLCM / (COINDIAMETERPIXELS / 2));
     return distanceCoinFood;
   }
 
