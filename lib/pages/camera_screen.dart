@@ -87,6 +87,7 @@ class CameraScreenState extends State<CameraScreen> {
           cameras: cameras,
           volume: false,
           surfaces: new Map(),
+          distances: new Map(),
         ),
       ),
     );
@@ -206,6 +207,7 @@ class CameraScreenState extends State<CameraScreen> {
                   cameras: cameras,
                   volume: false,
                   surfaces: new Map(),
+                  distances: new Map(),
                 ),
               ),
             );

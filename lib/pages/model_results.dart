@@ -27,6 +27,7 @@ class DisplayPictureScreen extends StatelessWidget {
   final List<CameraDescription> cameras;
   final bool volume;
   final Map surfaces;
+  final Map distances;
 
   const DisplayPictureScreen({
     Key? key,
@@ -35,6 +36,7 @@ class DisplayPictureScreen extends StatelessWidget {
     required this.cameras,
     required this.volume,
     required this.surfaces,
+    required this.distances,
   }) : super(key: key);
 
   @override
@@ -52,6 +54,7 @@ class DisplayPictureScreen extends StatelessWidget {
         cameras: this.cameras,
         volume: this.volume,
         surfaces: this.surfaces,
+        distances: this.distances,
       ),
       //AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
@@ -64,12 +67,14 @@ class Segmentation extends StatefulWidget {
   final List<CameraDescription> cameras;
   final bool volume;
   final Map surfaces;
+  final Map distances;
   Segmentation({
     required this.imagePath,
     required this.isSamsung,
     required this.cameras,
     required this.volume,
     required this.surfaces,
+    required this.distances,
   });
 
   @override
@@ -146,9 +151,11 @@ class _SegmentationState extends State<Segmentation> {
   Map output_classes = Map();
 
   List<List<List<int>>> output_classes_Volume = [];
+  List<List<List<int>>> output_classes_Surface = [];
   Map output_classes_height = Map();
   List<List<int>> minMax = [];
   int selectedClass = 0;
+  Map output_classes_distance = Map();
 
   @override
   void initState() {
@@ -220,6 +227,10 @@ class _SegmentationState extends State<Segmentation> {
         output_classes_Volume.add([]);
       }
 
+      for (int k = 0; k < 26; k++) {
+        output_classes_Surface.add([]);
+      }
+
       int forEachCount = 0;
       pixels.forEach(
         (element) {
@@ -232,6 +243,11 @@ class _SegmentationState extends State<Segmentation> {
           } else {
             output_classes[c] += 1;
           }
+          if (!widget.volume) {
+            output_classes_Surface[i].add(
+                element + [(forEachCount / 513).round(), forEachCount % 513]);
+          }
+
           if (widget.surfaces.containsKey(c)) {
             i = widget.surfaces.keys.toList().indexOf(c);
 
@@ -245,6 +261,16 @@ class _SegmentationState extends State<Segmentation> {
       if (widget.volume) {
         output_classes_height =
             Compute_output_classes_height(output_classes_Volume);
+      }
+      if (!widget.volume) {
+        output_classes_distance =
+            Compute_output_classes_distance(output_classes_Surface);
+        //print(output_classes_distance);
+      }
+      if (widget.volume && widget.distances.length != 0) {
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        print(widget.distances);
+        print(widget.distances[0]);
       }
       _loading = false;
     });
@@ -271,6 +297,44 @@ class _SegmentationState extends State<Segmentation> {
       }
     }
     return output_classes_height;
+  }
+
+  Map Compute_output_classes_distance(
+      List<List<List<int>>> output_classes_Surface) {
+    Map output_classes_distance = Map();
+    List<int> elemDist = [];
+    for (int l = 0; l < output_classes_Surface.length; l++) {
+      if (output_classes_Surface[l].length != 0) {
+        elemDist = elemDist + //du premier pixel de la classe d'indice l
+            [output_classes_Surface[l][0][0]] + //transparence
+            [output_classes_Surface[l][0][1]] + //r
+            [output_classes_Surface[l][0][2]] + //g
+            [output_classes_Surface[l][0][3]]; //b
+        String e = elemDist.toString(); //[t,r,g,b] en string
+        var i = KEYS.indexOf(e);
+        var c = VALUES[i];
+        output_classes_distance[i] = getDistance(output_classes_Surface[l]);
+        elemDist = [];
+      }
+    }
+    return output_classes_distance;
+  }
+
+  double getDistance(List<List<int>> typeOfClassPixels) {
+    if (typeOfClassPixels.length == 0) {
+      return 0;
+    }
+
+    List<int> listX = []; // correspond aux i cad lignes
+
+    for (int k = 0; k < typeOfClassPixels.length; k++) {
+      listX.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
+    }
+    int xmax = listX.reduce(math.max);
+    double distancePixel = (513 - 513 / 16 - xmax);
+    double distanceCoinFood =
+        (distancePixel * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
+    return distanceCoinFood;
   }
 
   // Not used anymore but we cant keep it just in case for now
@@ -348,6 +412,12 @@ class _SegmentationState extends State<Segmentation> {
     return (yBottomThickness - yTopThickness).round();
   }
 
+  double getPixelConsideringPerspective(
+      double yWithPerspective, double xDistCoinClass) {
+    return yWithPerspective + 9 * xDistCoinClass;
+  }
+
+/**************************Partie Widget *********************************** */
   Widget thick(int selectedClass) {
     var SIZEWIDTH = MediaQuery.of(context).size.width;
     final points = <Widget>[];
@@ -396,13 +466,38 @@ class _SegmentationState extends State<Segmentation> {
 
   Widget volumeList() {
     List<dynamic> widSurfKey = widget.surfaces.keys.toList();
+    // List<dynamic> widSurfValue = widget.surfaces.values.toList();
     final chips = <Widget>[];
     var categories = classes.values.toList();
-
+    var mykeys = widget.distances.keys.toList();
+    // int idxClass = -1;
+    // int autreidx = -1;
+    // var myvalue = widSurfValue[idxClass];
+    print("surfaces key:");
+    print(widget.surfaces.keys.toList());
+    print("surfaces values:");
+    print(widget.surfaces.values.toList());
+    print(widget.distances);
     for (int i = 0; i < minMax.length; i++) {
-      int thickpixels = minMax[i][2] - minMax[i][0];
+      double thickpixels = (minMax[i][2] - minMax[i][0]).toDouble();
+      int idxClass = classes.values.toList().indexOf(widSurfKey[i]);
+      int idxClassDist = widget.distances.keys.toList().indexOf(idxClass);
+      print('the idxClass is $idxClass');
+      print('the idxClassDist is $idxClassDist');
+      double distCoinClass = widget.distances.values.toList()[idxClassDist];
+      print('the distance coin-class is $distCoinClass');
+      // autreidx = mykeys.indexOf(idxClass.toString());
+      // print('idxCLass $idxClass');
+      // print('value idxClass $myvalue');
+      // print('autreidx $autreidx');
+      double thickpixelsReal =
+          getPixelConsideringPerspective(thickpixels, distCoinClass);
 
-      double thickness = (thickpixels * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
+      print('the real thicknespixel is $thickpixelsReal');
+      print('the thicknespixel is $thickpixels');
+      double thickness =
+          (thickpixelsReal * COINDIAMETERIRLCM / (2 * COINDIAMETERPIXELS));
+      print('real thickness in cm : $thickness');
       // print("BOOOOOOOOOOOOOONNNNNNNNJOUR");
       // print(classes[i]);
       // print(thickness);
@@ -413,6 +508,10 @@ class _SegmentationState extends State<Segmentation> {
 
       int item = widSurfKey.indexOf(widSurfKey[i]);
       int surf = widget.surfaces.values.toList()[item];
+      print("voila surface");
+      print(widget.surfaces.values.toList());
+      print("voila surface2");
+      print(widget.surfaces.keys.toList());
       int volume = (thickness * surf).round();
 
       chips.add(ActionChip(
@@ -455,6 +554,7 @@ class _SegmentationState extends State<Segmentation> {
                   builder: (context) => SecondPictureScreen(
                     cameras: widget.cameras,
                     surfaces: surfaceSaved,
+                    distances: output_classes_distance,
                   ),
                 ),
               );

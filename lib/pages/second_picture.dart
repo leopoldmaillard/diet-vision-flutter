@@ -10,10 +10,12 @@ import 'package:camera/camera.dart';
 class SecondPictureScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
   final Map surfaces;
+  final Map distances;
 
   SecondPictureScreen({
     required this.cameras,
     required this.surfaces,
+    required this.distances,
   });
 
   @override
@@ -152,6 +154,7 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   cameras: widget.cameras,
                   volume: true,
                   surfaces: widget.surfaces,
+                  distances: widget.distances,
                 ),
               ),
             );
