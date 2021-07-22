@@ -56,7 +56,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    print("disposed");
+    print("Camera 1 is disposed");
     controller.dispose();
     super.dispose();
   }
@@ -71,7 +71,7 @@ class CameraScreenState extends State<CameraScreen> {
           // the DisplayPictureScreen widget.
           imagePath: image.path,
           isSamsung: false,
-          cameras: cameras,
+          controller: controller,
           volume: false,
           surfaces: new Map(),
           distances: new Map(),
@@ -196,7 +196,7 @@ class CameraScreenState extends State<CameraScreen> {
                   // the DisplayPictureScreen widget.
                   imagePath: croppedFile.path,
                   isSamsung: isSamsung,
-                  cameras: cameras,
+                  controller: controller,
                   volume: false,
                   surfaces: new Map(),
                   distances: new Map(),

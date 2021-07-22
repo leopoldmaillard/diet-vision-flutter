@@ -8,12 +8,12 @@ import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
 import 'package:camera/camera.dart';
 
 class SecondPictureScreen extends StatefulWidget {
-  final List<CameraDescription> cameras;
+  final CameraController controller;
   final Map surfaces;
   final Map distances;
 
   SecondPictureScreen({
-    required this.cameras,
+    required this.controller,
     required this.surfaces,
     required this.distances,
   });
@@ -23,25 +23,14 @@ class SecondPictureScreen extends StatefulWidget {
 }
 
 class _SecondPictureScreenState extends State<SecondPictureScreen> {
-  late CameraController controller;
-
   @override
   void initState() {
     super.initState();
-    controller =
-        new CameraController(widget.cameras[0], ResolutionPreset.medium);
-    controller.initialize().then((_) {
-      if (!mounted) {
-        //not in the tree
-        return;
-      }
-      setState(() {});
-    });
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    //controller.dispose();
     super.dispose();
   }
 
@@ -61,10 +50,10 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   child: FittedBox(
                     fit: BoxFit.fitWidth,
                     child: Container(
-                      width: size / controller.value.aspectRatio,
+                      width: size / widget.controller.value.aspectRatio,
                       height: size,
                       child: new CameraPreview(
-                          controller), // this is my CameraPreview
+                          widget.controller), // this is my CameraPreview
                     ),
                   ),
                 ),
@@ -101,7 +90,7 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (!controller.value.isInitialized) {
+    if (!widget.controller.value.isInitialized) {
       return new Container();
     }
 
@@ -123,11 +112,11 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
           // catch the error.
           try {
             // Ensure that the camera is initialized.
-            await controller;
+            await widget.controller;
 
             // Attempt to take a picture and get the file `image`
             // where it was saved.
-            final image = await controller.takePicture();
+            final image = await widget.controller.takePicture();
 
             ImageProperties properties =
                 await FlutterNativeImage.getImageProperties(image.path);
@@ -155,7 +144,7 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   // the DisplayPictureScreen widget.
                   imagePath: croppedFile.path,
                   isSamsung: isSamsung,
-                  cameras: widget.cameras,
+                  controller: widget.controller,
                   volume: true,
                   surfaces: widget.surfaces,
                   distances: widget.distances,

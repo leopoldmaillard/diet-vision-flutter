@@ -22,7 +22,7 @@ const double COINDIAMETERIRLCM = 1.2875 * 2;
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
   final bool isSamsung;
-  final List<CameraDescription> cameras;
+  final CameraController controller;
   final bool volume;
   final Map surfaces;
   final Map distances;
@@ -31,7 +31,7 @@ class DisplayPictureScreen extends StatelessWidget {
     Key? key,
     required this.imagePath,
     required this.isSamsung,
-    required this.cameras,
+    required this.controller,
     required this.volume,
     required this.surfaces,
     required this.distances,
@@ -49,7 +49,7 @@ class DisplayPictureScreen extends StatelessWidget {
       body: Segmentation(
         imagePath: this.imagePath,
         isSamsung: this.isSamsung,
-        cameras: this.cameras,
+        controller: this.controller,
         volume: this.volume,
         surfaces: this.surfaces,
         distances: this.distances,
@@ -62,14 +62,14 @@ class DisplayPictureScreen extends StatelessWidget {
 class Segmentation extends StatefulWidget {
   final String imagePath;
   final bool isSamsung;
-  final List<CameraDescription> cameras;
+  final CameraController controller;
   final bool volume;
   final Map surfaces;
   final Map distances;
   Segmentation({
     required this.imagePath,
     required this.isSamsung,
-    required this.cameras,
+    required this.controller,
     required this.volume,
     required this.surfaces,
     required this.distances,
@@ -166,6 +166,7 @@ class _SegmentationState extends State<Segmentation> {
 
   @override
   void dispose() {
+    print("TFlite is disposed");
     super.dispose();
     Tflite.close();
   }
@@ -538,7 +539,7 @@ class _SegmentationState extends State<Segmentation> {
               await Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => SecondPictureScreen(
-                    cameras: widget.cameras,
+                    controller: widget.controller,
                     surfaces: surfaceSaved,
                     distances: _output_classes_distance,
                   ),
