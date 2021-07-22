@@ -93,6 +93,71 @@ class CameraScreenState extends State<CameraScreen> {
     );
   }
 
+  /* **********************WIDGET**********************/
+  Widget getDisplayCameraScreen(size) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Stack(
+          alignment: Alignment.bottomRight,
+          children: <Widget>[
+            Container(
+              width: size,
+              height: size,
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.center,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Container(
+                      width: size / controller.value.aspectRatio,
+                      height: size,
+                      child: new CameraPreview(
+                          controller), // this is my CameraPreview
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              child: Container(
+                width: size / 8,
+                height: size / 8,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).primaryColor.withOpacity(0.4),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 5),
+        Container(
+          child: Text(
+            "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(height: 40),
+        ElevatedButton.icon(
+          icon: Icon(Icons.image),
+          label: Text('Chose from Gallery'),
+          onPressed: () {
+            pickGalleryImage();
+          },
+          style: ElevatedButton.styleFrom(
+            shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(50.0),
+            ),
+            primary: Theme.of(context).primaryColor,
+          ),
+        ),
+        // Drinks
+        DrinksButton(),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!controller.value.isInitialized) {
@@ -102,67 +167,7 @@ class CameraScreenState extends State<CameraScreen> {
     var size = MediaQuery.of(context).size.width;
     bool isSamsung = false;
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: <Widget>[
-              Container(
-                width: size,
-                height: size,
-                child: ClipRect(
-                  child: OverflowBox(
-                    alignment: Alignment.center,
-                    child: FittedBox(
-                      fit: BoxFit.fitWidth,
-                      child: Container(
-                        width: size / controller.value.aspectRatio,
-                        height: size,
-                        child: new CameraPreview(
-                            controller), // this is my CameraPreview
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Align(
-                child: Container(
-                  width: size / 8,
-                  height: size / 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).primaryColor.withOpacity(0.4),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          Container(
-            child: Text(
-              "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(height: 40),
-          ElevatedButton.icon(
-            icon: Icon(Icons.image),
-            label: Text('Chose from Gallery'),
-            onPressed: () {
-              pickGalleryImage();
-            },
-            style: ElevatedButton.styleFrom(
-              shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(50.0),
-              ),
-              primary: Theme.of(context).primaryColor,
-            ),
-          ),
-          // Drinks
-          DrinksButton(),
-        ],
-      ),
+      body: getDisplayCameraScreen(size),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         child: const Icon(Icons.circle_outlined),
