@@ -14,44 +14,93 @@ class _StatisticsState extends State<Statistics> {
   DateTime _Today = new DateTime.now();
   bool showAvg = false;
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              // Display the text on top of the chart
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Text(
-                      "Meal's result",
-                      style: TextStyle(
-                          color: Color(0xff827daa),
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 2),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                  ]),
-              Text(
-                _Today.toString().substring(0, 10),
+  // get title of the Y axe
+  String getTitlesY(value) {
+    switch (value.toInt()) {
+      case 1:
+        return '1000 kcal';
+      case 3:
+        return '1500 kcal ';
+      case 5:
+        return '2000 kcal';
+    }
+    return '';
+  }
+
+  //get Title of the X axe
+  String getTitlesX(value) {
+    switch (value.toInt()) {
+      case 2:
+        return 'JUN';
+      case 5:
+        return 'JUL';
+      case 8:
+        return 'AUG';
+    }
+    return '';
+  }
+
+  SideTitles displayTitleData() {
+    return SideTitles(
+      showTitles: true,
+      reservedSize: 22,
+      getTextStyles: (value) => const TextStyle(
+          color: Color(0xff68737d), fontWeight: FontWeight.bold, fontSize: 16),
+      getTitles: (value) => getTitlesX(value),
+      margin: 8,
+    );
+
+    // Y Axis
+  }
+
+  SideTitles displaySideTitles() {
+    return SideTitles(
+      showTitles: true,
+      getTextStyles: (value) => const TextStyle(
+        color: Color(0xff67727d),
+        fontWeight: FontWeight.bold,
+        fontSize: 15,
+      ),
+      getTitles: (value) => getTitlesY(value),
+      reservedSize: 28,
+      margin: 12,
+    );
+  }
+
+  Widget displayStatisticScreen(BuildContext context) {
+    return Column(
+      children: [
+        // Display the text on top of the chart
+        Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const SizedBox(
+                height: 10,
+              ),
+              const Text(
+                "Meal's result",
                 style: TextStyle(
                     color: Color(0xff827daa),
-                    fontSize: 25,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2),
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(
+                height: 10,
+              ),
+            ]),
+        Text(
+          _Today.toString().substring(0, 10),
+          style: TextStyle(
+              color: Color(0xff827daa),
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2),
+          textAlign: TextAlign.center,
+        ),
 
-              /*SizedBox(
+        /*SizedBox(
                 width: 80,
                 height: 40,
                 child: DropdownTiming(),
@@ -60,49 +109,56 @@ class _StatisticsState extends State<Statistics> {
               Expanded(
                 child: DropdownTiming(),
               ),*/
-              // Display the chart
-              AspectRatio(
-                aspectRatio:
-                    0.8, //1.70 (ratio graphic between height and width),
-                child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(18),
-                      ),
-                      color: Color(0xff232d37)),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        right: 18.0, left: 12.0, top: 24, bottom: 12),
-                    child: LineChart(
-                      showAvg ? avgData() : mainData(),
-                    ),
-                  ),
-                ),
-              ),
 
-              // Button to display the average of the first curve
-              SizedBox(
-                width: 80,
-                height: 40,
-                child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      showAvg = !showAvg;
-                    });
-                  },
-                  child: Text(
-                    'AVG',
-                    style: TextStyle(
-                        fontSize: 25,
-                        color: showAvg
-                            ? Colors.purple.withOpacity(0.5)
-                            : Colors.purple),
-                  ),
+        // Display the chart
+        AspectRatio(
+          aspectRatio: 0.8, //1.70 (ratio graphic between height and width),
+          child: Container(
+            margin: const EdgeInsets.all(8.0),
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(18),
                 ),
+                color: Color(0xff232d37)),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  right: 18.0, left: 12.0, top: 24, bottom: 12),
+              child: LineChart(
+                showAvg ? avgData() : mainData(),
               ),
-            ],
+            ),
           ),
+        ),
+
+        // Button to display the average of the first curve
+        SizedBox(
+          width: 80,
+          height: 40,
+          child: TextButton(
+            onPressed: () {
+              setState(() {
+                showAvg = !showAvg;
+              });
+            },
+            child: Text(
+              'AVG',
+              style: TextStyle(
+                  fontSize: 25,
+                  color:
+                      showAvg ? Colors.purple.withOpacity(0.5) : Colors.purple),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        SingleChildScrollView(
+          child: displayStatisticScreen(context),
         ),
       ],
     );
@@ -134,49 +190,10 @@ class _StatisticsState extends State<Statistics> {
       // X Axis
       titlesData: FlTitlesData(
         show: true,
-        bottomTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 22,
-          getTextStyles: (value) => const TextStyle(
-              color: Color(0xff68737d),
-              fontWeight: FontWeight.bold,
-              fontSize: 16),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 2:
-                return 'JUN';
-              case 5:
-                return 'JUL';
-              case 8:
-                return 'AUG';
-            }
-            return '';
-          },
-          margin: 8,
-        ),
+        bottomTitles: displayTitleData(),
 
         // Y Axis
-        leftTitles: SideTitles(
-          showTitles: true,
-          getTextStyles: (value) => const TextStyle(
-            color: Color(0xff67727d),
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 1:
-                return '1000 kcal';
-              case 3:
-                return '1500 kcal';
-              case 5:
-                return '2000 kcal';
-            }
-            return '';
-          },
-          reservedSize: 28,
-          margin: 12,
-        ),
+        leftTitles: displaySideTitles(),
       ),
 
       // Chart Axis initialisation
@@ -238,49 +255,10 @@ class _StatisticsState extends State<Statistics> {
       ),
       titlesData: FlTitlesData(
         show: true,
-        bottomTitles: SideTitles(
-          showTitles: true,
-          reservedSize: 22,
-          getTextStyles: (value) => const TextStyle(
-              color: Color(0xff68737d),
-              fontWeight: FontWeight.bold,
-              fontSize: 16),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 2:
-                return 'JUN';
-              case 5:
-                return 'JUL';
-              case 8:
-                return 'AUG';
-            }
-            return '';
-          },
-          margin: 8,
-        ),
+        bottomTitles: displayTitleData(),
 
         // Y Axis Legend
-        leftTitles: SideTitles(
-          showTitles: true,
-          getTextStyles: (value) => const TextStyle(
-            color: Color(0xff67727d),
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 1:
-                return '1000 kcal';
-              case 3:
-                return '1500 kcal ';
-              case 5:
-                return '2000 kcal';
-            }
-            return '';
-          },
-          reservedSize: 28,
-          margin: 12,
-        ),
+        leftTitles: displaySideTitles(),
       ),
 
       // Size of the chart and display average data
