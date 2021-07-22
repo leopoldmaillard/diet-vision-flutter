@@ -237,7 +237,7 @@ class _SegmentationState extends State<Segmentation> {
       pixels.forEach(
         (element) {
           //surface
-          String e = element.toString();
+          e = element.toString();
           i = KEYS.indexOf(e);
           c = VALUES[i];
           if (!output_classes.containsKey(c)) {
@@ -333,7 +333,7 @@ class _SegmentationState extends State<Segmentation> {
       return 0;
     }
     int xmax = 0;
-    double distancePixel = 0.0, distanceCoinFood;
+    double distancePixel, distanceCoinFood;
     List<int> listX = []; // correspond aux i cad lignes
 
     for (int k = 0; k < typeOfClassPixels.length; k++) {
@@ -344,7 +344,10 @@ class _SegmentationState extends State<Segmentation> {
         (513 - 513 / 16 - xmax); // /16 because the middle of the coin
     distanceCoinFood =
         (distancePixel * COINDIAMETERIRLCM / (COINDIAMETERPIXELS / 2));
-    return distanceCoinFood;
+    if (distanceCoinFood < 0) {
+      return distanceCoinFood.abs();
+    } else
+      return distanceCoinFood;
   }
 
   /// get an estimation of the thickness
@@ -404,7 +407,7 @@ class _SegmentationState extends State<Segmentation> {
   double getPixelConsideringPerspective(
       double yWithPerspective, double xDistCoinClass) {
     return yWithPerspective *
-        (1 / (1.54 - 0.39 * log(0.94 * (xDistCoinClass).abs() + 4.00)));
+        (1 / (1.54 - 0.39 * log(0.94 * (xDistCoinClass) + 4.00)));
   }
   //thickdeformee = thickReel - 9.33*xdistance
 
@@ -455,46 +458,44 @@ class _SegmentationState extends State<Segmentation> {
     return Stack(children: points);
   }
 
+  // obtain a list of the volume and the thickness for each class segmented in the first/second picture
   Widget volumeList() {
     List<dynamic> widSurfKey = widget.surfaces.keys.toList();
+    List<dynamic> widSurfVal = widget.surfaces.values.toList();
     final chips = <Widget>[];
     var categories = classes.values.toList();
     var mykeys = widget.distances.keys.toList();
+    var dist = widget.distances.values.toList();
 
-    // print("surfaces key:");
-    // print(widget.surfaces.keys.toList());
-    // print("surfaces values:");
-    // print(widget.surfaces.values.toList());
     print(widget.distances);
+    double thickPixels, thickness, distCoinClass, thickPixelsReal;
+    //idxClass: index in the output_classes of the current classe
+    //idxClassDIst: index in the widget.distance of the current classe
+    int idxClass, idxClassDist; //, index, color, item, surf, volume;
 
+    /************************  INFO IMPORTANTE ****************************************
+     * **  Si on cree ces variables en dehors de la boucle for:
+     *  (sur la deuxieme photo) on peut changer une fois le curseur sur la classe backed cook
+     *  et après on peut plus changer les classes pour ajuster la thickness*****/
+
+    // obtain the volume for each class segmented in the first/second picture
     for (int i = 0; i < minMax.length; i++) {
-      double thickpixels = (minMax[i][2] - minMax[i][0]).toDouble();
-      int idxClass = classes.values.toList().indexOf(widSurfKey[i]);
-      int idxClassDist = widget.distances.keys.toList().indexOf(idxClass);
-      print(
-          'the idxClass is $idxClass'); // index in the output_classes of the current classe
-      print(
-          'the idxClassDist is $idxClassDist'); // index in the widget.distance of the current classe
-      double distCoinClass = widget.distances.values.toList()[idxClassDist];
-      print('the distance coin-class is $distCoinClass');
-      double thickpixelsReal =
-          getPixelConsideringPerspective(thickpixels, distCoinClass);
-      print('the thicknespixel is $thickpixels');
-      print('the real thicknespixel is $thickpixelsReal');
-
-      double thickness =
-          (thickpixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
+      thickPixels = (minMax[i][2] - minMax[i][0]).toDouble();
+      idxClass =
+          categories.indexOf(widSurfKey[i]); // replace: classes.values.toList()
+      idxClassDist =
+          mykeys.indexOf(idxClass); // replace:widget.distances.keys.toList()
+      distCoinClass = dist[idxClassDist]; // replace:widget.distances.values
+      thickPixelsReal =
+          getPixelConsideringPerspective(thickPixels, distCoinClass);
+      thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
       print('real thickness in cm : $thickness');
-      // print("BOOOOOOOOOOOOOONNNNNNNNJOUR");
-      // print(classes[i]);
-      // print(thickness);
-      // print("end of thickness");
 
       int index = categories.indexOf(widSurfKey[i]);
       int color = pascalVOCLabelColors[index];
 
       int item = widSurfKey.indexOf(widSurfKey[i]);
-      int surf = widget.surfaces.values.toList()[item];
+      int surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
       int volume = (thickness * surf).round();
 
       chips.add(ActionChip(
