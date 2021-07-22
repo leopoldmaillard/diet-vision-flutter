@@ -232,8 +232,25 @@ class DrinksButton extends StatefulWidget {
 
 /* This is the private State class that goes with MyStatefulWidget. */
 class _DrinksButtonState extends State<DrinksButton> {
-  @override
-  Widget build(BuildContext context) {
+  DropdownMenuItem<String> displayImagesAndLabels(Map map) {
+    return new DropdownMenuItem<String>(
+      value: map["id"].toString(),
+      // value: _mySelection,
+      child: Row(
+        children: <Widget>[
+          Image.asset(
+            map["image"],
+            width: 25,
+            height: 25,
+          ),
+          Container(
+              margin: EdgeInsets.only(left: 10), child: Text(map["name"])),
+        ],
+      ),
+    );
+  }
+
+  Widget drinkButton(BuildContext context) {
     return DropdownButton<String>(
       value: dropdownValue,
       icon: Icon(
@@ -248,27 +265,22 @@ class _DrinksButtonState extends State<DrinksButton> {
         color: Theme.of(context).primaryColor,
       ),
       onChanged: (String? newValue) {
-        setState(() {
-          dropdownValue = newValue!;
-        });
-      },
-      items: _myJson.map((Map map) {
-        return new DropdownMenuItem<String>(
-          value: map["id"].toString(),
-          // value: _mySelection,
-          child: Row(
-            children: <Widget>[
-              Image.asset(
-                map["image"],
-                width: 25,
-                height: 25,
-              ),
-              Container(
-                  margin: EdgeInsets.only(left: 10), child: Text(map["name"])),
-            ],
-          ),
+        setState(
+          () {
+            dropdownValue = newValue!;
+          },
         );
-      }).toList(),
+      },
+      items: _myJson.map(
+        (Map map) {
+          return displayImagesAndLabels(map);
+        },
+      ).toList(),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return drinkButton(context);
   }
 }

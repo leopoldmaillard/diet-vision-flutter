@@ -489,7 +489,10 @@ class _SegmentationState extends State<Segmentation> {
       thickPixelsReal =
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
+
+      print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
       print('real thickness in cm : $thickness');
+      print('distance : $distCoinClass');
 
       int index = categories.indexOf(widSurfKey[i]);
       int color = pascalVOCLabelColors[index];
