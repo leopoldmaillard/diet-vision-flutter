@@ -1,8 +1,6 @@
 import 'dart:math';
-import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:quiver/collection.dart';
@@ -15,11 +13,11 @@ import 'package:flutter_dash/flutter_dash.dart';
 
 // globals variables
 
-int OUTPUTSIZE = 513 * 513;
-double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
+const int OUTPUTSIZE = 513 * 513;
+const double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
 const double SURFACE2EUROS = pi * 12.875 * 12.875; // 521 mm2
-double COINDIAMETERPIXELS = 513 / 4;
-double COINDIAMETERIRLCM = 1.2875 * 2;
+const double COINDIAMETERPIXELS = 513 / 4;
+const double COINDIAMETERIRLCM = 1.2875 * 2;
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
@@ -148,14 +146,14 @@ class _SegmentationState extends State<Segmentation> {
   bool _loading = true;
   var _outputPNG; // Mask
   var _outputRAW; // classic picture taken
-  Map output_classes = Map();
+  Map _output_classes = Map();
 
-  List<List<List<int>>> output_classes_Volume = [];
-  List<List<List<int>>> output_classes_Surface = [];
-  Map output_classes_height = Map();
+  List<List<List<int>>> _output_classes_Volume = [];
+  List<List<List<int>>> _output_classes_Surface = [];
+  Map _output_classes_height = Map();
+  Map _output_classes_distance = Map();
   List<List<int>> minMax = [];
-  int selectedClass = 0;
-  Map output_classes_distance = Map();
+  int _selectedClass = 0;
 
   @override
   void initState() {
@@ -179,7 +177,8 @@ class _SegmentationState extends State<Segmentation> {
 
   segmentImage(String imagePath) async {
     var output;
-    var outputFixed;
+    var outputraw;
+
     if (widget.isSamsung) {
       final originalFile = File(imagePath);
       List<int> imageBytes = await originalFile.readAsBytes();
@@ -193,13 +192,14 @@ class _SegmentationState extends State<Segmentation> {
       final fixedFile =
           await originalFile.writeAsBytes(IMG.encodePng(fixedImage));
 
-      outputFixed = await Tflite.runSegmentationOnImage(
+      output = await Tflite.runSegmentationOnImage(
         path: fixedFile.path,
         imageMean: 0.0,
         imageStd: 255.0,
         labelColors: pascalVOCLabelColors,
         outputType: 'png',
       );
+      outputraw = IMG.decodePng(output);
     } else {
       output = await Tflite.runSegmentationOnImage(
         // Segmentation for regular Mobile Phone
@@ -209,65 +209,75 @@ class _SegmentationState extends State<Segmentation> {
         labelColors: pascalVOCLabelColors,
         outputType: 'png',
       );
+      outputraw = IMG.decodePng(output);
     }
+
+    if (outputraw != null)
+      outputraw = outputraw.getBytes(format: IMG.Format.rgba);
+
+    Iterable<List<int>> pixels = partition(outputraw, 4);
+    List<List<List<int>>> output_classes_Volume = [];
+    List<List<List<int>>> output_classes_Surface = [];
+
+    for (int k = 0; k < widget.surfaces.length; k++) {
+      output_classes_Volume.add([]);
+    }
+
+    for (int k = 0; k < 26; k++) {
+      output_classes_Surface.add([]);
+    }
+
+    Map output_classes = Map();
+    int forEachCount = 0;
+    String e;
+    var i, c;
+    pixels.forEach(
+      (element) {
+        //surface
+        e = element.toString();
+        i = KEYS.indexOf(e);
+        c = VALUES[i];
+        if (!output_classes.containsKey(c)) {
+          output_classes[c] = 1;
+        } else {
+          output_classes[c] += 1;
+        }
+        if (!widget.volume) {
+          output_classes_Surface[i].add(
+              element + [(forEachCount / 513).round(), forEachCount % 513]);
+        }
+
+        if (widget.surfaces.containsKey(c)) {
+          i = widget.surfaces.keys.toList().indexOf(c);
+
+          //concatene list [jsaipaskwa, r,g,b] et [i,j]
+          output_classes_Volume[i].add(
+              element + [(forEachCount / 513).round(), forEachCount % 513]);
+        }
+        forEachCount++;
+      },
+    );
+
+    Map output_classes_height = Map();
+    Map output_classes_distance = Map();
+
+    if (widget.volume) {
+      output_classes_height =
+          Compute_output_classes_height(output_classes_Volume);
+    }
+    if (!widget.volume) {
+      output_classes_distance =
+          Compute_output_classes_distance(output_classes_Surface);
+    }
+
     setState(() {
-      if (widget.isSamsung) {
-        _outputPNG = outputFixed;
-        _outputRAW = IMG.decodePng(outputFixed);
-      } else {
-        _outputPNG = output;
-        _outputRAW = IMG.decodePng(output);
-      }
-      if (_outputRAW != null)
-        _outputRAW = _outputRAW.getBytes(format: IMG.Format.rgba);
-
-      /* separate each pixel in the format of 4 value rgb+jesaispluquoi */
-      Iterable<List<int>> pixels = partition(_outputRAW, 4);
-      for (int k = 0; k < widget.surfaces.length; k++) {
-        output_classes_Volume.add([]);
-      }
-
-      for (int k = 0; k < 26; k++) {
-        output_classes_Surface.add([]);
-      }
-
-      int forEachCount = 0;
-      String e;
-      var i, c;
-      pixels.forEach(
-        (element) {
-          //surface
-          e = element.toString();
-          i = KEYS.indexOf(e);
-          c = VALUES[i];
-          if (!output_classes.containsKey(c)) {
-            output_classes[c] = 1;
-          } else {
-            output_classes[c] += 1;
-          }
-          if (!widget.volume) {
-            output_classes_Surface[i].add(
-                element + [(forEachCount / 513).round(), forEachCount % 513]);
-          }
-
-          if (widget.surfaces.containsKey(c)) {
-            i = widget.surfaces.keys.toList().indexOf(c);
-
-            //concatene list [jsaipaskwa, r,g,b] et [i,j]
-            output_classes_Volume[i].add(
-                element + [(forEachCount / 513).round(), forEachCount % 513]);
-          }
-          forEachCount++;
-        },
-      );
-      if (widget.volume) {
-        output_classes_height =
-            Compute_output_classes_height(output_classes_Volume);
-      }
-      if (!widget.volume) {
-        output_classes_distance =
-            Compute_output_classes_distance(output_classes_Surface);
-      }
+      _outputPNG = output;
+      _outputRAW = outputraw;
+      _output_classes = output_classes;
+      _output_classes_Surface = output_classes_Surface;
+      _output_classes_Volume = output_classes_Volume;
+      _output_classes_distance = output_classes_distance;
+      _output_classes_height = output_classes_height;
       _loading = false;
     });
   }
@@ -493,13 +503,13 @@ class _SegmentationState extends State<Segmentation> {
       chips.add(ActionChip(
         onPressed: () {
           setState(() {
-            selectedClass = item;
+            _selectedClass = item;
           });
         },
         backgroundColor: Color(color),
         shape: StadiumBorder(
           side: BorderSide(
-            color: item == selectedClass
+            color: item == _selectedClass
                 ? Theme.of(context).primaryColor
                 : Color(color),
             width: 2.0,
@@ -530,7 +540,7 @@ class _SegmentationState extends State<Segmentation> {
                   builder: (context) => SecondPictureScreen(
                     cameras: widget.cameras,
                     surfaces: surfaceSaved,
-                    distances: output_classes_distance,
+                    distances: _output_classes_distance,
                   ),
                 ),
               );
@@ -548,13 +558,13 @@ class _SegmentationState extends State<Segmentation> {
   Widget displaySlider(bool volume) {
     return volume
         ? Slider(
-            value: minMax[selectedClass][0].toDouble(),
+            value: minMax[_selectedClass][0].toDouble(),
             min: 0,
-            max: minMax[selectedClass][2].toDouble(),
+            max: minMax[_selectedClass][2].toDouble(),
             activeColor: Theme.of(context).primaryColor,
             onChanged: (double value) {
               setState(() {
-                minMax[selectedClass][0] = value.toInt();
+                minMax[_selectedClass][0] = value.toInt();
               });
             },
           )
@@ -564,7 +574,7 @@ class _SegmentationState extends State<Segmentation> {
   Widget displaySurfaceOrVolume(bool volume, List<String> categories) {
     return !volume
         ? ListView(
-            children: output_classes.entries.map(
+            children: _output_classes.entries.map(
               (e) {
                 int percent = ((e.value / OUTPUTSIZE) * 100).round();
                 if (percent >= 1) {
@@ -620,7 +630,7 @@ class _SegmentationState extends State<Segmentation> {
             ? Container(
                 height: SIZEWIDTH,
                 width: SIZEWIDTH,
-                child: thick(selectedClass),
+                child: thick(_selectedClass),
               )
             : Container(),
       ],

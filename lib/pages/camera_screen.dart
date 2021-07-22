@@ -56,6 +56,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
+    print("disposed");
     controller.dispose();
     super.dispose();
   }
