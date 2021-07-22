@@ -6,19 +6,6 @@ import 'package:transfer_learning_fruit_veggies/main.dart';
 import 'dart:math';
 import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
 import 'package:image_picker/image_picker.dart';
-
-// class CameraScreen extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Center(
-//       child: new Text(
-//         "Camera_Screen",
-//         style: new TextStyle(fontSize: 20.0),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:camera/camera.dart';
 
 /* Json Format variable for the drop down List button of beverage */
@@ -61,7 +48,6 @@ class CameraScreenState extends State<CameraScreen> {
         new CameraController(widget.cameras[0], ResolutionPreset.medium);
     controller.initialize().then((_) {
       if (!mounted) {
-        //not in the tree
         return;
       }
       setState(() {});

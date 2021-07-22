@@ -31,7 +31,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       } else {
         showFab = false;
       }
-      setState(() {});
+      //setState(() {});
     });
   }
 

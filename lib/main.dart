@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/home.dart';
@@ -21,7 +20,6 @@ class MyApp extends StatelessWidget {
         primaryColor: new Color(0xff8C33FF),
       ),
       debugShowCheckedModeBanner: false,
-      //home: new Home(),
       home: new Home(cameras: cameras),
     );
   }

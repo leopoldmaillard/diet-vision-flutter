@@ -267,13 +267,7 @@ class _SegmentationState extends State<Segmentation> {
       if (!widget.volume) {
         output_classes_distance =
             Compute_output_classes_distance(output_classes_Surface);
-        //print(output_classes_distance);
       }
-      // if (widget.volume && widget.distances.length != 0) {
-      //   print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-      //   print(widget.distances);
-      //   print(widget.distances[0]);
-      // }
       _loading = false;
     });
   }
@@ -467,7 +461,6 @@ class _SegmentationState extends State<Segmentation> {
     var mykeys = widget.distances.keys.toList();
     var dist = widget.distances.values.toList();
 
-    print(widget.distances);
     double thickPixels, thickness, distCoinClass, thickPixelsReal;
     //idxClass: index in the output_classes of the current classe
     //idxClassDIst: index in the widget.distance of the current classe
@@ -489,10 +482,6 @@ class _SegmentationState extends State<Segmentation> {
       thickPixelsReal =
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
-
-      print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-      print('real thickness in cm : $thickness');
-      print('distance : $distCoinClass');
 
       int index = categories.indexOf(widSurfKey[i]);
       int color = pascalVOCLabelColors[index];
