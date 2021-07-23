@@ -404,8 +404,9 @@ class _SegmentationState extends State<Segmentation> {
 
     points.add(
       Positioned(
-        top: minMax[selectedClass][0] / 513 * SIZEWIDTH - 5,
-        left: minMax[selectedClass][1] / 513 * SIZEWIDTH - 5,
+        //rangeslider changement
+        top: minMax[selectedClass][0].abs() / 513 * SIZEWIDTH - 5,
+        left: minMax[selectedClass][1].abs() / 513 * SIZEWIDTH - 5,
         child: Container(
           height: 10,
           width: 10,
@@ -416,8 +417,9 @@ class _SegmentationState extends State<Segmentation> {
     );
     points.add(
       Positioned(
-        top: minMax[selectedClass][2] / 513 * SIZEWIDTH - 5,
-        left: minMax[selectedClass][3] / 513 * SIZEWIDTH - 5,
+        //here rangeslider changment
+        top: minMax[selectedClass][2].abs() / 513 * SIZEWIDTH - 5,
+        left: minMax[selectedClass][3].abs() / 513 * SIZEWIDTH - 5,
         child: Container(
           height: 10,
           width: 10,
@@ -428,12 +430,14 @@ class _SegmentationState extends State<Segmentation> {
     );
     points.add(
       Positioned(
-        top: minMax[selectedClass][0] / 513 * SIZEWIDTH + 5,
-        left: minMax[selectedClass][1] / 513 * SIZEWIDTH,
+        //rangesliderchangment
+        top: minMax[selectedClass][0].abs() / 513 * SIZEWIDTH + 5,
+        left: minMax[selectedClass][1].abs() / 513 * SIZEWIDTH,
         child: Dash(
           direction: Axis.vertical,
-          length: (minMax[selectedClass][2] / 513 * SIZEWIDTH - 10) -
-              (minMax[selectedClass][0] / 513 * SIZEWIDTH),
+          //here
+          length: (minMax[selectedClass][2].abs() / 513 * SIZEWIDTH - 10) -
+              (minMax[selectedClass][0].abs() / 513 * SIZEWIDTH),
           dashColor: Theme.of(context).primaryColor,
           dashLength: 4,
           dashBorderRadius: 8,
@@ -457,7 +461,8 @@ class _SegmentationState extends State<Segmentation> {
     print(widget.distances);
 
     for (int i = 0; i < minMax.length; i++) {
-      double thickpixels = (minMax[i][2] - minMax[i][0]).toDouble();
+      //rangeslider changement
+      double thickpixels = (minMax[i][2].abs() - minMax[i][0].abs()).toDouble();
       int idxClass = classes.values.toList().indexOf(widSurfKey[i]);
       int idxClassDist = widget.distances.keys.toList().indexOf(idxClass);
       print(
@@ -542,8 +547,10 @@ class _SegmentationState extends State<Segmentation> {
   }
 
   Widget displaySlider(bool volume) {
+    // double ymax = -minMax[selectedClass][2].toDouble();
+    // double ymin = -minMax[selectedClass][0].toDouble();
     return volume
-        ? Slider(
+        ? /*Slider(
             value: minMax[selectedClass][0].toDouble(),
             min: 0,
             max: minMax[selectedClass][2].toDouble(),
@@ -553,7 +560,23 @@ class _SegmentationState extends State<Segmentation> {
                 minMax[selectedClass][0] = value.toInt();
               });
             },
-          )
+          )*/
+        RangeSlider(
+            values: RangeValues(
+                minMax[selectedClass][2].toDouble() > 0
+                    ? -minMax[selectedClass][2].toDouble()
+                    : minMax[selectedClass][2].toDouble(),
+                minMax[selectedClass][0].toDouble() > 0
+                    ? -minMax[selectedClass][0].toDouble()
+                    : minMax[selectedClass][0].toDouble()),
+            min: -513.0,
+            max: 0.0,
+            onChanged: (RangeValues value) {
+              setState(() {
+                minMax[selectedClass][0] = value.end.toInt();
+                minMax[selectedClass][2] = value.start.toInt();
+              });
+            })
         : Container();
   }
 
