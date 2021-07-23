@@ -8,12 +8,14 @@ import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
 import 'package:camera/camera.dart';
 
 class SecondPictureScreen extends StatefulWidget {
-  final List<CameraDescription> cameras;
+  final CameraController controller;
   final Map surfaces;
+  final Map distances;
 
   SecondPictureScreen({
-    required this.cameras,
+    required this.controller,
     required this.surfaces,
+    required this.distances,
   });
 
   @override
@@ -21,31 +23,74 @@ class SecondPictureScreen extends StatefulWidget {
 }
 
 class _SecondPictureScreenState extends State<SecondPictureScreen> {
-  late CameraController controller;
-
   @override
   void initState() {
     super.initState();
-    controller =
-        new CameraController(widget.cameras[0], ResolutionPreset.medium);
-    controller.initialize().then((_) {
-      if (!mounted) {
-        //not in the tree
-        return;
-      }
-      setState(() {});
-    });
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    //controller.dispose();
     super.dispose();
+  }
+
+  Widget getDisplaySecondPisctureScreen(size) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Stack(
+          alignment: Alignment.bottomRight,
+          children: <Widget>[
+            Container(
+              width: size,
+              height: size,
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.center,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Container(
+                      width: size / widget.controller.value.aspectRatio,
+                      height: size,
+                      child: new CameraPreview(
+                          widget.controller), // this is my CameraPreview
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              child: Container(
+                width: size / 4,
+                height: (size / 4) * sin(pi / 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.elliptical(
+                      size / 4,
+                      (size / 4) * sin(pi / 4),
+                    ),
+                  ),
+                  color: Theme.of(context).primaryColor.withOpacity(0.4),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 5),
+        Container(
+          child: Text(
+            "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(height: 40),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!controller.value.isInitialized) {
+    if (!widget.controller.value.isInitialized) {
       return new Container();
     }
 
@@ -57,53 +102,7 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
         title: const Text('Second Picture'),
         brightness: Brightness.dark,
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: <Widget>[
-              Container(
-                width: size,
-                height: size,
-                child: ClipRect(
-                  child: OverflowBox(
-                    alignment: Alignment.center,
-                    child: FittedBox(
-                      fit: BoxFit.fitWidth,
-                      child: Container(
-                        width: size / controller.value.aspectRatio,
-                        height: size,
-                        child: new CameraPreview(
-                            controller), // this is my CameraPreview
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Align(
-                child: Container(
-                  width: size / 4,
-                  height: (size / 4) * sin(pi / 4),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(
-                        Radius.elliptical(size / 4, (size / 4) * sin(pi / 4))),
-                    color: Theme.of(context).primaryColor.withOpacity(0.4),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          Container(
-            child: Text(
-              "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(height: 40),
-        ],
-      ),
+      body: getDisplaySecondPisctureScreen(size),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         child: const Icon(Icons.circle_outlined),
@@ -113,11 +112,11 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
           // catch the error.
           try {
             // Ensure that the camera is initialized.
-            await controller;
+            await widget.controller;
 
             // Attempt to take a picture and get the file `image`
             // where it was saved.
-            final image = await controller.takePicture();
+            final image = await widget.controller.takePicture();
 
             ImageProperties properties =
                 await FlutterNativeImage.getImageProperties(image.path);
@@ -145,9 +144,10 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   // the DisplayPictureScreen widget.
                   imagePath: croppedFile.path,
                   isSamsung: isSamsung,
-                  cameras: widget.cameras,
+                  controller: widget.controller,
                   volume: true,
                   surfaces: widget.surfaces,
+                  distances: widget.distances,
                 ),
               ),
             );

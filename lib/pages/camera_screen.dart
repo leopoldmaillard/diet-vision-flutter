@@ -6,19 +6,6 @@ import 'package:transfer_learning_fruit_veggies/main.dart';
 import 'dart:math';
 import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
 import 'package:image_picker/image_picker.dart';
-
-// class CameraScreen extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Center(
-//       child: new Text(
-//         "Camera_Screen",
-//         style: new TextStyle(fontSize: 20.0),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:camera/camera.dart';
 
 /* Json Format variable for the drop down List button of beverage */
@@ -61,7 +48,6 @@ class CameraScreenState extends State<CameraScreen> {
         new CameraController(widget.cameras[0], ResolutionPreset.medium);
     controller.initialize().then((_) {
       if (!mounted) {
-        //not in the tree
         return;
       }
       setState(() {});
@@ -70,6 +56,7 @@ class CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
+    print("Camera 1 is disposed");
     controller.dispose();
     super.dispose();
   }
@@ -84,11 +71,77 @@ class CameraScreenState extends State<CameraScreen> {
           // the DisplayPictureScreen widget.
           imagePath: image.path,
           isSamsung: false,
-          cameras: cameras,
+          controller: controller,
           volume: false,
           surfaces: new Map(),
+          distances: new Map(),
         ),
       ),
+    );
+  }
+
+  /* **********************WIDGET**********************/
+  Widget getDisplayCameraScreen(size) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Stack(
+          alignment: Alignment.bottomRight,
+          children: <Widget>[
+            Container(
+              width: size,
+              height: size,
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.center,
+                  child: FittedBox(
+                    fit: BoxFit.fitWidth,
+                    child: Container(
+                      width: size / controller.value.aspectRatio,
+                      height: size,
+                      child: new CameraPreview(
+                          controller), // this is my CameraPreview
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              child: Container(
+                width: size / 8,
+                height: size / 8,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).primaryColor.withOpacity(0.4),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 5),
+        Container(
+          child: Text(
+            "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SizedBox(height: 40),
+        ElevatedButton.icon(
+          icon: Icon(Icons.image),
+          label: Text('Chose from Gallery'),
+          onPressed: () {
+            pickGalleryImage();
+          },
+          style: ElevatedButton.styleFrom(
+            shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(50.0),
+            ),
+            primary: Theme.of(context).primaryColor,
+          ),
+        ),
+        // Drinks
+        DrinksButton(),
+      ],
     );
   }
 
@@ -101,67 +154,7 @@ class CameraScreenState extends State<CameraScreen> {
     var size = MediaQuery.of(context).size.width;
     bool isSamsung = false;
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Stack(
-            alignment: Alignment.bottomRight,
-            children: <Widget>[
-              Container(
-                width: size,
-                height: size,
-                child: ClipRect(
-                  child: OverflowBox(
-                    alignment: Alignment.center,
-                    child: FittedBox(
-                      fit: BoxFit.fitWidth,
-                      child: Container(
-                        width: size / controller.value.aspectRatio,
-                        height: size,
-                        child: new CameraPreview(
-                            controller), // this is my CameraPreview
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Align(
-                child: Container(
-                  width: size / 8,
-                  height: size / 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).primaryColor.withOpacity(0.4),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 5),
-          Container(
-            child: Text(
-              "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SizedBox(height: 40),
-          ElevatedButton.icon(
-            icon: Icon(Icons.image),
-            label: Text('Chose from Gallery'),
-            onPressed: () {
-              pickGalleryImage();
-            },
-            style: ElevatedButton.styleFrom(
-              shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(50.0),
-              ),
-              primary: Theme.of(context).primaryColor,
-            ),
-          ),
-          // Drinks
-          DrinksButton(),
-        ],
-      ),
+      body: getDisplayCameraScreen(size),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         child: const Icon(Icons.circle_outlined),
@@ -203,9 +196,10 @@ class CameraScreenState extends State<CameraScreen> {
                   // the DisplayPictureScreen widget.
                   imagePath: croppedFile.path,
                   isSamsung: isSamsung,
-                  cameras: cameras,
+                  controller: controller,
                   volume: false,
                   surfaces: new Map(),
+                  distances: new Map(),
                 ),
               ),
             );
@@ -230,8 +224,25 @@ class DrinksButton extends StatefulWidget {
 
 /* This is the private State class that goes with MyStatefulWidget. */
 class _DrinksButtonState extends State<DrinksButton> {
-  @override
-  Widget build(BuildContext context) {
+  DropdownMenuItem<String> displayImagesAndLabels(Map map) {
+    return new DropdownMenuItem<String>(
+      value: map["id"].toString(),
+      // value: _mySelection,
+      child: Row(
+        children: <Widget>[
+          Image.asset(
+            map["image"],
+            width: 25,
+            height: 25,
+          ),
+          Container(
+              margin: EdgeInsets.only(left: 10), child: Text(map["name"])),
+        ],
+      ),
+    );
+  }
+
+  Widget drinkButton(BuildContext context) {
     return DropdownButton<String>(
       value: dropdownValue,
       icon: Icon(
@@ -246,27 +257,22 @@ class _DrinksButtonState extends State<DrinksButton> {
         color: Theme.of(context).primaryColor,
       ),
       onChanged: (String? newValue) {
-        setState(() {
-          dropdownValue = newValue!;
-        });
-      },
-      items: _myJson.map((Map map) {
-        return new DropdownMenuItem<String>(
-          value: map["id"].toString(),
-          // value: _mySelection,
-          child: Row(
-            children: <Widget>[
-              Image.asset(
-                map["image"],
-                width: 25,
-                height: 25,
-              ),
-              Container(
-                  margin: EdgeInsets.only(left: 10), child: Text(map["name"])),
-            ],
-          ),
+        setState(
+          () {
+            dropdownValue = newValue!;
+          },
         );
-      }).toList(),
+      },
+      items: _myJson.map(
+        (Map map) {
+          return displayImagesAndLabels(map);
+        },
+      ).toList(),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return drinkButton(context);
   }
 }
