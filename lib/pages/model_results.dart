@@ -10,6 +10,7 @@ import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+import 'package:xml/xml.dart';
 
 // globals variables
 
@@ -154,6 +155,10 @@ class _SegmentationState extends State<Segmentation> {
   Map _output_classes_distance = Map();
   List<List<int>> minMax = [];
   int _selectedClass = 0;
+  //RangeSlider2
+  List<List<int>> minMaxWidth = [];
+  List<List<int>> minMaxHeigh = [];
+  Map _output_classes_width = Map();
 
   @override
   void initState() {
@@ -261,7 +266,7 @@ class _SegmentationState extends State<Segmentation> {
 
     Map output_classes_height = Map();
     Map output_classes_distance = Map();
-
+    Map output_classes_width = Map();
     if (widget.volume) {
       output_classes_height =
           Compute_output_classes_height(output_classes_Volume);
@@ -269,6 +274,10 @@ class _SegmentationState extends State<Segmentation> {
     if (!widget.volume) {
       output_classes_distance =
           Compute_output_classes_distance(output_classes_Surface);
+      output_classes_width =
+          Compute_output_classes_width(output_classes_Surface);
+      print("Ceci est la output classes width: ");
+      print(output_classes_width);
     }
 
     setState(() {
@@ -279,6 +288,7 @@ class _SegmentationState extends State<Segmentation> {
       _output_classes_Volume = output_classes_Volume;
       _output_classes_distance = output_classes_distance;
       _output_classes_height = output_classes_height;
+      _output_classes_width = output_classes_width;
       _loading = false;
     });
   }
@@ -330,6 +340,31 @@ class _SegmentationState extends State<Segmentation> {
       }
     }
     return output_classes_distance;
+  }
+
+  //width in cm for the food items:
+  //[indicede ouput_classes: distance en cm, ......]
+  Map Compute_output_classes_width(
+      List<List<List<int>>> output_classes_Surface) {
+    Map output_classes_width = Map();
+    List<int> elemDist = [];
+    String e;
+    var i, c;
+    for (int l = 0; l < output_classes_Surface.length; l++) {
+      if (output_classes_Surface[l].length != 0) {
+        elemDist = elemDist + //du premier pixel de la classe d'indice l
+            [output_classes_Surface[l][0][0]] + //transparence
+            [output_classes_Surface[l][0][1]] + //r
+            [output_classes_Surface[l][0][2]] + //g
+            [output_classes_Surface[l][0][3]]; //b
+        e = elemDist.toString(); //[t,r,g,b] en string
+        i = KEYS.indexOf(e);
+        c = VALUES[i];
+        output_classes_width[c] = getWidth(output_classes_Surface[l]);
+        elemDist = [];
+      }
+    }
+    return output_classes_width;
   }
 
   // distance between the center of the coin and the food item (each class detected) in cm
@@ -407,6 +442,41 @@ class _SegmentationState extends State<Segmentation> {
     return (yBottomThickness - yTopThickness).round();
   }
 
+/**********on test avec le deuxieme slider */
+  //SLider2
+  /// get an estimation of the width
+  double getWidth(List<List<int>> typeOfClassPixels) {
+    if (typeOfClassPixels.length == 0) {
+      return 0;
+    }
+    List<int> listX = []; // correspond aux i cad lignes
+    List<int> listY = []; // j cad colones
+    double widthReal;
+
+    for (int k = 0; k < typeOfClassPixels.length; k++) {
+      listY.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
+      listX.add(typeOfClassPixels[k][5]); //[t,r,g,b,i,j] donc j
+    }
+
+    int xWidthMax = listX.lastWhere((element) => (element < 513)); //pixel Xmax
+    int xWidthMin = listX.firstWhere((element) => element >= 0); //pixel Xmin
+
+    int idxWidthMax = listX.indexOf(xWidthMax); //index max
+    int yWidthMax = listY[idxWidthMax]; // Y of the right pixel (max width)
+
+    int idxWidthMin = listX.indexOf(xWidthMin); //index max
+    int yWidthMin = listY[idxWidthMin]; // Y of the left pixel (min width)
+    int yMin = listY.indexOf(yWidthMin);
+    int yMax = listY.indexOf(yWidthMax);
+    //int yWidth = (yMax - yMin) ~/ 2;
+    int widthPixels = (xWidthMax - xWidthMin).abs();
+    widthReal = (widthPixels * COINDIAMETERIRLCM / (COINDIAMETERPIXELS / 2));
+// Ymax: y for the Xmax
+// Ymin: y for the Xmin
+    minMaxWidth.add([xWidthMax, yMax, xWidthMin, yMax]); // y fixed on the Y max
+    return (widthReal).abs();
+  }
+
 //ywithperspective = le nb de pixels de lepaisseur de la deuxieme image (celle déformée)
 //xDistCoinClass = distance en cm
   double getPixelConsideringPerspective(
@@ -461,6 +531,54 @@ class _SegmentationState extends State<Segmentation> {
       ),
     );
     return Stack(children: points);
+  }
+
+  Widget width(int selectedClass) {
+    var SIZEWIDTH = MediaQuery.of(context).size.width;
+    final pointsW = <Widget>[];
+
+    pointsW.add(
+      Positioned(
+        top: minMaxWidth[selectedClass][1] / 513 * SIZEWIDTH, // - 5,
+        left: minMaxWidth[selectedClass][2] / 513 * SIZEWIDTH - 5,
+        child: Container(
+          height: 10,
+          width: 10,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Theme.of(context)
+                  .primaryColor), //Theme.of(context).primaryColor),
+        ),
+      ),
+    );
+    pointsW.add(
+      Positioned(
+        top: minMaxWidth[selectedClass][1] / 513 * SIZEWIDTH,
+        left: minMaxWidth[selectedClass][0] / 513 * SIZEWIDTH - 5,
+        child: Container(
+          height: 10,
+          width: 10,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle, color: Theme.of(context).primaryColor),
+        ),
+      ),
+    );
+    pointsW.add(
+      Positioned(
+        top: minMaxWidth[selectedClass][1] / 513 * SIZEWIDTH + 5,
+        left: minMaxWidth[selectedClass][2] / 513 * SIZEWIDTH + 5,
+        child: Dash(
+          direction: Axis.horizontal,
+          length: (minMaxWidth[selectedClass][0] / 513 * SIZEWIDTH - 10) -
+              (minMaxWidth[selectedClass][2] / 513 * SIZEWIDTH),
+          dashColor: Theme.of(context).primaryColor,
+          dashLength: 4,
+          dashBorderRadius: 8,
+          dashGap: 5,
+        ),
+      ),
+    );
+    return Stack(children: pointsW);
   }
 
   // obtain a list of the volume and the thickness for each class segmented in the first/second picture
@@ -572,7 +690,77 @@ class _SegmentationState extends State<Segmentation> {
         : Container();
   }
 
+  //slider to add the width for a selectedClass
+  Widget displaySliderX(bool volume) {
+    return !volume
+        ? RangeSlider(
+            values: RangeValues(
+                minMaxWidth[_selectedClass][2].toDouble() //xmin //> 0
+                //? -minMaxWidth[_selectedClass][2].toDouble()
+                // : minMaxWidth[_selectedClass][2].toDouble()
+                ,
+                minMaxWidth[_selectedClass][0].toDouble() //max //> 0
+                // ? -minMaxWidth[_selectedClass][0].toDouble()
+                // :minMaxWidth[_selectedClass][0].toDouble())
+                ),
+            min: 0.0,
+            max: 513,
+            onChanged: (RangeValues value) {
+              setState(() {
+                minMaxWidth[_selectedClass][2] = value.start.toInt();
+                minMaxWidth[_selectedClass][0] = value.end.toInt();
+                print('min:');
+                print(value.start);
+                print('max:');
+                print(value.end);
+              });
+            })
+        : Container();
+  }
+
   Widget displaySurfaceOrVolume(bool volume, List<String> categories) {
+    /*List<dynamic> widSurfKey = surfaceSaved.keys.toList();
+    List<dynamic> widSurfVal = surfaceSaved.values.toList();
+    final chipsW = <Widget>[];
+    var categories = classes.values.toList();
+    List<int> item;
+    double widthPixels, width;
+    for (int i = 0; i < minMaxWidth.length; i++) {
+      widthPixels = (minMaxWidth[i][0] - minMaxWidth[i][2]).toDouble();
+      width = (widthPixels * COINDIAMETERIRLCM / (COINDIAMETERPIXELS / 2));
+
+      int index = categories.indexOf(widSurfKey[i]);
+      int color = pascalVOCLabelColors[index];
+      item[i] = widSurfKey.indexOf(widSurfKey[i]);
+    }*/
+/*
+      chipsW.add(ActionChip(
+        onPressed: () {
+          setState(() {
+            _selectedClass = item;
+          });
+        },
+        backgroundColor: Color(color),
+        shape: StadiumBorder(
+          side: BorderSide(
+            color: item == _selectedClass
+                ? Theme.of(context).primaryColor
+                : Color(color),
+            width: 2.0,
+          ),
+        ),
+        label: Text(
+           widSurfKey[i] +
+          '   ' +
+              width.toStringAsFixed(1) +
+              'cm | Surf. ' +
+              //  widSurfVal[i].toString() +
+              'cm²',
+          style: const TextStyle(color: Colors.white),
+        ),
+      ));
+    }*/
+
     return !volume
         ? ListView(
             children: _output_classes.entries.map(
@@ -585,7 +773,18 @@ class _SegmentationState extends State<Segmentation> {
                   int color = pascalVOCLabelColors[index];
                   surfaceSaved[e.key] = surface;
                   return ActionChip(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          //_selectedClass = item;
+                        });
+                      },
+                      /*shape: StadiumBorder(
+                        side: BorderSide(
+                          color: item == _selectedClass
+                              ? Theme.of(context).primaryColor
+                              : Color(color),
+                        ),
+                      ),*/
                       avatar: CircleAvatar(
                         backgroundColor: Colors.white,
                         child: Text(percent.toString() + "%",
@@ -633,7 +832,11 @@ class _SegmentationState extends State<Segmentation> {
                 width: SIZEWIDTH,
                 child: thick(_selectedClass),
               )
-            : Container(),
+            : Container(
+                height: SIZEWIDTH,
+                width: SIZEWIDTH,
+                child: width(_selectedClass),
+              ),
       ],
     );
   }
@@ -664,6 +867,7 @@ class _SegmentationState extends State<Segmentation> {
                   child: displaySurfaceOrVolume(widget.volume, categories),
                 ),
                 displaySlider(widget.volume),
+                displaySliderX(widget.volume),
                 displayGetVolumeEstimationButton(widget.volume),
                 SizedBox(height: 25),
               ],
