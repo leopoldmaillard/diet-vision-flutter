@@ -423,8 +423,8 @@ class _SegmentationState extends State<Segmentation> {
 
     points.add(
       Positioned(
-        top: minMax[selectedClass][0] / 513 * SIZEWIDTH - 5,
-        left: minMax[selectedClass][1] / 513 * SIZEWIDTH - 5,
+        top: minMax[selectedClass][0].abs() / 513 * SIZEWIDTH - 5,
+        left: minMax[selectedClass][1].abs() / 513 * SIZEWIDTH - 5,
         child: Container(
           height: 10,
           width: 10,
@@ -435,8 +435,8 @@ class _SegmentationState extends State<Segmentation> {
     );
     points.add(
       Positioned(
-        top: minMax[selectedClass][2] / 513 * SIZEWIDTH - 5,
-        left: minMax[selectedClass][3] / 513 * SIZEWIDTH - 5,
+        top: minMax[selectedClass][2].abs() / 513 * SIZEWIDTH - 5,
+        left: minMax[selectedClass][3].abs() / 513 * SIZEWIDTH - 5,
         child: Container(
           height: 10,
           width: 10,
@@ -447,12 +447,12 @@ class _SegmentationState extends State<Segmentation> {
     );
     points.add(
       Positioned(
-        top: minMax[selectedClass][0] / 513 * SIZEWIDTH + 5,
-        left: minMax[selectedClass][1] / 513 * SIZEWIDTH,
+        top: minMax[selectedClass][0].abs() / 513 * SIZEWIDTH + 5,
+        left: minMax[selectedClass][1].abs() / 513 * SIZEWIDTH,
         child: Dash(
           direction: Axis.vertical,
-          length: (minMax[selectedClass][2] / 513 * SIZEWIDTH - 10) -
-              (minMax[selectedClass][0] / 513 * SIZEWIDTH),
+          length: (minMax[selectedClass][2].abs() / 513 * SIZEWIDTH - 10) -
+              (minMax[selectedClass][0].abs() / 513 * SIZEWIDTH),
           dashColor: Theme.of(context).primaryColor,
           dashLength: 4,
           dashBorderRadius: 8,
@@ -484,7 +484,7 @@ class _SegmentationState extends State<Segmentation> {
 
     // obtain the volume for each class segmented in the first/second picture
     for (int i = 0; i < minMax.length; i++) {
-      thickPixels = (minMax[i][2] - minMax[i][0]).toDouble();
+      thickPixels = (minMax[i][2].abs() - minMax[i][0].abs()).toDouble();
       idxClass =
           categories.indexOf(widSurfKey[i]); // replace: classes.values.toList()
       idxClassDist =
@@ -561,31 +561,33 @@ class _SegmentationState extends State<Segmentation> {
         ? Column(
             children: [
               Center(
-                child: Text(
-                    "Feel free to adjust the average thickness of each food item."),
+                child: Container(
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).buttonColor,
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: Text(
+                      "Feel free to adjust the average thickness of each food item"),
+                ),
               ),
-              Slider(
-                value: minMax[_selectedClass][0].toDouble(),
-                min: 0,
-                max: minMax[_selectedClass][2].toDouble(),
-                activeColor: Theme.of(context).primaryColor,
-                onChanged: (double value) {
-                  setState(() {
-                    minMax[_selectedClass][0] = value.toInt();
-                  });
-                },
-              ),
-              Slider(
-                value: minMax[_selectedClass][2].toDouble(),
-                min: minMax[_selectedClass][0].toDouble(),
-                max: 513,
-                activeColor: Theme.of(context).primaryColor,
-                onChanged: (double value) {
-                  setState(() {
-                    minMax[_selectedClass][2] = value.toInt();
-                  });
-                },
-              )
+              RangeSlider(
+                  activeColor: Theme.of(context).primaryColor,
+                  values: RangeValues(
+                      minMax[_selectedClass][2].toDouble() > 0
+                          ? -minMax[_selectedClass][2].toDouble()
+                          : minMax[_selectedClass][2].toDouble(),
+                      minMax[_selectedClass][0].toDouble() > 0
+                          ? -minMax[_selectedClass][0].toDouble()
+                          : minMax[_selectedClass][0].toDouble()),
+                  min: -513.0,
+                  max: 0.0,
+                  onChanged: (RangeValues value) {
+                    setState(() {
+                      minMax[_selectedClass][0] = value.end.toInt();
+                      minMax[_selectedClass][2] = value.start.toInt();
+                    });
+                  })
             ],
           )
         : Container();
