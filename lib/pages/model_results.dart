@@ -558,16 +558,35 @@ class _SegmentationState extends State<Segmentation> {
 
   Widget displaySlider(bool volume) {
     return volume
-        ? Slider(
-            value: minMax[_selectedClass][0].toDouble(),
-            min: 0,
-            max: minMax[_selectedClass][2].toDouble(),
-            activeColor: Theme.of(context).primaryColor,
-            onChanged: (double value) {
-              setState(() {
-                minMax[_selectedClass][0] = value.toInt();
-              });
-            },
+        ? Column(
+            children: [
+              Center(
+                child: Text(
+                    "Feel free to adjust the average thickness of each food item."),
+              ),
+              Slider(
+                value: minMax[_selectedClass][0].toDouble(),
+                min: 0,
+                max: minMax[_selectedClass][2].toDouble(),
+                activeColor: Theme.of(context).primaryColor,
+                onChanged: (double value) {
+                  setState(() {
+                    minMax[_selectedClass][0] = value.toInt();
+                  });
+                },
+              ),
+              Slider(
+                value: minMax[_selectedClass][2].toDouble(),
+                min: minMax[_selectedClass][0].toDouble(),
+                max: 513,
+                activeColor: Theme.of(context).primaryColor,
+                onChanged: (double value) {
+                  setState(() {
+                    minMax[_selectedClass][2] = value.toInt();
+                  });
+                },
+              )
+            ],
           )
         : Container();
   }
