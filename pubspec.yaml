@@ -40,6 +40,8 @@ dependencies:
   quiver: ^3.0.1
   flutter_exif_rotation: ^0.4.1
   flutter_dash: ^0.0.1
+  geolocator: ^6.2.1
+  geocoder: ^0.2.1
 
 dev_dependencies:
   flutter_test:
