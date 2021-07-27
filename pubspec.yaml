@@ -40,10 +40,13 @@ dependencies:
   quiver: ^3.0.1
   flutter_exif_rotation: ^0.4.1
   flutter_dash: ^0.0.1
+  flutter_bloc: ^7.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  sqflite: ^2.0.0+3
+  path_provider: ^2.0.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
