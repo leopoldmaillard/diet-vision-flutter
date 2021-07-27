@@ -278,6 +278,7 @@ class _SegmentationState extends State<Segmentation> {
           Compute_output_classes_width(output_classes_Surface);
       print("Ceci est la output classes width: ");
       print(output_classes_width);
+      print("ceci est la mniMaxWidth: $minMaxWidth");
     }
 
     setState(() {
@@ -457,24 +458,40 @@ class _SegmentationState extends State<Segmentation> {
       listY.add(typeOfClassPixels[k][4]); //[t,r,g,b,i,j] donc i
       listX.add(typeOfClassPixels[k][5]); //[t,r,g,b,i,j] donc j
     }
+    listX.sort();
+    //  listY.sort();
 
-    int xWidthMax = listX.lastWhere((element) => (element < 513)); //pixel Xmax
-    int xWidthMin = listX.firstWhere((element) => element >= 0); //pixel Xmin
+    int xWidthMax = listX.reduce(math.max);
+    //listX.lastWhere((element) => (element < 513)); //pixel Xmax
+
+    int xWidthMin = listX.reduce(math.min);
+    // firstWhere((element) => element >= 0); //pixel Xmin
 
     int idxWidthMax = listX.indexOf(xWidthMax); //index max
     int yWidthMax = listY[idxWidthMax]; // Y of the right pixel (max width)
 
     int idxWidthMin = listX.indexOf(xWidthMin); //index max
     int yWidthMin = listY[idxWidthMin]; // Y of the left pixel (min width)
-    int yMin = listY.indexOf(yWidthMin);
-    int yMax = listY.indexOf(yWidthMax);
+    //int yMin = listY.indexOf(yWidthMin);
+    //int yMax = listY.indexOf(yWidthMax);
+    yWidthMax = (yWidthMax + yWidthMin) ~/ 2;
+    int yWidthMax2 = 250;
     //int yWidth = (yMax - yMin) ~/ 2;
     int widthPixels = (xWidthMax - xWidthMin).abs();
     widthReal = (widthPixels * COINDIAMETERIRLCM / (COINDIAMETERPIXELS / 2));
 // Ymax: y for the Xmax
 // Ymin: y for the Xmin
-    minMaxWidth.add([xWidthMax, yMax, xWidthMin, yMax]); // y fixed on the Y max
+    minMaxWidth.add(
+        [xWidthMax, yWidthMax, xWidthMin, yWidthMax]); // y fixed on the Y max
     return (widthReal).abs();
+  }
+
+  //convert the index of the class into the index of the output_classes_width
+  int giveRightIndexWidth(int indexClass) {
+    var widthKey = _output_classes_width.keys.toList();
+    var mykey = VALUES[indexClass];
+    int indexWidth = widthKey.indexOf(mykey);
+    return indexWidth;
   }
 
 //ywithperspective = le nb de pixels de lepaisseur de la deuxieme image (celle déformée)
@@ -536,10 +553,10 @@ class _SegmentationState extends State<Segmentation> {
   Widget width(int selectedClass) {
     var SIZEWIDTH = MediaQuery.of(context).size.width;
     final pointsW = <Widget>[];
-
+    selectedClass = giveRightIndexWidth(selectedClass);
     pointsW.add(
       Positioned(
-        top: minMaxWidth[selectedClass][1] / 513 * SIZEWIDTH, // - 5,
+        top: minMaxWidth[selectedClass][1] / 513 * SIZEWIDTH,
         left: minMaxWidth[selectedClass][2] / 513 * SIZEWIDTH - 5,
         child: Container(
           height: 10,
@@ -569,7 +586,7 @@ class _SegmentationState extends State<Segmentation> {
         left: minMaxWidth[selectedClass][2] / 513 * SIZEWIDTH + 5,
         child: Dash(
           direction: Axis.horizontal,
-          length: (minMaxWidth[selectedClass][0] / 513 * SIZEWIDTH - 10) -
+          length: (minMaxWidth[selectedClass][0] / 513 * SIZEWIDTH - 2) -
               (minMaxWidth[selectedClass][2] / 513 * SIZEWIDTH),
           dashColor: Theme.of(context).primaryColor,
           dashLength: 4,
@@ -692,14 +709,15 @@ class _SegmentationState extends State<Segmentation> {
 
   //slider to add the width for a selectedClass
   Widget displaySliderX(bool volume) {
+    int selectedClass = giveRightIndexWidth(_selectedClass);
     return !volume
         ? RangeSlider(
             values: RangeValues(
-                minMaxWidth[_selectedClass][2].toDouble() //xmin //> 0
+                minMaxWidth[selectedClass][2].toDouble() //xmin //> 0
                 //? -minMaxWidth[_selectedClass][2].toDouble()
                 // : minMaxWidth[_selectedClass][2].toDouble()
                 ,
-                minMaxWidth[_selectedClass][0].toDouble() //max //> 0
+                minMaxWidth[selectedClass][0].toDouble() //max //> 0
                 // ? -minMaxWidth[_selectedClass][0].toDouble()
                 // :minMaxWidth[_selectedClass][0].toDouble())
                 ),
@@ -707,8 +725,9 @@ class _SegmentationState extends State<Segmentation> {
             max: 513,
             onChanged: (RangeValues value) {
               setState(() {
-                minMaxWidth[_selectedClass][2] = value.start.toInt();
-                minMaxWidth[_selectedClass][0] = value.end.toInt();
+                selectedClass = giveRightIndexWidth(_selectedClass);
+                minMaxWidth[selectedClass][2] = value.start.toInt();
+                minMaxWidth[selectedClass][0] = value.end.toInt();
                 print('min:');
                 print(value.start);
                 print('max:');
@@ -775,7 +794,7 @@ class _SegmentationState extends State<Segmentation> {
                   return ActionChip(
                       onPressed: () {
                         setState(() {
-                          //_selectedClass = item;
+                          _selectedClass = categories.indexOf(e.key).toInt();
                         });
                       },
                       /*shape: StadiumBorder(
