@@ -1,6 +1,37 @@
 import 'package:flutter/material.dart';
+import '../source/coinDiameter.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
+  final String country;
+
+  Profile(this.country);
+
+  @override
+  _ProfileState createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  String selectedCoin = "";
+
+  @override
+  void initState() {
+    super.initState();
+    // return the coin type based on the country of the user
+    // eg. "euro", "us_dollar" etc.
+    String coin = coinCountryJson.firstWhere(
+        (element) => element["country"] == this.widget.country)["coin"];
+
+    // return a list with the jsons entries of all the coins of this category
+    // eg. "euro" have the 50 centimes, 1 euro, 2 euros etc coins.
+    List coins =
+        coinDiameterJson.where((element) => element["coin"] == coin).toList();
+
+    //Set the default coin to the last available (usually the bigger one)
+    setState(() {
+      selectedCoin = coins.last["value"];
+    });
+  }
+
   Widget textfield({@required String hintText = ""}) {
     return Material(
       elevation: 4,
@@ -25,6 +56,28 @@ class Profile extends StatelessWidget {
     );
   }
 
+  Widget availableCoinsList() {
+    String coin = coinCountryJson.firstWhere(
+        (element) => element["country"] == this.widget.country)["coin"];
+
+    List coins =
+        coinDiameterJson.where((element) => element["coin"] == coin).toList();
+    return DropdownButton<String>(
+      items: coins.map((e) {
+        return DropdownMenuItem<String>(
+          child: Text(e["value"]),
+          value: e["value"],
+        );
+      }).toList(),
+      onChanged: (String? newValue) {
+        setState(() {
+          selectedCoin = newValue!;
+        });
+      },
+      value: selectedCoin,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +93,7 @@ class Profile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   textfield(
-                    hintText: 'Username',
+                    hintText: 'Username ' + this.widget.country,
                   ),
                   textfield(
                     hintText: 'Email',
@@ -48,9 +101,7 @@ class Profile extends StatelessWidget {
                   textfield(
                     hintText: 'Password',
                   ),
-                  textfield(
-                    hintText: 'Confirm password',
-                  ),
+                  availableCoinsList(),
                   Container(
                     height: 55,
                     width: double.infinity,
