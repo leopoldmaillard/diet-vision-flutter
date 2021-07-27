@@ -1,18 +1,18 @@
 import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
 
 class Food {
-  static int cpt = 0;
+  // static int cpt = 0;
   int id = 0;
   String name = '';
 
   Food({required this.name}) {
-    incCpt();
-    this.id = cpt;
+    //incCpt();
+    // this.id = cpt;
   }
 
-  static void incCpt() {
-    cpt++;
-  }
+  // static void incCpt() {
+  //   cpt++;
+  // }
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{DatabaseProvider.COLUMN_NAME: name};

@@ -19,10 +19,13 @@ class _HistoryMealState extends State<HistoryMeal> {
   void initState() {
     super.initState();
     DatabaseProvider.db.getFoods().then(
-          (foodList) => BlocProvider.of<FoodBloc>(context).add(
-            SetFoods(foodList),
-          ),
+      (foodList) {
+        print(foodList);
+        BlocProvider.of<FoodBloc>(context).add(
+          SetFoods(foodList),
         );
+      },
+    );
   }
 
   showFoodDialog(BuildContext context, Food food, int index) {
@@ -69,6 +72,9 @@ class _HistoryMealState extends State<HistoryMeal> {
       body: Container(
         padding: EdgeInsets.all(8),
         color: Colors.grey,
+
+        ///a tout moment ou qqchose change dans le foodbloc, le bloc consumer
+        /// sera updated
         child: BlocConsumer<FoodBloc, List<Food>>(
           builder: (context, foodList) {
             return ListView.builder(
@@ -81,7 +87,7 @@ class _HistoryMealState extends State<HistoryMeal> {
                     contentPadding: EdgeInsets.all(16),
                     title: Text(food.name, style: TextStyle(fontSize: 26)),
                     subtitle: Text(
-                      "Name : ${food.name}:\nVegan: }",
+                      "Name : ${food.name}${food.id}:\n id: ${food.id}",
                       style: TextStyle(fontSize: 20),
                     ),
                     onTap: () => showFoodDialog(context, food, index),

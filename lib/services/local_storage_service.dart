@@ -21,6 +21,7 @@ class DatabaseProvider {
 
     if (_database != null) {
       print("database already created and returned");
+      print(_database.toString());
       return _database!;
     }
 
@@ -40,7 +41,7 @@ class DatabaseProvider {
 
         await database.execute(
           "CREATE TABLE $TABLE_FOOD ("
-          "$COLUMN_ID INTEGER PRIMARY KEY,"
+          "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
           "$COLUMN_NAME TEXT"
           ")",
         );
@@ -68,6 +69,8 @@ class DatabaseProvider {
   Future<Food> insert(Food food) async {
     final db = await database;
     food.id = await db.insert(TABLE_FOOD, food.toMap());
+    print("food id :");
+    print(food.id);
     return food;
   }
 
