@@ -443,7 +443,7 @@ class _SegmentationState extends State<Segmentation> {
 
   void AddElementToDatabase(List KeyValue) {
     int valuecm2 = (KeyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
-    String nameFood = KeyValue[0] + ':' + valuecm2.toString() + 'cm²';
+    String nameFood = KeyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
     Food food = Food(name: nameFood);
     DatabaseProvider.db.insert(food).then(
           (storedFood) => BlocProvider.of<FoodBloc>(context).add(
