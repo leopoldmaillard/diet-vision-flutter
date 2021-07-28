@@ -12,19 +12,22 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   String selectedCoin = "";
+  String currency = "";
+  List coins = [];
 
   @override
   void initState() {
     super.initState();
     // return the coin type based on the country of the user
     // eg. "euro", "us_dollar" etc.
-    String coin = coinCountryJson.firstWhere(
+    currency = coinCountryJson.firstWhere(
         (element) => element["country"] == this.widget.country)["coin"];
 
     // return a list with the jsons entries of all the coins of this category
     // eg. "euro" have the 50 centimes, 1 euro, 2 euros etc coins.
-    List coins =
-        coinDiameterJson.where((element) => element["coin"] == coin).toList();
+    coins = coinDiameterJson
+        .where((element) => element["coin"] == currency)
+        .toList();
 
     //Set the default coin to the last available (usually the bigger one)
     setState(() {
@@ -57,11 +60,6 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget availableCoinsList() {
-    String coin = coinCountryJson.firstWhere(
-        (element) => element["country"] == this.widget.country)["coin"];
-
-    List coins =
-        coinDiameterJson.where((element) => element["coin"] == coin).toList();
     return DropdownButton<String>(
       items: coins.map((e) {
         return DropdownMenuItem<String>(
@@ -109,26 +107,20 @@ class _ProfileState extends State<Profile> {
                       onPressed: () {},
                       color: Colors.black54,
                       child: Center(
-                          child: Text(
-                        "Update",
-                        style: TextStyle(
-                          fontSize: 23,
-                          color: Colors.white,
+                        child: Text(
+                          "Update",
+                          style: TextStyle(
+                            fontSize: 23,
+                            color: Colors.white,
+                          ),
                         ),
-                      )),
+                      ),
                     ),
                   ),
                 ],
               ),
             )
           ]),
-          CustomPaint(
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-            ),
-            painter: HeaderCurvedContainer(),
-          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -152,7 +144,7 @@ class _ProfileState extends State<Profile> {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.white, width: 5),
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: Theme.of(context).primaryColor.withOpacity(0.4),
                   image: DecorationImage(
                       fit: BoxFit.cover,
                       image: AssetImage('assets/images/iconeProfile.jpg')),
