@@ -6,6 +6,7 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/model/food.dart';
 import 'package:transfer_learning_fruit_veggies/pages/page2.dart';
+import 'package:transfer_learning_fruit_veggies/events/delete_food.dart';
 
 class HistoryMeal extends StatefulWidget {
   const HistoryMeal({Key? key}) : super(key: key);
@@ -44,15 +45,21 @@ class _HistoryMealState extends State<HistoryMeal> {
             ),
             child: Text("Update"),
           ),
-          // TextButton(
-          //   onPressed: () => DatabaseProvider.db.delete(food.id).then((_) {
-          //     BlocProvider.of<FoodBloc>(context).add(
-          //       DeleteFood(index),
-          //     );
-          //     Navigator.pop(context);
-          //   }),
-          //   child: Text("Delete"),
-          // ),
+
+          ///after we delete the food from ouf database, then we delete the
+          ///food from our foodbloc (and the dialog)
+          TextButton(
+            onPressed: () => DatabaseProvider.db.delete(food.id).then(
+              (_) {
+                BlocProvider.of<FoodBloc>(context).add(
+                  DeleteFood(index),
+                );
+                Navigator.pop(context);
+              },
+            ),
+            child: Text("Delete"),
+          ),
+
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text("Cancel"),
@@ -87,7 +94,7 @@ class _HistoryMealState extends State<HistoryMeal> {
                     contentPadding: EdgeInsets.all(16),
                     title: Text(food.name, style: TextStyle(fontSize: 26)),
                     subtitle: Text(
-                      "Name : ${food.name}${food.id}:\n id: ${food.id}",
+                      "id: ${food.id}",
                       style: TextStyle(fontSize: 20),
                     ),
                     onTap: () => showFoodDialog(context, food, index),
@@ -98,13 +105,6 @@ class _HistoryMealState extends State<HistoryMeal> {
             );
           },
           listener: (BuildContext context, foodList) {},
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (BuildContext context) => Page2()),
         ),
       ),
     );

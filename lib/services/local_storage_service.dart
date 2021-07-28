@@ -74,9 +74,13 @@ class DatabaseProvider {
     return food;
   }
 
+  /// return the nb of line that are deleted if the method is sucessful,
+  ///  0 if it didnt find any match
+  /// param :
+  ///  id ==> id to delete
   Future<int> delete(int id) async {
     final db = await database;
-
+    //the ? will be replace by the id from whereArgs
     return await db.delete(
       TABLE_FOOD,
       where: "id = ?",
@@ -84,6 +88,9 @@ class DatabaseProvider {
     );
   }
 
+  /// param :
+  /// food ==> its the value that will be replaced into the database
+  /// we update this food.id by this value : food.toMap()
   Future<int> update(Food food) async {
     final db = await database;
 
