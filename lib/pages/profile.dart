@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../source/coinDiameter.dart';
+import '../globals.dart' as globals;
+import 'dart:math';
 
 class Profile extends StatefulWidget {
   final String country;
@@ -14,6 +16,8 @@ class _ProfileState extends State<Profile> {
   String selectedCoin = "";
   String currency = "";
   List coins = [];
+  double height = 170;
+  double weight = 70;
 
   @override
   void initState() {
@@ -32,35 +36,49 @@ class _ProfileState extends State<Profile> {
     //Set the default coin to the last available (usually the bigger one)
     setState(() {
       selectedCoin = coins.last["value"];
+      globals.coinDiameter = coins.last["diameter_mm"] / 10; // Diameter cm
+      globals.coinSurface = pi *
+          (coins.last["diameter_mm"] / 2) *
+          (coins.last["diameter_mm"] / 2);
     });
   }
 
   Widget textfield({@required String hintText = ""}) {
-    return Material(
-      elevation: 4,
-      shadowColor: Colors.grey,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: TextField(
-          decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: TextStyle(
-                letterSpacing: 2,
-                color: Colors.black54,
-                fontWeight: FontWeight.bold,
+    return Padding(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Material(
+              elevation: 2,
+              shadowColor: Colors.grey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-              fillColor: Colors.white30,
-              filled: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide.none,
-              ))),
-    );
+              child: TextField(
+                  decoration: InputDecoration(
+                      hintText: hintText,
+                      hintStyle: TextStyle(
+                        letterSpacing: 2,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      fillColor: Colors.white30,
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide.none,
+                      ))),
+            ),
+          ],
+        ));
   }
 
   Widget availableCoinsList() {
     return DropdownButton<String>(
+      underline: Container(
+        height: 0,
+        color: Theme.of(context).primaryColor,
+      ),
       items: coins.map((e) {
         return DropdownMenuItem<String>(
           child: Text(e["value"]),
@@ -70,105 +88,90 @@ class _ProfileState extends State<Profile> {
       onChanged: (String? newValue) {
         setState(() {
           selectedCoin = newValue!;
+          globals.coinDiameter = coins.firstWhere((element) =>
+                  element["value"] == selectedCoin)["diameter_mm"] /
+              10;
+          globals.coinSurface =
+              pi * (globals.coinDiameter * 5) * (globals.coinDiameter * 5);
         });
       },
       value: selectedCoin,
     );
   }
 
+  Widget fancyText(String text) {
+    return Container(
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Text(
+          text,
+          style: TextStyle(
+            letterSpacing: 2,
+            color: Colors.black54,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Container(
-              height: 450,
-              width: double.infinity,
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  textfield(
-                    hintText: 'Username ' + this.widget.country,
-                  ),
-                  textfield(
-                    hintText: 'Email',
-                  ),
-                  textfield(
-                    hintText: 'Password',
-                  ),
-                  availableCoinsList(),
-                  Container(
-                    height: 55,
-                    width: double.infinity,
-                    child: RaisedButton(
-                      onPressed: () {},
-                      color: Colors.black54,
-                      child: Center(
-                        child: Text(
-                          "Update",
-                          style: TextStyle(
-                            fontSize: 23,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ]),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                  "Profile",
-                  style: TextStyle(
-                    fontSize: 35,
-                    letterSpacing: 1.5,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              /* Round with the profile picture inside */
-              Container(
-                padding: EdgeInsets.all(10.0),
-                width: MediaQuery.of(context).size.width / 2,
-                height: MediaQuery.of(context).size.width / 2,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white, width: 5),
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).primaryColor.withOpacity(0.4),
-                  image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: AssetImage('assets/images/iconeProfile.jpg')),
-                ),
-              ),
-            ],
+        body: ListView(
+      children: [
+        SizedBox(
+          height: 10.0,
+        ),
+        Container(
+          padding: EdgeInsets.all(10.0),
+          width: MediaQuery.of(context).size.width / 3,
+          height: MediaQuery.of(context).size.width / 3,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.white, width: 5),
+            shape: BoxShape.circle,
+            color: Theme.of(context).primaryColor.withOpacity(0.4),
+            image: DecorationImage(
+                fit: BoxFit.scaleDown,
+                image: AssetImage('assets/images/iconeProfile.jpg')),
           ),
-          /* Here is the button to edit the profile picture */
-          Padding(
-            padding: EdgeInsets.only(bottom: 270, left: 184),
-            child: CircleAvatar(
-              backgroundColor: Colors.black54,
-              child: IconButton(
-                icon: Icon(
-                  Icons.edit,
-                  color: Colors.white,
-                ),
-                onPressed: () {},
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+        ),
+        textfield(hintText: "Full Name"),
+        textfield(hintText: "Email"),
+        textfield(hintText: "Password"),
+        fancyText("How tall are you : " + height.toInt().toString() + " cm"),
+        Slider(
+          activeColor: Theme.of(context).primaryColor,
+          value: height,
+          min: 120,
+          max: 230,
+          onChanged: (double value) {
+            setState(() {
+              height = value;
+            });
+          },
+        ),
+        fancyText("What's your weight : " + weight.toInt().toString() + " kg"),
+        Slider(
+          activeColor: Theme.of(context).primaryColor,
+          value: weight,
+          min: 30,
+          max: 150,
+          onChanged: (double value) {
+            setState(() {
+              weight = value;
+            });
+          },
+        ),
+        fancyText("Your country : " + widget.country),
+        Row(
+          children: [
+            fancyText("Chose your Fiducial Marker"),
+            availableCoinsList(),
+          ],
+        ),
+      ],
+    ));
   }
 }
 

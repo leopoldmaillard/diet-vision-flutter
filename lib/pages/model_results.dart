@@ -10,14 +10,15 @@ import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+import '../globals.dart' as globals;
 
 // globals variables
 
 const int OUTPUTSIZE = 513 * 513;
 const double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
-const double SURFACE2EUROS = pi * 12.875 * 12.875; // 521 mm2
+double SURFACE2EUROS = globals.coinSurface; //pi * 12.875 * 12.875; // 521 mm2
 const double COINDIAMETERPIXELS = 513 / 4;
-const double COINDIAMETERIRLCM = 1.2875 * 2;
+double COINDIAMETERIRLCM = globals.coinDiameter;
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;

@@ -7,6 +7,7 @@ import 'dart:math';
 import 'package:transfer_learning_fruit_veggies/pages/model_results.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:camera/camera.dart';
+import '../globals.dart' as globals;
 
 /* Json Format variable for the drop down List button of beverage */
 List<Map> _myJson = [
@@ -51,6 +52,8 @@ class CameraScreenState extends State<CameraScreen> {
         return;
       }
       setState(() {});
+      print("Diamètre : " + globals.coinDiameter.toString() + " cm");
+      print("Surface : " + globals.coinSurface.toString() + " mm2");
     });
   }
 
