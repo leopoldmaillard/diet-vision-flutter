@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/services.dart';
 
 class Statistics extends StatefulWidget {
   @override
@@ -13,16 +14,30 @@ class _StatisticsState extends State<Statistics> {
   ];
   DateTime _Today = new DateTime.now();
   bool showAvg = false;
+  // get AVG
+  LineChartBarData curve = new LineChartBarData();
+  //points to add on chart
+  List<FlSpot> data = [];
+  //data for a mounth
+  List<double> dataCal = [];
+  int tailleData = 7;
 
   // get title of the Y axe
   String getTitlesY(value) {
+    //  return (value.toString() + ' kcal');
     switch (value.toInt()) {
-      case 1:
+      case 500:
+        return '500 kcal';
+      case 1000:
         return '1000 kcal';
-      case 3:
+      case 1500:
         return '1500 kcal ';
-      case 5:
+      case 2000:
         return '2000 kcal';
+      case 2500:
+        return '2500 kcal';
+      case 3000:
+        return '3000 kcal';
     }
     return '';
   }
@@ -30,16 +45,71 @@ class _StatisticsState extends State<Statistics> {
   //get Title of the X axe
   String getTitlesX(value) {
     switch (value.toInt()) {
+      case 1:
+        return 'Mo';
       case 2:
-        return 'JUN';
+        return 'Tu';
+      case 3:
+        return 'We';
+      case 4:
+        return 'Th';
       case 5:
-        return 'JUL';
-      case 8:
-        return 'AUG';
+        return 'Fr';
+      case 6:
+        return 'Sa';
+      case 7:
+        return 'Su';
     }
     return '';
   }
 
+  double getAvg() {
+    double mean = 0;
+    return mean;
+  }
+
+  //give a size and inster plot (i,0) , initialize/register data
+  void fillLineChart() {
+    data = [];
+    if (data.length == 0) {
+      for (int i = 0; i < tailleData; i++) {
+        data.add(FlSpot(i.toDouble() + 1, 1000));
+      }
+    }
+    if (data[tailleData - 2].y == 1000) {
+      replaceLineSpot(tailleData - 2, 1200);
+      data.add(FlSpot(7, 500));
+    }
+    print(data);
+  }
+
+  //change the value at the index given
+  void replaceLineSpot(int index, double value) {
+    double x;
+    x = data[index].x;
+    data[index] = FlSpot(x, value);
+  }
+
+  //add a point in the list
+  void addPoint(double value) {
+    data.add(FlSpot(data.length.toDouble(), value));
+  }
+
+  //remove a point
+  void removePoint(int index) {
+    data.removeAt(index);
+  }
+  // //add points (y) in the dataCalories
+  // void fillKCalData(List<double> Calories) {
+  //   for (int i = 0; i < Calories.length; i++) {
+  //     Calories.add(1000);
+  //   }
+  // }
+
+  // ignore: slash_for_doc_comments
+/******************Widget Part *********************/
+
+  //Display Title Y axis
   SideTitles displayTitleData() {
     return SideTitles(
       showTitles: true,
@@ -49,10 +119,9 @@ class _StatisticsState extends State<Statistics> {
       getTitles: (value) => getTitlesX(value),
       margin: 8,
     );
-
-    // Y Axis
   }
 
+  //Display Title X axis
   SideTitles displaySideTitles() {
     return SideTitles(
       showTitles: true,
@@ -67,29 +136,25 @@ class _StatisticsState extends State<Statistics> {
     );
   }
 
-  Widget displayStatisticScreen(BuildContext context) {
+  // display the top list above the chart
+  Widget displayTitle() {
     return Column(
-      children: [
-        // Display the text on top of the chart
-        Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                "Meal's result",
-                style: TextStyle(
-                    color: Color(0xff827daa),
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-            ]),
+      children: <Widget>[
+        SizedBox(
+          height: 10,
+        ),
+        const Text(
+          "Meal's result per week",
+          style: TextStyle(
+              color: Color(0xff827daa),
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 2),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
         Text(
           _Today.toString().substring(0, 10),
           style: TextStyle(
@@ -99,62 +164,94 @@ class _StatisticsState extends State<Statistics> {
               letterSpacing: 2),
           textAlign: TextAlign.center,
         ),
+      ],
+    );
+  }
 
-        /*SizedBox(
-                width: 80,
-                height: 40,
-                child: DropdownTiming(),
-              ),
-
-              Expanded(
-                child: DropdownTiming(),
-              ),*/
-
-        // Display the chart
-        AspectRatio(
-          aspectRatio: 0.8, //1.70 (ratio graphic between height and width),
-          child: Container(
-            margin: const EdgeInsets.all(8.0),
-            decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(18),
-                ),
-                color: Color(0xff232d37)),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  right: 18.0, left: 12.0, top: 24, bottom: 12),
-              child: LineChart(
-                showAvg ? avgData() : mainData(),
-              ),
+  //dSPLAY THE CHART WITH THE LINECHARTBAR
+  Widget DisplayChart() {
+    return AspectRatio(
+      aspectRatio: 0.8, //1.70 (ratio graphic between height and width),
+      child: Container(
+        margin: const EdgeInsets.all(8.0),
+        decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(
+              Radius.circular(18),
             ),
+            color: Color(0xff232d37)), //Theme.of(context).primaryColor
+        child: Padding(
+          padding: const EdgeInsets.only(
+              right: 18.0, left: 12.0, top: 24, bottom: 12),
+          child: LineChart(
+            showAvg ? avgData() : mainData(),
           ),
         ),
+      ),
+    );
+  }
 
-        // Button to display the average of the first curve
-        SizedBox(
+  //Button for AVG of the linechartbar
+  Widget AVGButton() {
+    return SizedBox(
+      width: 80,
+      height: 40,
+      child: TextButton(
+        onPressed: () {
+          setState(() {
+            showAvg = !showAvg;
+          });
+        },
+        child: Text(
+          'AVG',
+          style: TextStyle(
+              fontSize: 25,
+              color: showAvg ? Colors.purple.withOpacity(0.5) : Colors.purple),
+        ),
+      ),
+    );
+  }
+
+// display the screen of statistics part
+  Widget displayStatisticScreen(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        displayTitle(),
+        DisplayChart(),
+        AVGButton(),
+        // Test for Dropdown Button
+        /*     SizedBox(
           width: 80,
           height: 40,
-          child: TextButton(
-            onPressed: () {
-              setState(() {
-                showAvg = !showAvg;
-              });
-            },
-            child: Text(
-              'AVG',
-              style: TextStyle(
-                  fontSize: 25,
-                  color:
-                      showAvg ? Colors.purple.withOpacity(0.5) : Colors.purple),
-            ),
-          ),
+          child: DropdownTiming(),
         ),
+        Expanded(
+          child: DropdownTiming(),
+        ),*/
       ],
     );
   }
 
   @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < tailleData; i++) {
+      dataCal.add(0.0);
+    }
+    // fillKCalData(dataCal);
+    fillLineChart();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    data = [];
+    dataCal = [];
+  }
+
+  @override
   Widget build(BuildContext context) {
+    fillLineChart();
     return Stack(
       children: <Widget>[
         SingleChildScrollView(
@@ -200,22 +297,14 @@ class _StatisticsState extends State<Statistics> {
       borderData: FlBorderData(
           show: true,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
-      minX: 0,
-      maxX: 11,
+      minX: 1,
+      maxX: 7,
       minY: 0,
-      maxY: 6,
+      maxY: 3000,
       // Data of the curve (add points (x,y))
       lineBarsData: [
         LineChartBarData(
-          spots: [
-            FlSpot(0, 3),
-            FlSpot(2.6, 2),
-            FlSpot(4.9, 5),
-            FlSpot(6.8, 3.1),
-            FlSpot(8, 4),
-            FlSpot(9.5, 3),
-            FlSpot(11, 4),
-          ],
+          spots: data,
           isCurved: true,
           colors: gradientColors,
           barWidth: 5,
@@ -235,41 +324,58 @@ class _StatisticsState extends State<Statistics> {
 
   // Output: average of the first curve
   LineChartData avgData() {
+    double mean = getAvg();
     return LineChartData(
-      lineTouchData: LineTouchData(enabled: false),
-      gridData: FlGridData(
-        show: true,
-        drawHorizontalLine: true,
-        getDrawingVerticalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-        getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-      ),
-      titlesData: FlTitlesData(
-        show: true,
-        bottomTitles: displayTitleData(),
-
-        // Y Axis Legend
-        leftTitles: displaySideTitles(),
-      ),
-
-      // Size of the chart and display average data
-      borderData: FlBorderData(
+        lineTouchData: LineTouchData(enabled: false),
+        gridData: FlGridData(
           show: true,
-          border: Border.all(color: const Color(0xff37434d), width: 1)),
-      minX: 0,
-      maxX: 11,
-      minY: 0,
-      maxY: 6,
-      lineBarsData: [
+          drawHorizontalLine: true,
+          getDrawingVerticalLine: (value) {
+            return FlLine(
+              color: const Color(0xff37434d),
+              strokeWidth: 1,
+            );
+          },
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: const Color(0xff37434d),
+              strokeWidth: 1,
+            );
+          },
+        ),
+        titlesData: FlTitlesData(
+          show: true,
+          bottomTitles: displayTitleData(),
+          // Y Axis Legend
+          leftTitles: displaySideTitles(),
+        ),
+
+        // Size of the chart and display average data
+        borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: const Color(0xff37434d), width: 1)),
+        minX: 0,
+        maxX: 11,
+        minY: 0,
+        maxY: 3000,
+        lineBarsData: [
+          LineChartBarData(
+            spots: data,
+            isCurved: true,
+            colors: gradientColors,
+            barWidth: 5,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: false,
+            ),
+            belowBarData: BarAreaData(
+              show: true,
+              colors: gradientColors
+                  .map((color) => color.withOpacity(0.3))
+                  .toList(),
+            ),
+          ),
+        ] /*
         LineChartBarData(
           spots: [
             FlSpot(0, 3.44),
@@ -301,15 +407,15 @@ class _StatisticsState extends State<Statistics> {
                 .withOpacity(0.1),
           ]),
         ),
-      ],
-    );
+      ],*/
+        );
   }
 }
 
 // class to choose in a list of name&icon (per day/per month/per week)
 class Item {
-  const Item(this.name);
   final String name;
+  const Item(this.name);
 }
 
 class DropdownTiming extends StatefulWidget {
@@ -320,38 +426,28 @@ class DropdownTiming extends StatefulWidget {
 }
 
 class DropdownTimingState extends State<DropdownTiming> {
-  Item SelectedUser = new Item('day');
+  String SelectedUser = "week";
 
   //List for the button
-  List<Item> timing = <Item>[
-    const Item(
-      'day',
-    ),
-    const Item(
-      'week',
-    ),
-    const Item(
-      'month',
-    ),
-  ];
+  List<String> timing = <String>['day', 'week', 'month'];
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<Item>(
+    return DropdownButton<String>(
       hint: Text('Select timing'),
       value: SelectedUser,
-      onChanged: (Item? value) {
+      onChanged: (String? newValue) {
         setState(() {
-          SelectedUser = value!;
+          SelectedUser = newValue!;
         });
       },
-      items: timing.map((Item time) {
+      items: timing.map((String time) {
         return DropdownMenuItem(
           value: time,
           child: Row(
             children: [
               Text(
-                time.name,
+                time,
                 style: TextStyle(color: Colors.black),
               ),
             ],
