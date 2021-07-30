@@ -13,6 +13,8 @@ class _StatisticsState extends State<Statistics> {
     const Color(0xff02d39a),
   ];
   DateTime _Today = new DateTime.now();
+  int weekDay = 0; //monday .. (1=mond, ... 7=sunday)
+  double maxValue = 0;
   bool showAvg = false;
   // get AVG
   LineChartBarData curve = new LineChartBarData();
@@ -109,33 +111,6 @@ class _StatisticsState extends State<Statistics> {
   // ignore: slash_for_doc_comments
 /******************Widget Part *********************/
 
-  //Display Title Y axis
-  SideTitles displayTitleData() {
-    return SideTitles(
-      showTitles: true,
-      reservedSize: 22,
-      getTextStyles: (value) => const TextStyle(
-          color: Color(0xff68737d), fontWeight: FontWeight.bold, fontSize: 16),
-      getTitles: (value) => getTitlesX(value),
-      margin: 8,
-    );
-  }
-
-  //Display Title X axis
-  SideTitles displaySideTitles() {
-    return SideTitles(
-      showTitles: true,
-      getTextStyles: (value) => const TextStyle(
-        color: Color(0xff67727d),
-        fontWeight: FontWeight.bold,
-        fontSize: 15,
-      ),
-      getTitles: (value) => getTitlesY(value),
-      reservedSize: 28,
-      margin: 12,
-    );
-  }
-
   // display the top list above the chart
   Widget displayTitle() {
     return Column(
@@ -190,6 +165,21 @@ class _StatisticsState extends State<Statistics> {
     );
   }
 
+  //Display axis titles
+  SideTitles displayAxisTitles(int axis) {
+    return SideTitles(
+      showTitles: true,
+      reservedSize: axis == 0 ? 22 : 28,
+      getTextStyles: (value) => const TextStyle(
+        color: Color(0xff67727d),
+        fontWeight: FontWeight.bold,
+        fontSize: 15,
+      ),
+      getTitles: (value) => axis == 0 ? getTitlesX(value) : getTitlesY(value),
+      margin: axis == 0 ? 8 : 12,
+    );
+  }
+
   //Button for AVG of the linechartbar
   Widget AVGButton() {
     return SizedBox(
@@ -232,32 +222,21 @@ class _StatisticsState extends State<Statistics> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    for (int i = 0; i < tailleData; i++) {
-      dataCal.add(0.0);
-    }
-    // fillKCalData(dataCal);
-    fillLineChart();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    data = [];
-    dataCal = [];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    fillLineChart();
-    return Stack(
-      children: <Widget>[
-        SingleChildScrollView(
-          child: displayStatisticScreen(context),
-        ),
-      ],
+  //display data in the chart
+  LineChartBarData displayData() {
+    return LineChartBarData(
+      spots: data,
+      isCurved: true,
+      colors: gradientColors,
+      barWidth: 5,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: false,
+      ),
+      belowBarData: BarAreaData(
+        show: true,
+        colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+      ),
     );
   }
 
@@ -287,10 +266,9 @@ class _StatisticsState extends State<Statistics> {
       // X Axis
       titlesData: FlTitlesData(
         show: true,
-        bottomTitles: displayTitleData(),
-
+        bottomTitles: displayAxisTitles(0),
         // Y Axis
-        leftTitles: displaySideTitles(),
+        leftTitles: displayAxisTitles(1),
       ),
 
       // Chart Axis initialisation
@@ -300,25 +278,29 @@ class _StatisticsState extends State<Statistics> {
       minX: 1,
       maxX: 7,
       minY: 0,
-      maxY: 3000,
+      maxY: maxValue,
       // Data of the curve (add points (x,y))
       lineBarsData: [
-        LineChartBarData(
-          spots: data,
-          isCurved: true,
-          colors: gradientColors,
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            colors:
-                gradientColors.map((color) => color.withOpacity(0.3)).toList(),
-          ),
-        ),
+        displayData(),
       ],
+    );
+  }
+
+  //display mean data
+  LineChartBarData displayMeanData() {
+    return LineChartBarData(
+      spots: data,
+      isCurved: true,
+      colors: gradientColors,
+      barWidth: 5,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: false,
+      ),
+      belowBarData: BarAreaData(
+        show: true,
+        colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+      ),
     );
   }
 
@@ -345,46 +327,26 @@ class _StatisticsState extends State<Statistics> {
         ),
         titlesData: FlTitlesData(
           show: true,
-          bottomTitles: displayTitleData(),
+          bottomTitles: displayAxisTitles(0),
           // Y Axis Legend
-          leftTitles: displaySideTitles(),
+          leftTitles: displayAxisTitles(1),
         ),
 
         // Size of the chart and display average data
         borderData: FlBorderData(
             show: true,
             border: Border.all(color: const Color(0xff37434d), width: 1)),
-        minX: 0,
-        maxX: 11,
+        minX: 1,
+        maxX: 7,
         minY: 0,
-        maxY: 3000,
+        maxY: maxValue,
         lineBarsData: [
-          LineChartBarData(
-            spots: data,
-            isCurved: true,
-            colors: gradientColors,
-            barWidth: 5,
-            isStrokeCapRound: true,
-            dotData: FlDotData(
-              show: false,
-            ),
-            belowBarData: BarAreaData(
-              show: true,
-              colors: gradientColors
-                  .map((color) => color.withOpacity(0.3))
-                  .toList(),
-            ),
-          ),
+          displayMeanData(),
         ] /*
         LineChartBarData(
           spots: [
             FlSpot(0, 3.44),
             FlSpot(2.6, 3.44),
-            FlSpot(4.9, 3.44),
-            FlSpot(6.8, 3.44),
-            FlSpot(8, 3.44),
-            FlSpot(9.5, 3.44),
-            FlSpot(11, 3.44),
           ],
           isCurved: true,
           colors: [
@@ -409,6 +371,39 @@ class _StatisticsState extends State<Statistics> {
         ),
       ],*/
         );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < tailleData; i++) {
+      dataCal.add(0.0);
+    }
+    // fillKCalData(dataCal);
+    fillLineChart();
+    // day of the week: 1:monday,...7:sunday
+    weekDay = _Today.weekday;
+    print('the day: $weekDay');
+    maxValue = 2000;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    data = [];
+    dataCal = [];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    fillLineChart();
+    return Stack(
+      children: <Widget>[
+        SingleChildScrollView(
+          child: displayStatisticScreen(context),
+        ),
+      ],
+    );
   }
 }
 
