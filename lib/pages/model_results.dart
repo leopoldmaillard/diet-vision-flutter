@@ -17,8 +17,6 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
 
-// globals variables
-
 const int OUTPUTSIZE = 513 * 513;
 const double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
 const double SURFACE2EUROS = pi * 12.875 * 12.875; // 521 mm2
@@ -60,7 +58,6 @@ class DisplayPictureScreen extends StatelessWidget {
         surfaces: this.surfaces,
         distances: this.distances,
       ),
-      //AspectRatio(aspectRatio: 1, child: Image.file(File(imagePath))),
     );
   }
 }
@@ -152,12 +149,12 @@ class _SegmentationState extends State<Segmentation> {
   bool _loading = true;
   var _outputPNG; // Mask
   var _outputRAW; // classic picture taken
-  Map _output_classes = Map();
+  Map _outputClasses = Map();
 
-  List<List<List<int>>> _output_classes_Volume = [];
-  List<List<List<int>>> _output_classes_Surface = [];
-  Map _output_classes_height = Map();
-  Map _output_classes_distance = Map();
+  List<List<List<int>>> _outputClassesVolume = [];
+  List<List<List<int>>> _outputClassesSurface = [];
+  Map _outputClassesHeight = Map();
+  Map _outputClassesDistance = Map();
   List<List<int>> minMax = [];
   int _selectedClass = 0;
 
@@ -172,7 +169,6 @@ class _SegmentationState extends State<Segmentation> {
 
   @override
   void dispose() {
-    print("TFlite is disposed");
     super.dispose();
     Tflite.close();
   }
@@ -181,6 +177,10 @@ class _SegmentationState extends State<Segmentation> {
     await Tflite.loadModel(
         model: 'assets/segmenter.tflite', labels: 'assets/labels.txt');
   }
+
+  /* **************************************************************************/
+  /* *********************  SEGMENTATION IMAGE  *******************************/
+  /* **************************************************************************/
 
   segmentImage(String imagePath) async {
     var output;
@@ -222,19 +222,71 @@ class _SegmentationState extends State<Segmentation> {
     if (outputraw != null)
       outputraw = outputraw.getBytes(format: IMG.Format.rgba);
 
+    //Here we go through all pixels
+    List pixelIterate = computeSurfaceAndAddPixelsCoordinates(outputraw);
+    Map outputClasses = pixelIterate[0];
+    List<List<List<int>>> outputClassesSurface = pixelIterate[1];
+    List<List<List<int>>> outputClassesVolume = pixelIterate[2];
+
+    Map outputClassesHeight = Map();
+    Map outputClassesDistance = Map();
+
+    outputClassesHeight = computeThicknessIfVolume(outputClassesVolume);
+    outputClassesDistance = computeDistanceifNoVolume(outputClassesSurface);
+
+    setState(() {
+      _outputPNG = output;
+      _outputRAW = outputraw;
+      _outputClasses = outputClasses;
+      _outputClassesSurface = outputClassesSurface;
+      _outputClassesVolume = outputClassesVolume;
+      _outputClassesDistance = outputClassesDistance;
+      _outputClassesHeight = outputClassesHeight;
+      _loading = false;
+    });
+
+    List keyValue = maxClasse();
+    addElementToDatabase(keyValue);
+  }
+
+  /* **************************************************************************/
+  /* ********************  ESTIMATION ALGORITHM   *****************************/
+  /* **************************************************************************/
+
+  /// return a Map : [idx general of the class (from map) : thicknessClass, ...]
+
+  Map<dynamic, dynamic> computeThicknessIfVolume(outputClassesVolume) {
+    return widget.volume
+        ? computeOutputClassesHeight(outputClassesVolume)
+        : Map();
+  }
+
+  /// return a Map : [idx general of the class (from map) : Dist coinClass, ...]
+
+  Map<dynamic, dynamic> computeDistanceifNoVolume(outputClassesSurface) {
+    return !widget.volume
+        ? computeOutputClassesDistance(outputClassesSurface)
+        : Map();
+  }
+
+  ///return 3 Lists :
+  ///-outputClass List : [[r,g,b] : 'labelClasse' , .....]
+  ///-outputClasseSurface List : [ [r,g,b,i,j], .....]
+  ///-outputClasseVolume List : [ [r,g,b,i,j], .....]
+
+  List computeSurfaceAndAddPixelsCoordinates(dynamic outputraw) {
     Iterable<List<int>> pixels = partition(outputraw, 4);
-    List<List<List<int>>> output_classes_Volume = [];
-    List<List<List<int>>> output_classes_Surface = [];
+    List<List<List<int>>> outputClassesVolume = [];
+    List<List<List<int>>> outputClassesSurface = [];
 
     for (int k = 0; k < widget.surfaces.length; k++) {
-      output_classes_Volume.add([]);
+      outputClassesVolume.add([]);
     }
 
     for (int k = 0; k < 26; k++) {
-      output_classes_Surface.add([]);
+      outputClassesSurface.add([]);
     }
-
-    Map output_classes = Map();
+    Map outputClasses = Map();
     int forEachCount = 0;
     String e;
     var i, c;
@@ -244,13 +296,13 @@ class _SegmentationState extends State<Segmentation> {
         e = element.toString();
         i = KEYS.indexOf(e);
         c = VALUES[i];
-        if (!output_classes.containsKey(c)) {
-          output_classes[c] = 1;
+        if (!outputClasses.containsKey(c)) {
+          outputClasses[c] = 1;
         } else {
-          output_classes[c] += 1;
+          outputClasses[c] += 1;
         }
         if (!widget.volume) {
-          output_classes_Surface[i].add(
+          outputClassesSurface[i].add(
               element + [(forEachCount / 513).round(), forEachCount % 513]);
         }
 
@@ -258,90 +310,74 @@ class _SegmentationState extends State<Segmentation> {
           i = widget.surfaces.keys.toList().indexOf(c);
 
           //concatene list [jsaipaskwa, r,g,b] et [i,j]
-          output_classes_Volume[i].add(
+          outputClassesVolume[i].add(
               element + [(forEachCount / 513).round(), forEachCount % 513]);
         }
         forEachCount++;
       },
     );
-
-    Map output_classes_height = Map();
-    Map output_classes_distance = Map();
-
-    if (widget.volume) {
-      output_classes_height =
-          Compute_output_classes_height(output_classes_Volume);
-    }
-    if (!widget.volume) {
-      output_classes_distance =
-          Compute_output_classes_distance(output_classes_Surface);
-    }
-
-    setState(() {
-      _outputPNG = output;
-      _outputRAW = outputraw;
-      _output_classes = output_classes;
-      _output_classes_Surface = output_classes_Surface;
-      _output_classes_Volume = output_classes_Volume;
-      _output_classes_distance = output_classes_distance;
-      _output_classes_height = output_classes_height;
-      _loading = false;
-    });
-
-    List KeyValue = maxClasse();
-    AddElementToDatabase(KeyValue);
+    return [outputClasses, outputClassesSurface, outputClassesVolume];
   }
 
-  Map Compute_output_classes_height(
-      List<List<List<int>>> output_classes_Volume) {
-    Map output_classes_height = Map();
+  /// param : a List (for each class) of a List of pixels [r,g,b,i,j].
+  /// Return a Map of the distances between coin and the differentes classes
+  /// Detected
+  /// return a Map : [idx general of the class (from general map) : thickness, ...]
+
+  Map computeOutputClassesHeight(List<List<List<int>>> outputClassesVolume) {
+    Map outputClassesHeight = Map();
     List<int> elemHeight = [];
     String e;
     var i, c;
     for (int l = 0; l < widget.surfaces.length; l++) {
-      if (output_classes_Volume[l].length != 0) {
+      if (outputClassesVolume[l].length != 0) {
         elemHeight = elemHeight + //du premier pixel de la classe d'indice l
-            [output_classes_Volume[l][0][0]] + //transparence
-            [output_classes_Volume[l][0][1]] + //r
-            [output_classes_Volume[l][0][2]] + //g
-            [output_classes_Volume[l][0][3]]; //b
+            [outputClassesVolume[l][0][0]] + //transparence
+            [outputClassesVolume[l][0][1]] + //r
+            [outputClassesVolume[l][0][2]] + //g
+            [outputClassesVolume[l][0][3]]; //b
         e = elemHeight.toString(); //[t,r,g,b] en string
         i = KEYS.indexOf(e);
         c = VALUES[i];
 
-        output_classes_height[c] =
-            getThicknessprecise(output_classes_Volume[l], c);
+        outputClassesHeight[c] = getThicknessprecise(outputClassesVolume[l], c);
         elemHeight = [];
       }
     }
-    return output_classes_height;
+    return outputClassesHeight;
   }
 
-//[indicede ouput_classes: distance en cm, ......]
-  Map Compute_output_classes_distance(
-      List<List<List<int>>> output_classes_Surface) {
-    Map output_classes_distance = Map();
+  /// param : a List (for each class) of a List of pixels [r,g,b,i,j].
+  /// Return a Map of the distances between coin and the differentes classes
+  /// Detected
+  /// return a Map : [idx general of the class (from general map) : Dist coinClass, ...]
+
+  Map computeOutputClassesDistance(List<List<List<int>>> outputClassesSurface) {
+    Map outputClassesDistance = Map();
     List<int> elemDist = [];
     String e;
     var i, c;
-    for (int l = 0; l < output_classes_Surface.length; l++) {
-      if (output_classes_Surface[l].length != 0) {
+    for (int l = 0; l < outputClassesSurface.length; l++) {
+      if (outputClassesSurface[l].length != 0) {
         elemDist = elemDist + //du premier pixel de la classe d'indice l
-            [output_classes_Surface[l][0][0]] + //transparence
-            [output_classes_Surface[l][0][1]] + //r
-            [output_classes_Surface[l][0][2]] + //g
-            [output_classes_Surface[l][0][3]]; //b
+            [outputClassesSurface[l][0][0]] + //transparence
+            [outputClassesSurface[l][0][1]] + //r
+            [outputClassesSurface[l][0][2]] + //g
+            [outputClassesSurface[l][0][3]]; //b
         e = elemDist.toString(); //[t,r,g,b] en string
         i = KEYS.indexOf(e);
         c = VALUES[i];
-        output_classes_distance[i] = getDistance(output_classes_Surface[l]);
+        outputClassesDistance[i] = getDistance(outputClassesSurface[l]);
         elemDist = [];
       }
     }
-    return output_classes_distance;
+    return outputClassesDistance;
   }
 
-  // distance between the center of the coin and the food item (each class detected) in cm
+  // param : Lists of pixels [ [r,g,b], [r,g,b2], ....]
+  // return a double : distance between coin center and  food item in cm
+  // for one class
+
   double getDistance(List<List<int>> typeOfClassPixels) {
     if (typeOfClassPixels.length == 0) {
       return 0;
@@ -364,7 +400,12 @@ class _SegmentationState extends State<Segmentation> {
       return distanceCoinFood;
   }
 
-  /// get an estimation of the thickness
+  /// Get an estimation of the thickness
+  /// Check the comment inside the function to understand it.
+  /// Store in minMax global variable the coordonates of the thickness
+  /// [yTopThickness, xBottomThickness, yBottomThickness, xBottomThickness]
+  /// and return the value in pixel of the thickness
+
   int getThicknessprecise(List<List<int>> typeOfClassPixels, String classe) {
     if (typeOfClassPixels.length == 0) {
       return 0;
@@ -408,16 +449,19 @@ class _SegmentationState extends State<Segmentation> {
     }
 
     // (ytop, xbot)  and (ybot xbot)
-    //we dont use xtop in the first coordonnate because we want to draw
-    //a line between the point the hiwer and the lower of the food
+    // we dont use xtop in the first coordonnate because we want to draw
+    // a line between the point the hiwer and the lower of the food
     // and taking the x of the bottom of the thickness is quite better. (Ithink)
     minMax.add(
         [yTopThickness, xBottomThickness, yBottomThickness, xBottomThickness]);
     return (yBottomThickness - yTopThickness).round();
   }
 
-//ywithperspective = le nb de pixels de lepaisseur de la deuxieme image (celle déformée)
-//xDistCoinClass = distance en cm
+  /// return real value in pixel of the perspective thickness
+  /// ywithperspective = thickness number of pixels of the 2nd picture (deformed)
+  /// xDistCoinClass = distance in cm
+  ///
+
   double getPixelConsideringPerspective(
       double yWithPerspective, double xDistCoinClass) {
     return yWithPerspective *
@@ -425,11 +469,12 @@ class _SegmentationState extends State<Segmentation> {
   }
   //thickdeformee = thickReel - 9.33*xdistance
 
+  /// some function to change
   List maxClasse() {
     var thevalue = 0;
     var thekey = 'Background 🏞️';
     //k != 'Food Containers 🍽️' && k != 'Background 🏞️' &&
-    _output_classes.forEach((k, v) {
+    _outputClasses.forEach((k, v) {
       if (k != 'Food Containers 🍽️' && k != 'Background 🏞️' && v > thevalue) {
         thevalue = v;
         thekey = k;
@@ -441,9 +486,10 @@ class _SegmentationState extends State<Segmentation> {
     return [thekey, thevalue];
   }
 
-  void AddElementToDatabase(List KeyValue) {
-    int valuecm2 = (KeyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
-    String nameFood = KeyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
+  /// some function to change
+  void addElementToDatabase(List keyValue) {
+    int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
+    String nameFood = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
     Food food = Food(name: nameFood);
     DatabaseProvider.db.insert(food).then(
           (storedFood) => BlocProvider.of<FoodBloc>(context).add(
@@ -452,7 +498,10 @@ class _SegmentationState extends State<Segmentation> {
         );
   }
 
-/**************************Partie Widget *********************************** */
+  /* **************************************************************************/
+  /* ***************************  WIDGET  *************************************/
+  /* **************************************************************************/
+
   Widget thick(int selectedClass) {
     var SIZEWIDTH = MediaQuery.of(context).size.width;
     final points = <Widget>[];
@@ -509,7 +558,7 @@ class _SegmentationState extends State<Segmentation> {
     var dist = widget.distances.values.toList();
 
     double thickPixels, thickness, distCoinClass, thickPixelsReal;
-    //idxClass: index in the output_classes of the current classe
+    //idxClass: index in the outputClasses of the current classe
     //idxClassDIst: index in the widget.distance of the current classe
     int idxClass, idxClassDist; //, index, color, item, surf, volume;
 
@@ -577,7 +626,7 @@ class _SegmentationState extends State<Segmentation> {
                   builder: (context) => SecondPictureScreen(
                     controller: widget.controller,
                     surfaces: surfaceSaved,
-                    distances: _output_classes_distance,
+                    distances: _outputClassesDistance,
                   ),
                 ),
               );
@@ -632,7 +681,7 @@ class _SegmentationState extends State<Segmentation> {
   Widget displaySurfaceOrVolume(bool volume, List<String> categories) {
     return !volume
         ? ListView(
-            children: _output_classes.entries.map(
+            children: _outputClasses.entries.map(
               (e) {
                 int percent = ((e.value / OUTPUTSIZE) * 100).round();
                 if (percent >= 1) {
