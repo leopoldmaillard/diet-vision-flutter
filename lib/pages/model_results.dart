@@ -11,6 +11,12 @@ import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 
+import 'package:transfer_learning_fruit_veggies/model/food.dart';
+import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
+import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
+
 // globals variables
 
 const int OUTPUTSIZE = 513 * 513;
@@ -281,6 +287,9 @@ class _SegmentationState extends State<Segmentation> {
       _output_classes_height = output_classes_height;
       _loading = false;
     });
+
+    List KeyValue = maxClasse();
+    AddElementToDatabase(KeyValue);
   }
 
   Map Compute_output_classes_height(
@@ -415,6 +424,33 @@ class _SegmentationState extends State<Segmentation> {
         (1 / (1.54 - 0.39 * log(0.94 * (xDistCoinClass) + 4.00)));
   }
   //thickdeformee = thickReel - 9.33*xdistance
+
+  List maxClasse() {
+    var thevalue = 0;
+    var thekey = 'Background 🏞️';
+    //k != 'Food Containers 🍽️' && k != 'Background 🏞️' &&
+    _output_classes.forEach((k, v) {
+      if (k != 'Food Containers 🍽️' && k != 'Background 🏞️' && v > thevalue) {
+        thevalue = v;
+        thekey = k;
+      }
+    });
+
+    print(thekey);
+    print(thevalue);
+    return [thekey, thevalue];
+  }
+
+  void AddElementToDatabase(List KeyValue) {
+    int valuecm2 = (KeyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
+    String nameFood = KeyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
+    Food food = Food(name: nameFood);
+    DatabaseProvider.db.insert(food).then(
+          (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+            AddFood(storedFood),
+          ),
+        );
+  }
 
 /**************************Partie Widget *********************************** */
   Widget thick(int selectedClass) {
@@ -606,18 +642,18 @@ class _SegmentationState extends State<Segmentation> {
                   int color = pascalVOCLabelColors[index];
                   surfaceSaved[e.key] = surface;
                   return ActionChip(
-                      onPressed: () {},
-                      avatar: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Text(percent.toString() + "%",
-                            style:
-                                TextStyle(color: Color(color), fontSize: 10)),
-                      ),
-                      backgroundColor: Color(color),
-                      label: Text(
-                        e.key + '   ' + surface.toString() + 'cm²',
-                        style: const TextStyle(color: Colors.white),
-                      ));
+                    onPressed: () {},
+                    avatar: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: Text(percent.toString() + "%",
+                          style: TextStyle(color: Color(color), fontSize: 10)),
+                    ),
+                    backgroundColor: Color(color),
+                    label: Text(
+                      e.key + '   ' + surface.toString() + 'cm²',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  );
                 } else {
                   return Container();
                 }

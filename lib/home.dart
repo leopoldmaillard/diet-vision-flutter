@@ -4,7 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
 import 'package:transfer_learning_fruit_veggies/pages/geoloc.dart';
-import 'package:transfer_learning_fruit_veggies/pages/page3.dart';
+import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
 import 'package:transfer_learning_fruit_veggies/pages/statistics.dart';
 import 'package:transfer_learning_fruit_veggies/pages/profile.dart';
 
@@ -69,7 +69,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           /* Navigation au sein de l'appli*/
           //CameraScreen(),
           Geoloc(),
-          Page3(),
+          HistoryMeal(),
           CameraScreen(widget.cameras),
           Statistics(),
           Profile(),
