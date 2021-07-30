@@ -20,71 +20,24 @@ class _LoginScreenState extends State<LoginScreen> {
   String _email = '', _password = '';
   final auth = FirebaseAuth.instance;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Log in'),
-          backgroundColor: Colors.purple,
-        ),
-        body: Column(
-          children: [
-            // add a part to write the mail
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(hintText: 'Email'),
-                  onChanged: (value) {
-                    setState(() {
-                      _email = value.trim();
-                    });
-                  }),
-            ),
+/** try to do a authentification automaticaly */
+  // Future<User> getUser() async {
+  //   return await auth.currentUser;
+  // }
 
-            // add a part to write the mail
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                obscureText: true,
-                decoration: InputDecoration(hintText: 'Password'),
-                onChanged: (value) {
-                  setState(() {
-                    _password = value.trim();
-                  });
-                },
-              ),
-            ),
-            // add button to sign in or sign up
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                RaisedButton(
-                    color: Theme.of(context).accentColor,
-                    child: Text('Signin'),
-                    onPressed: () => _signin(_email, _password)),
-                RaisedButton(
-                    color: Theme.of(context).accentColor,
-                    child: Text('Signup'),
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => SignUpScreen())))
-                //_signup(_email, _password)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                    child: Text('Forgot Password ?'),
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => ResetScreen())))
-              ],
-            )
-          ],
-        ));
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   getUser().then(
+  //     (user) {
+  //       if (user != null) {
+  //         FHomeScreen();
+  //       }
+  //     },
+  //   );
+  // }
 
+  //signin the first time in the app with email/password
   _signin(String _email, String _password) async {
     try {
       await auth.signInWithEmailAndPassword(email: _email, password: _password);
@@ -97,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+// connexion to the app when you are already registered
   _signup(String _email, String _password) async {
     try {
       await auth.createUserWithEmailAndPassword(
@@ -109,5 +63,86 @@ class _LoginScreenState extends State<LoginScreen> {
       // print(error.message);
       Fluttertoast.showToast(msg: error.message, gravity: ToastGravity.TOP);
     }
+  }
+
+  //display text field for add e mail or pwd
+  Widget displayTextField(int texte) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+          keyboardType:
+              texte == 0 ? TextInputType.emailAddress : TextInputType.multiline,
+          obscureText: texte == 1 ? true : false,
+          decoration: texte == 0
+              ? InputDecoration(hintText: 'Email')
+              : InputDecoration(hintText: 'Password'),
+          onChanged: (value) {
+            setState(() {
+              if (texte == 0) {
+                _email = value.trim();
+              }
+              if (texte == 1) {
+                _password = value.trim();
+              }
+            });
+          }),
+    );
+  }
+
+  //display button signin/signup
+  Widget buttonSign(int sign) {
+    return RaisedButton(
+        color: Theme.of(context).accentColor,
+        child: sign == 0 ? Text('Signin') : Text('Signup'),
+        onPressed: () {
+          setState(() {
+            if (sign == 0) {
+              _signin(_email, _password);
+            }
+            if (sign == 1) {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => SignUpScreen()));
+            }
+          });
+        });
+  }
+
+//display forgot password button and send a email to change the pwd
+  Widget displayForgotPassword() {
+    return TextButton(
+        child: Text('Forgot Password ?'),
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => ResetScreen())));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Log in'),
+          backgroundColor: Colors.purple,
+        ),
+        body: Column(
+          children: [
+            // add a part to write the mail
+            displayTextField(0),
+            // wirte the password
+            displayTextField(1),
+            // add button to sign in or sign up
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                buttonSign(0),
+                buttonSign(1),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                displayForgotPassword(),
+              ],
+            )
+          ],
+        ));
   }
 }

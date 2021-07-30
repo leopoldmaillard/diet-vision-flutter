@@ -22,7 +22,6 @@ class _VerifyScreenState extends State<VerifyScreen> {
   @override
   void initState() {
     User user = auth.currentUser;
-    //print('ceci est le nom du user: \n');
     //print(user);
     user.sendEmailVerification();
 
@@ -31,6 +30,17 @@ class _VerifyScreenState extends State<VerifyScreen> {
       checkEmailVerified(user);
     });
     super.initState();
+  }
+
+  // in the case where the email is verified, the timer is delated and the user can go on the homepage
+  Future<void> checkEmailVerified(User u) async {
+    u = auth.currentUser;
+    await u.reload();
+    if (u.emailVerified) {
+      timer.cancel();
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => FHomeScreen()));
+    }
   }
 
   @override
@@ -48,16 +58,5 @@ class _VerifyScreenState extends State<VerifyScreen> {
                  please verify"""),
       ),
     );
-  }
-
-  // in the case where the email is verified, the timer is delated and the user can go on the homepage
-  Future<void> checkEmailVerified(User u) async {
-    u = auth.currentUser;
-    await u.reload();
-    if (u.emailVerified) {
-      timer.cancel();
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => FHomeScreen()));
-    }
   }
 }

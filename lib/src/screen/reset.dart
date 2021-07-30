@@ -16,6 +16,38 @@ class _ResetScreenState extends State<ResetScreen> {
   String _email = '';
   final auth = FirebaseAuth.instance;
 
+  //display a button to sign in
+  Widget displaySignIn() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        RaisedButton(
+            color: Theme.of(context).accentColor,
+            child: Text('Send Request'),
+            textColor: Colors.white,
+            onPressed: () {
+              auth.sendPasswordResetEmail(email: _email);
+              Navigator.of(context).pop();
+            })
+      ],
+    );
+  }
+
+  // add a part to write the mail
+  Widget displayEmail() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(hintText: 'Email'),
+          onChanged: (value) {
+            setState(() {
+              _email = value.trim();
+            });
+          }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,32 +57,8 @@ class _ResetScreenState extends State<ResetScreen> {
         ),
         body: Column(
           children: [
-            // add a part to write the mail
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(hintText: 'Email'),
-                  onChanged: (value) {
-                    setState(() {
-                      _email = value.trim();
-                    });
-                  }),
-            ),
-            // add button to sign in or sign up
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                RaisedButton(
-                    color: Theme.of(context).accentColor,
-                    child: Text('Send Request'),
-                    textColor: Colors.white,
-                    onPressed: () {
-                      auth.sendPasswordResetEmail(email: _email);
-                      Navigator.of(context).pop();
-                    }),
-              ],
-            ),
+            displayEmail(),
+            displaySignIn(),
           ],
         ));
   }
