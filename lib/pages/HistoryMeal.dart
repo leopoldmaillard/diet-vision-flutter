@@ -19,6 +19,11 @@ class _HistoryMealState extends State<HistoryMeal> {
   @override
   void initState() {
     super.initState();
+    retrieveDatabase();
+  }
+
+  // execute a query to retrieve database store in db variable
+  void retrieveDatabase() {
     DatabaseProvider.db.getFoods().then(
       (foodList) {
         print(foodList);
@@ -30,21 +35,25 @@ class _HistoryMealState extends State<HistoryMeal> {
   }
 
   showFoodDialog(BuildContext context, Food food, int index) {
+    // alert dialog come with showdialog (need context and builder)
     showDialog(
       context: context,
+      barrierDismissible: false, //whether user can tap outside the alerdialog
+      //Alert dialog are basically pop-ups with content and buttons
       builder: (context) => AlertDialog(
         title: Text(food.name),
-        content: Text("ID ${food.id}"),
+        content:
+            Text("ID ${food.id}"), //main content, image easily integratable
         actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Page2(),
-              ),
-            ),
-            child: Text("Update"),
-          ),
+          // TextButton(
+          //   onPressed: () => Navigator.pushReplacement(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => Page2(),
+          //     ),
+          //   ),
+          //   child: Text("Update"),
+          // ),
 
           ///after we delete the food from ouf database, then we delete the
           ///food from our foodbloc (and the dialog)
@@ -65,6 +74,7 @@ class _HistoryMealState extends State<HistoryMeal> {
             child: Text("Cancel"),
           ),
         ],
+        elevation: 24.0,
       ),
     );
   }
@@ -110,3 +120,11 @@ class _HistoryMealState extends State<HistoryMeal> {
     );
   }
 }
+
+
+/***
+ *  BlocConsumer is analogous to a nested BlocListener and BlocBuilder
+ *  BlocConsumer should only be used when it is necessary to both rebuild UI and
+ *  execute other reactions to state changes in the bloc.
+ *  -required BlocWidgetBuilder and BlocWidgetListener
+ */

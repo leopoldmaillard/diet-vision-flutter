@@ -18,7 +18,7 @@ class FoodBloc extends Bloc<FoodEvent, List<Food>> {
       yield event.foodList;
     } else if (event is AddFood) {
       /// after added the food in the database, we create a new state and
-      /// we add the new food to the state and return the state
+      /// we add the new food to the state and return the state(foodlist)
       List<Food> newState = List.from(state);
       if (event.newFood != null) {
         newState.add(event.newFood);

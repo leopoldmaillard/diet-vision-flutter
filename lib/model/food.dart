@@ -5,14 +5,7 @@ class Food {
   int id = 0;
   String name = '';
 
-  Food({required this.name}) {
-    //incCpt();
-    // this.id = cpt;
-  }
-
-  // static void incCpt() {
-  //   cpt++;
-  // }
+  Food({required this.name});
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{DatabaseProvider.COLUMN_NAME: name};

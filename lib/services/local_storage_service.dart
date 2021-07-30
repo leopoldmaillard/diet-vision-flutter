@@ -16,6 +16,7 @@ class DatabaseProvider {
   // plus tard on utilise les opérateurs ! pour le return à cause du futur
   Database? _database = null;
 
+  /// methode get de la base de donnée
   Future<Database> get database async {
     print("database getter called");
 
@@ -30,6 +31,7 @@ class DatabaseProvider {
     return _database!;
   }
 
+  /// creation of the database file and of the table
   Future<Database> createDatabase() async {
     String dbPath = await getDatabasesPath();
 
@@ -50,6 +52,9 @@ class DatabaseProvider {
     );
   }
 
+  /// execute a query for the table of table food (all the table)
+  /// and add to the foodlist all elements from the requests
+  /// return a List<Food>
   Future<List<Food>> getFoods() async {
     final db = await database;
 
@@ -66,6 +71,8 @@ class DatabaseProvider {
     return foodList;
   }
 
+  /// insert a food element (by using its map) into the database
+  /// return Food inserted element
   Future<Food> insert(Food food) async {
     final db = await database;
     food.id = await db.insert(TABLE_FOOD, food.toMap());
@@ -74,7 +81,7 @@ class DatabaseProvider {
     return food;
   }
 
-  /// return the nb of line that are deleted if the method is sucessful,
+  /// return the nb of lines that are deleted if the method is sucessful,
   ///  0 if it didnt find any match
   /// param :
   ///  id ==> id to delete
@@ -89,7 +96,7 @@ class DatabaseProvider {
   }
 
   /// param :
-  /// food ==> its the value that will be replaced into the database
+  /// food ==> it is the value that will be replaced into the database
   /// we update this food.id by this value : food.toMap()
   Future<int> update(Food food) async {
     final db = await database;
