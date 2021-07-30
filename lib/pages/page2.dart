@@ -1,13 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
+import 'package:transfer_learning_fruit_veggies/events/delete_food.dart';
+import 'package:transfer_learning_fruit_veggies/model/food.dart';
+import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
 
-class Page2 extends StatelessWidget {
+import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class Page2 extends StatefulWidget {
+  const Page2({Key? key}) : super(key: key);
+
+  @override
+  _Page2State createState() => _Page2State();
+}
+
+class _Page2State extends State<Page2> {
+  @override
+  void initState() {
+    Food food = Food(name: "food name");
+    //après add on rajoute levenement qu'on veut invoquer
+    // on attend de recupérer notre food, une fois que cest fait
+    // on préviens le bloc qu'on a ajouté de la food et qu'on la passer
+    // dans storedfood, et apres rajout levenement addfood au bloc
+    // et après la list devrait être uptaded ausi
+    // previens le blocconsumer
+    print("heeeeeeeeeeeeeloooooo page2");
+    // DatabaseProvider.db.insert(food).then(
+    //       (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+    //         AddFood(storedFood),
+    //       ),
+    //     );
+
+    //to delete manualy an item
+    // DatabaseProvider.db.delete(15).then(
+    //   (_) {
+    //     BlocProvider.of<FoodBloc>(context).add(
+    //       DeleteFood(15),
+    //     );
+    //   },
+    // );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new Center(
-      child: new Text(
-        "Recipe page. Recipe recommendations that fit the user's taste could be displayed here thanks to Shaun's website.",
-        style: new TextStyle(fontSize: 20.0),
-      ),
-    );
+    return Container();
   }
 }

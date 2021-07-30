@@ -3,10 +3,10 @@ import 'package:flutter_point_tab_bar/pointTabIndicator.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
-import 'package:transfer_learning_fruit_veggies/pages/page2.dart';
-import 'package:transfer_learning_fruit_veggies/pages/page3.dart';
-import 'package:transfer_learning_fruit_veggies/pages/page4.dart';
-import 'package:transfer_learning_fruit_veggies/pages/page5.dart';
+import 'package:transfer_learning_fruit_veggies/pages/geoloc.dart';
+import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
+import 'package:transfer_learning_fruit_veggies/pages/statistics.dart';
+import 'package:transfer_learning_fruit_veggies/pages/profile.dart';
 
 class Home extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -31,7 +31,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       } else {
         showFab = false;
       }
-      setState(() {});
+      //setState(() {});
     });
   }
 
@@ -68,11 +68,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         children: <Widget>[
           /* Navigation au sein de l'appli*/
           //CameraScreen(),
-          Page2(),
-          Page3(),
+          Geoloc(),
+          HistoryMeal(),
           CameraScreen(widget.cameras),
-          Page4(),
-          Page5(),
+          Statistics(),
+          Profile(),
         ],
       ),
     );

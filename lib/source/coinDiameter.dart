@@ -1,0 +1,213 @@
+// 1 inch = 2.54 cm (USA, Liberia et Birmanie)
+// website used:
+//https://www.blog-note.com/diametre-des-pieces-de-monnaie-e-euro-dollar-livre/
+List<Map> coinDiameterJson = [
+  //American Dollar
+  {
+    "id": '1',
+    "coin": "american_dollar",
+    "value": "1_c",
+    "diameter_inch": "0.75",
+    "diameter_mm": "19",
+  }, // 1 cent
+  {
+    "id": '2',
+    "coin": "american_dollar",
+    "value": "5_c",
+    "diameter_inch": "0.79",
+    "diameter_mm": "20",
+  },
+  {
+    "id": '3',
+    "coin": "american_dollar",
+    "value": "10_c",
+    "diameter_inch": "0.71",
+    "diameter_mm": "18",
+  },
+  {
+    "id": '4',
+    "coin": "american_dollar",
+    "value": "25_c",
+    "diameter_inch": "0.94",
+    "diameter_mm": "24",
+  }, // the most commonly used
+  {
+    "id": '5',
+    "coin": "american_dollar",
+    "value": "50_c",
+    "diameter_inch": "1.22",
+    "diameter_mm": "31",
+  },
+  {
+    "id": '6',
+    "coin": "american_dollar",
+    "value": "1_d",
+    "diameter_inch": "1.02",
+    "diameter_mm": "26",
+  },
+
+  // Canadien Dollar
+  {
+    "id": '7',
+    "coin": "canadien_dollar",
+    "value": "1_c",
+    "diameter_inch": "0.75",
+    "diameter_mm": "19",
+  },
+  {
+    "id": '8',
+    "coin": "canadien_dollar",
+    "value": "5_c",
+    "diameter_inch": "0.83",
+    "diameter_mm": "21",
+  },
+  {
+    "id": '9',
+    "coin": "canadien_dollar",
+    "value": "10_c",
+    "diameter_inch": "0.71",
+    "diameter_mm": "18",
+  },
+  {
+    "id": '10',
+    "coin": "canadien_dollar",
+    "value": "25_c",
+    "diameter_inch": "0.94",
+    "diameter_mm": "24",
+  },
+  {
+    "id": '11',
+    "coin": "canadien_dollar",
+    "value": "50_c",
+    "diameter_inch": "1.07",
+    "diameter_mm": "27",
+  },
+  {
+    "id": '12',
+    "coin": "canadien_dollar",
+    "value": "1_d",
+    "diameter_inch": "1.02",
+    "diameter_mm": "26",
+  },
+  {
+    "id": '13',
+    "coin": "canadien_dollar",
+    "value": "2_d",
+    "diameter_inch": "1.1",
+    "diameter_mm": "28",
+  },
+  // Livre Sterling
+  {
+    "id": '14',
+    "coin": "livre_sterling",
+    "value": "1_p",
+    "diameter_inch": "0.8",
+    "diameter_mm": "20.32",
+  },
+  {
+    "id": '15',
+    "coin": "livre_sterling",
+    "value": "2_p",
+    "diameter_inch": "1.02",
+    "diameter_mm": "25.91",
+  },
+  {
+    "id": '16',
+    "coin": "livre_sterling",
+    "value": "5_p",
+    "diameter_inch": "0.71",
+    "diameter_mm": "18",
+  },
+  {
+    "id": '17',
+    "coin": "livre_sterling",
+    "value": "10_p",
+    "diameter_inch": "0.96",
+    "diameter_mm": "24.05",
+  },
+  {
+    "id": '18',
+    "coin": "livre_sterling",
+    "value": "20_p",
+    "diameter_inch": "0.84",
+    "diameter_mm": "21.4",
+  },
+  {
+    "id": '19',
+    "coin": "livre_sterling",
+    "value": "50_p",
+    "diameter_inch": "1.07",
+    "diameter_mm": "27.3",
+  },
+  {
+    "id": '20',
+    "coin": "livre_sterling",
+    "value": "1_l",
+    "diameter_inch": "0.89",
+    "diameter_mm": "22.5",
+  },
+  {
+    "id": '21',
+    "coin": "livre_sterling",
+    "value": "2_l",
+    "diameter_inch": "0.89",
+    "diameter_mm": "28.4",
+  },
+  // Euro
+  {
+    "id": '22',
+    "coin": "euro",
+    "value": "1_c",
+    "diameter_inch": "0.64",
+    "diameter_mm": "16.25",
+  },
+  {
+    "id": '23',
+    "coin": "euro",
+    "value": "2_c",
+    "diameter_inch": "0.74",
+    "diameter_mm": "18.75",
+  },
+  {
+    "id": '24',
+    "coin": "euro",
+    "value": "5_c",
+    "diameter_inch": "0.84",
+    "diameter_mm": "21.25",
+  },
+  {
+    "id": '25',
+    "coin": "euro",
+    "value": "10_c",
+    "diameter_inch": "0.78",
+    "diameter_mm": "19.75",
+  },
+  {
+    "id": '26',
+    "coin": "euro",
+    "value": "20_c",
+    "diameter_inch": "0.88",
+    "diameter_mm": "22.25",
+  },
+  {
+    "id": '27',
+    "coin": "euro",
+    "value": "50_c",
+    "diameter_inch": "0.95",
+    "diameter_mm": "24.25",
+  },
+  {
+    "id": '28',
+    "coin": "euro",
+    "value": "1_e",
+    "diameter_inch": "0.92",
+    "diameter_mm": "23.25",
+  },
+  {
+    "id": '29',
+    "coin": "euro",
+    "value": "2_e",
+    "diameter_inch": "1.01",
+    "diameter_mm": "25.75",
+  },
+];
