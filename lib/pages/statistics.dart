@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/services.dart';
@@ -16,10 +18,12 @@ class _StatisticsState extends State<Statistics> {
   int weekDay = 0; //monday .. (1=mond, ... 7=sunday)
   double maxValue = 0;
   bool showAvg = false;
+
   // get AVG
   LineChartBarData curve = new LineChartBarData();
   //points to add on chart
   List<FlSpot> data = [];
+  List<FlSpot> dataMean = [];
   //data for a mounth
   List<double> dataCal = [];
   int tailleData = 7;
@@ -65,48 +69,55 @@ class _StatisticsState extends State<Statistics> {
     return '';
   }
 
+//get AVG from the data
   double getAvg() {
     double mean = 0;
-    return mean;
+    int i = 0;
+    for (i = 0; i < data.length; i++) {
+      mean = mean + data[i].y;
+    }
+    return mean / i;
   }
 
   //give a size and inster plot (i,0) , initialize/register data
   void fillLineChart() {
-    data = [];
-    if (data.length == 0) {
-      for (int i = 0; i < tailleData; i++) {
+    var r = new Random();
+    for (int i = 0; i < tailleData; i++) {
+      if (data.length < 0) {
         data.add(FlSpot(i.toDouble() + 1, 1000));
+      } else {
+        replaceLineSpot(data, i, r.nextDouble() * 2000);
       }
     }
-    if (data[tailleData - 2].y == 1000) {
-      replaceLineSpot(tailleData - 2, 1200);
-      data.add(FlSpot(7, 500));
-    }
-    print(data);
+    print('voici data:$data');
+    dataMean = data;
   }
 
   //change the value at the index given
-  void replaceLineSpot(int index, double value) {
+  void replaceLineSpot(List<FlSpot> da, int index, double value) {
     double x;
-    x = data[index].x;
-    data[index] = FlSpot(x, value);
+    x = da[index].x;
+    da[index] = FlSpot(x, value);
   }
 
   //add a point in the list
   void addPoint(double value) {
-    data.add(FlSpot(data.length.toDouble(), value));
+    data.add(FlSpot(data.length.toDouble() + 1, value));
   }
 
   //remove a point
   void removePoint(int index) {
     data.removeAt(index);
   }
-  // //add points (y) in the dataCalories
-  // void fillKCalData(List<double> Calories) {
-  //   for (int i = 0; i < Calories.length; i++) {
-  //     Calories.add(1000);
-  //   }
-  // }
+
+  //add points (y) in the dataCalories
+  void fillKCalData(List<double> Calories) {
+    var rng = new Random();
+    double minVal = 200;
+    for (int i = 0; i < Calories.length; i++) {
+      Calories.add((rng.nextDouble() + 200) * (maxValue - minVal));
+    }
+  }
 
   // ignore: slash_for_doc_comments
 /******************Widget Part *********************/
@@ -307,6 +318,10 @@ class _StatisticsState extends State<Statistics> {
   // Output: average of the first curve
   LineChartData avgData() {
     double mean = getAvg();
+    for (int i = 0; i < dataMean.length; i++) {
+      replaceLineSpot(dataMean, i, mean);
+    }
+    print('voici dataMean: $dataMean');
     return LineChartData(
         lineTouchData: LineTouchData(enabled: false),
         gridData: FlGridData(
@@ -342,49 +357,23 @@ class _StatisticsState extends State<Statistics> {
         maxY: maxValue,
         lineBarsData: [
           displayMeanData(),
-        ] /*
-        LineChartBarData(
-          spots: [
-            FlSpot(0, 3.44),
-            FlSpot(2.6, 3.44),
-          ],
-          isCurved: true,
-          colors: [
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)!,
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)!,
-          ],
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(show: true, colors: [
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)!
-                .withOpacity(0.1),
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)!
-                .withOpacity(0.1),
-          ]),
-        ),
-      ],*/
-        );
+        ]);
   }
 
   @override
   void initState() {
     super.initState();
+    var r = new Random();
     for (int i = 0; i < tailleData; i++) {
-      dataCal.add(0.0);
+      addPoint(0.0);
     }
-    // fillKCalData(dataCal);
+    //fillKCalData(dataCal);
     fillLineChart();
     // day of the week: 1:monday,...7:sunday
     weekDay = _Today.weekday;
     print('the day: $weekDay');
     maxValue = 2000;
+    print('calories for the week:$dataCal');
   }
 
   @override
@@ -452,3 +441,37 @@ class DropdownTimingState extends State<DropdownTiming> {
     );
   }
 }
+
+
+
+/*******In a linechartbar:
+ * 
+ * /*
+        LineChartBarData(
+          spots: [
+            FlSpot(0, 3.44),
+            FlSpot(2.6, 3.44),
+          ],
+          isCurved: true,
+          colors: [
+            ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                .lerp(0.2)!,
+            ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                .lerp(0.2)!,
+          ],
+          barWidth: 5,
+          isStrokeCapRound: true,
+          dotData: FlDotData(
+            show: false,
+          ),
+          belowBarData: BarAreaData(show: true, colors: [
+            ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                .lerp(0.2)!
+                .withOpacity(0.1),
+            ColorTween(begin: gradientColors[0], end: gradientColors[1])
+                .lerp(0.2)!
+                .withOpacity(0.1),
+          ]),
+        ),
+      ],*/
+ */
