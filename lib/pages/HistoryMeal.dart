@@ -15,6 +15,19 @@ class HistoryMeal extends StatefulWidget {
 }
 
 class _HistoryMealState extends State<HistoryMeal> {
+/* ****************************************************************************/
+/* *********************  FUNCTIONS SIGNATURES  *******************************/
+/* ****************************************************************************/
+//   ==> PopupScreen
+// dynamic showFoodDialog(BuildContext context, Food food, int index)
+// AlertDialog displayPopup(Food food, int index)
+// void deleteItem(Food food, int index)
+// Widget displayDeleteButton(Food food, int index)
+// Widget displayCancelButton()
+
+// ==> General Design
+// BlocConsumer<FoodBloc, List<Food>> getBlocConsummer()
+// Card designItemDisplayed(List<Food> foodList, int index)
   @override
   void initState() {
     super.initState();

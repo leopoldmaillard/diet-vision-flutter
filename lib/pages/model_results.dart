@@ -83,6 +83,46 @@ class Segmentation extends StatefulWidget {
 }
 
 class _SegmentationState extends State<Segmentation> {
+/* ****************************************************************************/
+/* *********************  FUNCTIONS SIGNATURES  *******************************/
+/* ****************************************************************************/
+
+  // SOMMAIRE :
+  //   ==> Segmentation Image
+  //    dynamic segmentImage(String imagePath);
+
+  // ==> estimation algorith
+  //  Map<dynamic, dynamic> computeThicknessIfVolume(outputClassesVolume)
+  //  Map<dynamic, dynamic> computeDistanceifNoVolume(outputClassesSurface)
+  //  List computeSurfaceAndAddPixelsCoordinates(dynamic outputraw)
+  //  Map computeOutputClassesHeight(List<List<List<int>>> outputClassesVolume)
+  //   Map computeOutputClassesDistance(List<List<List<int>>> outputClassesSurface)
+  //  double getDistance(List<List<int>> typeOfClassPixels)
+  //  int getThicknessprecise(List<List<int>> typeOfClassPixels, String classe)
+  //  List maxClasse()
+  //  void addElementToDatabase(List keyValue)
+
+  // ==> WIDGET
+  //  Positioned placeTopThicknessPoint(int selectedClass, var SIZEWIDTH)
+  //  Positioned placeBotThicknessPoint(int selectedClass, var SIZEWIDTH)
+  //  Positioned placeLineBetweenTopAndBotThickness(
+  //  int selectedClass, var SIZEWIDTH)
+  //  Widget drawThick(int selectedClass)
+  //  Widget volumeList()
+  //  ActionChip displayVolumeInfo(item, color, widSurfKey, thickness, volume, i)
+  //  Widget displayGetVolumeEstimationButton(bool volume) Widget helpMessageUtilisationSlider()
+  //  Widget sliderThickness()
+  //   Widget displaySlider(bool volume)
+  //   ActionChip displaySurfaceInfo(percent, surface, color, e)
+  //  ListView surfaceList(categories)
+  //  Widget displaySurfaceOrVolume(bool volume, List<String> categories)
+  //  Widget displayPictureWithSegFilter(var SIZEWIDTH)
+  //  Center displayLoadingScreen()
+  //  Column displaySurfaceAndVolumeInfos(SIZEWIDTH, categories)
+
+  /* **************************************************************************/
+  /* *********************  Classes and COlors  *******************************/
+  /* **************************************************************************/
   static List<int> pascalVOCLabelColors = [
     Color.fromARGB(255, 0, 0, 0).value, // background
     Color.fromARGB(255, 128, 0, 0).value, // leafy_greens
@@ -113,7 +153,6 @@ class _SegmentationState extends State<Segmentation> {
     Color.fromARGB(255, 192, 192, 192).value, // dining_tools
     Color.fromARGB(255, 192, 64, 64).value, // other_food
   ];
-
   static var classes = {
     '[0, 0, 0, 255]': 'Background 🏞️',
     '[128, 0, 0, 255]': 'Leafy Greens 🥬',
@@ -142,6 +181,10 @@ class _SegmentationState extends State<Segmentation> {
     '[192, 192, 192, 255]': 'Dining Tools 🍴',
     '[192, 64, 64, 255]': 'Other Food ❓'
   };
+
+  /* **************************************************************************/
+  /* *********************  Globals VARIABLE  *********************************/
+  /* **************************************************************************/
   var KEYS = classes.keys.toList();
   var VALUES = classes.values.toList();
   Map surfaceSaved = Map();
@@ -182,7 +225,7 @@ class _SegmentationState extends State<Segmentation> {
   /* *********************  SEGMENTATION IMAGE  *******************************/
   /* **************************************************************************/
 
-  segmentImage(String imagePath) async {
+  dynamic segmentImage(String imagePath) async {
     var output;
     var outputraw;
 
@@ -502,48 +545,59 @@ class _SegmentationState extends State<Segmentation> {
   /* ***************************  WIDGET  *************************************/
   /* **************************************************************************/
 
-  Widget thick(int selectedClass) {
+  Positioned placeTopThicknessPoint(int selectedClass, var SIZEWIDTH) {
+    return Positioned(
+      top: minMax[selectedClass][0].abs() / 513 * SIZEWIDTH - 5,
+      left: minMax[selectedClass][1].abs() / 513 * SIZEWIDTH - 5,
+      child: Container(
+        height: 10,
+        width: 10,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle, color: Theme.of(context).primaryColor),
+      ),
+    );
+  }
+
+  Positioned placeBotThicknessPoint(int selectedClass, var SIZEWIDTH) {
+    return Positioned(
+      top: minMax[selectedClass][2].abs() / 513 * SIZEWIDTH - 5,
+      left: minMax[selectedClass][3].abs() / 513 * SIZEWIDTH - 5,
+      child: Container(
+        height: 10,
+        width: 10,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle, color: Theme.of(context).primaryColor),
+      ),
+    );
+  }
+
+  Positioned placeLineBetweenTopAndBotThickness(
+      int selectedClass, var SIZEWIDTH) {
+    return Positioned(
+      top: minMax[selectedClass][0].abs() / 513 * SIZEWIDTH + 5,
+      left: minMax[selectedClass][1].abs() / 513 * SIZEWIDTH,
+      child: Dash(
+        direction: Axis.vertical,
+        length: (minMax[selectedClass][2].abs() / 513 * SIZEWIDTH - 10) -
+            (minMax[selectedClass][0].abs() / 513 * SIZEWIDTH),
+        dashColor: Theme.of(context).primaryColor,
+        dashLength: 4,
+        dashBorderRadius: 8,
+        dashGap: 5,
+      ),
+    );
+  }
+
+  /// return a Stack where points for drawing thickness is inside.
+// yTopThickness, xBottomThickness, yBottomThickness, xBottomThickness
+  Widget drawThick(int selectedClass) {
     var SIZEWIDTH = MediaQuery.of(context).size.width;
     final points = <Widget>[];
 
+    points.add(placeTopThicknessPoint(selectedClass, SIZEWIDTH));
+    points.add(placeBotThicknessPoint(selectedClass, SIZEWIDTH));
     points.add(
-      Positioned(
-        top: minMax[selectedClass][0].abs() / 513 * SIZEWIDTH - 5,
-        left: minMax[selectedClass][1].abs() / 513 * SIZEWIDTH - 5,
-        child: Container(
-          height: 10,
-          width: 10,
-          decoration: BoxDecoration(
-              shape: BoxShape.circle, color: Theme.of(context).primaryColor),
-        ),
-      ),
-    );
-    points.add(
-      Positioned(
-        top: minMax[selectedClass][2].abs() / 513 * SIZEWIDTH - 5,
-        left: minMax[selectedClass][3].abs() / 513 * SIZEWIDTH - 5,
-        child: Container(
-          height: 10,
-          width: 10,
-          decoration: BoxDecoration(
-              shape: BoxShape.circle, color: Theme.of(context).primaryColor),
-        ),
-      ),
-    );
-    points.add(
-      Positioned(
-        top: minMax[selectedClass][0].abs() / 513 * SIZEWIDTH + 5,
-        left: minMax[selectedClass][1].abs() / 513 * SIZEWIDTH,
-        child: Dash(
-          direction: Axis.vertical,
-          length: (minMax[selectedClass][2].abs() / 513 * SIZEWIDTH - 10) -
-              (minMax[selectedClass][0].abs() / 513 * SIZEWIDTH),
-          dashColor: Theme.of(context).primaryColor,
-          dashLength: 4,
-          dashBorderRadius: 8,
-          dashGap: 5,
-        ),
-      ),
+      placeLineBetweenTopAndBotThickness(selectedClass, SIZEWIDTH),
     );
     return Stack(children: points);
   }
@@ -567,6 +621,7 @@ class _SegmentationState extends State<Segmentation> {
      *  (sur la deuxieme photo) on peut changer une fois le curseur sur la classe backed cook
      *  et après on peut plus changer les classes pour ajuster la thickness*****/
 
+    int index, color, item, surf, volume;
     // obtain the volume for each class segmented in the first/second picture
     for (int i = 0; i < minMax.length; i++) {
       thickPixels = (minMax[i][2].abs() - minMax[i][0].abs()).toDouble();
@@ -579,40 +634,45 @@ class _SegmentationState extends State<Segmentation> {
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
 
-      int index = categories.indexOf(widSurfKey[i]);
-      int color = pascalVOCLabelColors[index];
+      index = categories.indexOf(widSurfKey[i]);
+      color = pascalVOCLabelColors[index];
 
-      int item = widSurfKey.indexOf(widSurfKey[i]);
-      int surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
-      int volume = (thickness * surf).round();
+      item = widSurfKey.indexOf(widSurfKey[i]);
+      surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
+      volume = (thickness * surf).round();
 
-      chips.add(ActionChip(
-        onPressed: () {
-          setState(() {
-            _selectedClass = item;
-          });
-        },
-        backgroundColor: Color(color),
-        shape: StadiumBorder(
-          side: BorderSide(
-            color: item == _selectedClass
-                ? Theme.of(context).primaryColor
-                : Color(color),
-            width: 2.0,
-          ),
-        ),
-        label: Text(
-          widSurfKey[i] +
-              '   ' +
-              thickness.toStringAsFixed(1) +
-              'cm | Vol. ' +
-              volume.toString() +
-              'cm³',
-          style: const TextStyle(color: Colors.white),
-        ),
-      ));
+      chips.add(
+          displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
     }
     return ListView(children: chips);
+  }
+
+  ActionChip displayVolumeInfo(item, color, widSurfKey, thickness, volume, i) {
+    return ActionChip(
+      onPressed: () {
+        setState(() {
+          _selectedClass = item;
+        });
+      },
+      backgroundColor: Color(color),
+      shape: StadiumBorder(
+        side: BorderSide(
+          color: item == _selectedClass
+              ? Theme.of(context).primaryColor
+              : Color(color),
+          width: 2.0,
+        ),
+      ),
+      label: Text(
+        widSurfKey[i] +
+            '   ' +
+            thickness.toStringAsFixed(1) +
+            'cm | Vol. ' +
+            volume.toString() +
+            'cm³',
+        style: const TextStyle(color: Colors.white),
+      ),
+    );
   }
 
   Widget displayGetVolumeEstimationButton(bool volume) {
@@ -641,77 +701,91 @@ class _SegmentationState extends State<Segmentation> {
         : Container();
   }
 
+  Widget helpMessageUtilisationSlider() {
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Theme.of(context).buttonColor,
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child:
+            Text("Feel free to adjust the average thickness of each food item"),
+      ),
+    );
+  }
+
+  Widget sliderThickness() {
+    return RangeSlider(
+      activeColor: Theme.of(context).primaryColor,
+      values: RangeValues(
+          minMax[_selectedClass][2].toDouble() > 0
+              ? -minMax[_selectedClass][2].toDouble()
+              : minMax[_selectedClass][2].toDouble(),
+          minMax[_selectedClass][0].toDouble() > 0
+              ? -minMax[_selectedClass][0].toDouble()
+              : minMax[_selectedClass][0].toDouble()),
+      min: -513.0,
+      max: 0.0,
+      onChanged: (RangeValues value) {
+        setState(
+          () {
+            minMax[_selectedClass][0] = value.end.toInt();
+            minMax[_selectedClass][2] = value.start.toInt();
+          },
+        );
+      },
+    );
+  }
+
   Widget displaySlider(bool volume) {
     return volume
         ? Column(
             children: [
-              Center(
-                child: Container(
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).buttonColor,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Text(
-                      "Feel free to adjust the average thickness of each food item"),
-                ),
-              ),
-              RangeSlider(
-                  activeColor: Theme.of(context).primaryColor,
-                  values: RangeValues(
-                      minMax[_selectedClass][2].toDouble() > 0
-                          ? -minMax[_selectedClass][2].toDouble()
-                          : minMax[_selectedClass][2].toDouble(),
-                      minMax[_selectedClass][0].toDouble() > 0
-                          ? -minMax[_selectedClass][0].toDouble()
-                          : minMax[_selectedClass][0].toDouble()),
-                  min: -513.0,
-                  max: 0.0,
-                  onChanged: (RangeValues value) {
-                    setState(() {
-                      minMax[_selectedClass][0] = value.end.toInt();
-                      minMax[_selectedClass][2] = value.start.toInt();
-                    });
-                  })
+              helpMessageUtilisationSlider(),
+              sliderThickness(),
             ],
           )
         : Container();
   }
 
-  Widget displaySurfaceOrVolume(bool volume, List<String> categories) {
-    return !volume
-        ? ListView(
-            children: _outputClasses.entries.map(
-              (e) {
-                int percent = ((e.value / OUTPUTSIZE) * 100).round();
-                if (percent >= 1) {
-                  int surface =
-                      (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
-                  int index = categories.indexOf(e.key);
-                  int color = pascalVOCLabelColors[index];
-                  surfaceSaved[e.key] = surface;
-                  return ActionChip(
-                    onPressed: () {},
-                    avatar: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      child: Text(percent.toString() + "%",
-                          style: TextStyle(color: Color(color), fontSize: 10)),
-                    ),
-                    backgroundColor: Color(color),
-                    label: Text(
-                      e.key + '   ' + surface.toString() + 'cm²',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  );
-                } else {
-                  return Container();
-                }
-              },
-            ).toList(),
-          )
+  ActionChip displaySurfaceInfo(percent, surface, color, e) {
+    return ActionChip(
+      onPressed: () {},
+      avatar: CircleAvatar(
+        backgroundColor: Colors.white,
+        child: Text(percent.toString() + "%",
+            style: TextStyle(color: Color(color), fontSize: 10)),
+      ),
+      backgroundColor: Color(color),
+      label: Text(
+        e.key + '   ' + surface.toString() + 'cm²',
+        style: const TextStyle(color: Colors.white),
+      ),
+    );
+  }
 
-        // If we display the volume
-        : volumeList();
+  ListView surfaceList(categories) {
+    return ListView(
+      children: _outputClasses.entries.map(
+        (e) {
+          int percent = ((e.value / OUTPUTSIZE) * 100).round();
+          if (percent > 1) {
+            int surface = (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
+            int index = categories.indexOf(e.key);
+            int color = pascalVOCLabelColors[index];
+            surfaceSaved[e.key] = surface;
+            return displaySurfaceInfo(percent, surface, color, e);
+          } else {
+            return Container();
+          }
+        },
+      ).toList(),
+    );
+  }
+
+  Widget displaySurfaceOrVolume(bool volume, List<String> categories) {
+    return !volume ? surfaceList(categories) : volumeList();
   }
 
   Widget displayPictureWithSegFilter(var SIZEWIDTH) {
@@ -737,9 +811,36 @@ class _SegmentationState extends State<Segmentation> {
             ? Container(
                 height: SIZEWIDTH,
                 width: SIZEWIDTH,
-                child: thick(_selectedClass),
+                child: drawThick(_selectedClass),
               )
             : Container(),
+      ],
+    );
+  }
+
+  Center displayLoadingScreen() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          CircularProgressIndicator(color: Theme.of(context).primaryColor),
+          SizedBox(height: 10),
+          Text('Cooking...'),
+        ],
+      ),
+    );
+  }
+
+  Column displaySurfaceAndVolumeInfos(SIZEWIDTH, categories) {
+    return Column(
+      children: [
+        displayPictureWithSegFilter(SIZEWIDTH),
+        Expanded(
+          child: displaySurfaceOrVolume(widget.volume, categories),
+        ),
+        displaySlider(widget.volume),
+        displayGetVolumeEstimationButton(widget.volume),
+        SizedBox(height: 25),
       ],
     );
   }
@@ -747,33 +848,12 @@ class _SegmentationState extends State<Segmentation> {
   @override
   Widget build(BuildContext context) {
     var SIZEWIDTH = MediaQuery.of(context).size.width;
-
     var categories = classes.values.toList();
 
     return Container(
       child: _loading == true
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CircularProgressIndicator(
-                      color: Theme.of(context).primaryColor),
-                  SizedBox(height: 10),
-                  Text('Cooking...'),
-                ],
-              ),
-            )
-          : Column(
-              children: [
-                displayPictureWithSegFilter(SIZEWIDTH),
-                Expanded(
-                  child: displaySurfaceOrVolume(widget.volume, categories),
-                ),
-                displaySlider(widget.volume),
-                displayGetVolumeEstimationButton(widget.volume),
-                SizedBox(height: 25),
-              ],
-            ),
+          ? displayLoadingScreen()
+          : displaySurfaceAndVolumeInfos(SIZEWIDTH, categories),
     );
   }
 }

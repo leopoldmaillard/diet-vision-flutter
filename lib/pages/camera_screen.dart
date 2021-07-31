@@ -21,6 +21,23 @@ class CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
   final picker = ImagePicker();
   bool isSamsung = false;
+/* ****************************************************************************/
+/* *********************  FUNCTIONS SIGNATURES  *******************************/
+/* ****************************************************************************/
+
+// ==> Picture functionnalities
+// 	dynamic pickGalleryImage() async ;
+// 	Future<File> takePictureAndgetCroppedFile() async
+// 	MaterialPageRoute sendFirstPicture(croppedFile)
+
+// ==> WIDGET
+
+// 	Widget instructionToTakePictureOfMeal()
+// 	Widget choseFromGalleryButton()
+// 	Widget getCameraScreenPreview(size)
+// 	Widget getRoundPurlpleArea(size)
+// 	Widget cameraAndPurpleArea(size)
+// 	Widget getDisplayedCameraScreen(size)
 
   @override
   void initState() {
@@ -43,7 +60,7 @@ class CameraScreenState extends State<CameraScreen> {
   }
 
   /* **************************************************************************/
-  /* **********************  FUNCTIONNALITIES  ********************************/
+  /* ******************  PICTURE FUNCTIONNALITIES  ****************************/
   /* **************************************************************************/
 
   /// Enable the user to do the segmentation on a picture taken from gallery
