@@ -31,7 +31,7 @@ class DatabaseProvider {
     return _database!;
   }
 
-  /// creation of the database file and of the table
+  /// creation of both the database file and the table
   Future<Database> createDatabase() async {
     String dbPath = await getDatabasesPath();
 
@@ -96,7 +96,7 @@ class DatabaseProvider {
   }
 
   /// param :
-  /// food ==> it is the value that will be replaced into the database
+  /// -food : it is the value that will be replaced into the database
   /// we update this food.id by this value : food.toMap()
   Future<int> update(Food food) async {
     final db = await database;

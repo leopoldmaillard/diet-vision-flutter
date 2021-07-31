@@ -12,6 +12,9 @@ class FoodBloc extends Bloc<FoodEvent, List<Food>> {
 
   FoodBloc() : super([]);
 
+  ///index is the index of the item in the ListView.builder from HistoryMeal
+  ///page (where it is displayed in the UI)
+
   @override
   Stream<List<Food>> mapEventToState(FoodEvent event) async* {
     if (event is SetFoods) {
@@ -20,9 +23,7 @@ class FoodBloc extends Bloc<FoodEvent, List<Food>> {
       /// after added the food in the database, we create a new state and
       /// we add the new food to the state and return the state(foodlist)
       List<Food> newState = List.from(state);
-      if (event.newFood != null) {
-        newState.add(event.newFood);
-      }
+      newState.add(event.newFood);
       yield newState;
     } else if (event is DeleteFood) {
       List<Food> newState = List.from(state);
