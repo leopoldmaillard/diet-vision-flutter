@@ -31,6 +31,7 @@ class _StatisticsState extends State<Statistics> {
   //List Botton (week(0)/Month(1)/Year(2))
   int valueBotton = 0;
   List<String> titleButtonRadio = ['Week', 'Month', 'Year'];
+  late LineChartData dataXTitle;
 
   // get title of the Y axe
   String getTitlesY(value) {
@@ -285,9 +286,59 @@ class _StatisticsState extends State<Statistics> {
     );
   }
 
+// LineChartData ==> changer l'axe X affichage
+  LineChartData displayXTitle(
+      double minX, double maxX, double minY, double maxY) {
+    dataXTitle = LineChartData(
+        lineTouchData: LineTouchData(enabled: false),
+        gridData: FlGridData(
+          show: true,
+          drawHorizontalLine: true,
+          getDrawingVerticalLine: (value) {
+            return FlLine(
+              color: const Color(0xff37434d),
+              strokeWidth: 1,
+            );
+          },
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: const Color(0xff37434d),
+              strokeWidth: 1,
+            );
+          },
+        ),
+        titlesData: FlTitlesData(
+          show: true,
+          bottomTitles: displayAxisTitles(0),
+          // Y Axis Legend
+          leftTitles: displayAxisTitles(1),
+        ),
+
+        // Size of the chart and display average data
+        borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: const Color(0xff37434d), width: 1)),
+        minX: minX,
+        maxX: maxX,
+        minY: minY,
+        maxY: maxY,
+        lineBarsData: [
+          displayMeanData(),
+        ]);
+    return dataXTitle;
+  }
+
   // Display the first curve between X:(0,11) et Y:(0,6)
   LineChartData mainData() {
-    return LineChartData(
+    double xMax;
+    if (valueBotton == 0) {
+      xMax = 7;
+    } else if (valueBotton == 1) {
+      xMax = 31;
+    } else
+      xMax = 366;
+    return displayXTitle(1, xMax, 0, maxValue);
+    /*LineChartData(
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
@@ -328,7 +379,7 @@ class _StatisticsState extends State<Statistics> {
       lineBarsData: [
         displayData(),
       ],
-    );
+    );*/
   }
 
   //display mean data
