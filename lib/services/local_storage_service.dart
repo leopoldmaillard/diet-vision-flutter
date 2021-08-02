@@ -6,12 +6,12 @@ import 'package:sqflite/sqlite_api.dart';
 
 class DatabaseProvider {
   static const String TABLE_FOOD = "food";
-  static const String COLUMN_VOLESTIM = "volume Estimation";
-  static const String COLUMN_VOLUMICMASS = "volumic mass";
   static const String COLUMN_ID = "id";
   static const String COLUMN_NAMEFOOD = "nameFood";
-  static const String COLUMN_NUTRISCORE = "nutriscore";
+  static const String COLUMN_VOLESTIM = "volumeEstimation";
+  static const String COLUMN_VOLUMICMASS = "volumicMass";
   static const String COLUMN_MASS = "mass";
+  static const String COLUMN_NUTRISCORE = "nutriscore";
   static const String COLUMN_KAL = "kal";
   static const String COLUMN_PROTEIN = "protein";
   static const String COLUMN_CARBOHYDRATES = "carbohydrates";
@@ -62,7 +62,7 @@ class DatabaseProvider {
           "$COLUMN_PROTEIN INTEGER,"
           "$COLUMN_CARBOHYDRATES INTEGER,"
           "$COLUMN_SUGAR INTEGER,"
-          "$COLUMN_FAT INTEGER,"
+          "$COLUMN_FAT INTEGER"
           ")",
         );
         print("Food table created");
@@ -79,6 +79,8 @@ class DatabaseProvider {
     var foods = await db.query(TABLE_FOOD, columns: [
       COLUMN_ID,
       COLUMN_NAMEFOOD,
+      COLUMN_VOLESTIM,
+      COLUMN_VOLUMICMASS,
       COLUMN_NUTRISCORE,
       COLUMN_MASS,
       COLUMN_KAL,

@@ -19,7 +19,9 @@ class Food {
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{DatabaseProvider.COLUMN_NAMEFOOD: nameFood};
 
-    map[DatabaseProvider.COLUMN_ID] = id;
+    /// do not remove this line becasue the database cant autoincrement if
+    /// we store it at 0
+    if (id != 0) map[DatabaseProvider.COLUMN_ID] = id;
     map[DatabaseProvider.COLUMN_NUTRISCORE] = nutriscore;
     if (mass != -1) map[DatabaseProvider.COLUMN_MASS] = mass;
     if (kal != -1) map[DatabaseProvider.COLUMN_KAL] = kal;
@@ -46,5 +48,28 @@ class Food {
     carbohydrates = map[DatabaseProvider.COLUMN_CARBOHYDRATES];
     sugar = map[DatabaseProvider.COLUMN_SUGAR];
     fat = map[DatabaseProvider.COLUMN_FAT];
+  }
+
+  String toString() {
+    // String nameFood = 'nameFood : ' + this.nameFood + '\n';
+    String volEstim = 'Volume : ' + this.volEstim.toString() + 'cm³' + '\n';
+    String volumicMass =
+        'Volumic mass : ' + (this.volumicMass / 10).toString() + '\n';
+    String mass = 'mass food : ' + this.mass.toString() + '\n';
+    String kal = this.kal.toString() + 'kcal\n';
+    String protein = 'protein : ' + this.protein.toString() + 'g' + '\n';
+    String carbohydrates =
+        'carbohydrates : ' + this.carbohydrates.toString() + 'g' + '\n';
+    String sugar = 'sugar : ' + this.sugar.toString() + 'g' + '\n';
+    String fat = 'fat : ' + this.fat.toString() + 'g' + '\n';
+    String finalString = (kal +
+        volEstim +
+        volumicMass +
+        mass +
+        protein +
+        carbohydrates +
+        sugar +
+        fat);
+    return finalString;
   }
 }

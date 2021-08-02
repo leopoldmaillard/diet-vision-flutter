@@ -135,7 +135,7 @@ class _HistoryMealState extends State<HistoryMeal> {
         contentPadding: EdgeInsets.all(16),
         title: Text(food.nameFood, style: TextStyle(fontSize: 26)),
         subtitle: Text(
-          "id: ${food.id}",
+          food.toString(),
           style: TextStyle(fontSize: 20),
         ),
         onTap: () => showFoodDialog(context, food, index),

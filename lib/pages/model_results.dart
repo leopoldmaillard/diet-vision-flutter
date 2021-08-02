@@ -287,9 +287,10 @@ class _SegmentationState extends State<Segmentation> {
       _outputClassesHeight = outputClassesHeight;
       _loading = false;
     });
+    // print(_outputClasses);
 
-    List keyValue = maxClasse();
-    addElementToDatabase(keyValue);
+    // List keyValue = maxClasse();
+    // addElementToDatabase(keyValue);
   }
 
   /* **************************************************************************/
@@ -512,12 +513,16 @@ class _SegmentationState extends State<Segmentation> {
   }
   //thickdeformee = thickReel - 9.33*xdistance
 
+  /* **************************************************************************/
+  /* **************************  DATABASE  ************************************/
+  /* **************************************************************************/
+
   /// some function to change
-  List maxClasse() {
+  List maxClasse(Map outputFinal) {
     var thevalue = 0;
     var thekey = 'Background 🏞️';
     //k != 'Food Containers 🍽️' && k != 'Background 🏞️' &&
-    _outputClasses.forEach((k, v) {
+    outputFinal.forEach((k, v) {
       if (k != 'Food Containers 🍽️' && k != 'Background 🏞️' && v > thevalue) {
         thevalue = v;
         thekey = k;
@@ -529,11 +534,42 @@ class _SegmentationState extends State<Segmentation> {
     return [thekey, thevalue];
   }
 
+  Food parseFoodData(String nameF, int volume) {
+    Food food = new Food(nameFood: nameF);
+    Random myrand = Random();
+    food.volEstim = volume;
+    food.volumicMass = myrand.nextInt(100);
+    food.mass = (food.volEstim * food.volumicMass) ~/ 100;
+    food.nutriscore = 'A';
+    food.kal = myrand.nextInt(100);
+    food.carbohydrates = myrand.nextInt(100);
+    food.protein = myrand.nextInt(100);
+    food.carbohydrates = myrand.nextInt(100);
+    food.sugar = myrand.nextInt(25);
+    food.fat = myrand.nextInt(30);
+    print("Food element parsed");
+    String blabla = food.toString();
+    print(blabla);
+    return food;
+  }
+
   /// some function to change
   void addElementToDatabase(List keyValue) {
     int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
     String nameFood1 = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
-    Food food = Food(nameFood: nameFood1);
+    Food food = parseFoodData(nameFood1, valuecm2);
+    DatabaseProvider.db.insert(food).then(
+          (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+            AddFood(storedFood),
+          ),
+        );
+  }
+
+  //keyvalue[0] = foodNAme
+  //keyvalue[1] = volum in cm3
+  void addElementToDatabaseAfterVolume(List keyValue) {
+    String nameFood1 = keyValue[0];
+    Food food = parseFoodData(nameFood1, keyValue[1]);
     DatabaseProvider.db.insert(food).then(
           (storedFood) => BlocProvider.of<FoodBloc>(context).add(
             AddFood(storedFood),
@@ -604,6 +640,7 @@ class _SegmentationState extends State<Segmentation> {
 
   // obtain a list of the volume and the thickness for each class segmented in the first/second picture
   Widget volumeList() {
+    Map outputFinal = Map(); // ['nameclass', volumeincm3, .....]
     List<dynamic> widSurfKey = widget.surfaces.keys.toList();
     List<dynamic> widSurfVal = widget.surfaces.values.toList();
     final chips = <Widget>[];
@@ -634,16 +671,28 @@ class _SegmentationState extends State<Segmentation> {
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
 
-      index = categories.indexOf(widSurfKey[i]);
+      index =
+          categories.indexOf(widSurfKey[i]); //real index in the global variabl
       color = pascalVOCLabelColors[index];
 
       item = widSurfKey.indexOf(widSurfKey[i]);
       surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
       volume = (thickness * surf).round();
-
+      // print("volumeList displayed");
+      // print(index);
+      // print(item);
+      // print(volume);
+      // print(widSurfKey[i]);
+      //widSurfkey[i] cest le nameFood
+      //index cest l'indice de la classe dans la variable globale
+      outputFinal[widSurfKey[i].toString()] = volume;
       chips.add(
           displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
     }
+    print("the final output");
+    print(outputFinal);
+    List keyValue = maxClasse(outputFinal);
+    addElementToDatabaseAfterVolume(keyValue);
     return ListView(children: chips);
   }
 
