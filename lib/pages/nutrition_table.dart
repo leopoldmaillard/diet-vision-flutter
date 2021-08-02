@@ -38,198 +38,186 @@ List<Map> drinkNutritionJson = [
 //quantity: 100 g
 /*
 id, name, cal(cal/100g), nutriscore (A-D) , eq: 266 ml (=100g) 1 ml = 1 cm^3, glucide: en g
+vm (g/ml)
 */
 List<Map> foodNutritionJson = [
   {
     "id": '1',
     "name": "Leafy Greens",
-    "cal": "27",
+    "cal": 20.0,
     "nutriscore": "A",
-    "glucide": "2.33",
-    "eq": "266"
-  }, // poireau
+    "glucide": "N/A",
+    "vm": 0.10
+  },
   {
     "id": '2',
     "name": "Stem Vegetables",
-    "cal": "27",
+    "cal": 35.0,
     "nutriscore": "A",
-    "glucide": "2.33",
-    "eq": "266"
-  }, // poireau
+    "glucide": "N/A",
+    "vm": 0.60
+  },
   {
     "id": '3',
     "name": "Non-starchy Roots",
-    "cal": "40",
+    "cal": 38.0,
     "nutriscore": "A",
-    "glucide": "7.59",
-    "eq": "194"
-  }, // carotte
+    "glucide": "N/A",
+    "vm": 0.60
+  },
   {
     "id": '4',
     "name": "Vegetables | Other",
-    "cal": "37",
+    "cal": 25.0,
     "nutriscore": "A",
-    "glucide": "2.53",
-    "eq": "269"
-  }, // brocoli
+    "glucide": "N/A",
+    "vm": 0.20
+  },
   {
     "id": '5',
     "name": "Fruits",
-    "cal": "53",
+    "cal": 55.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
-  }, // pomme
+    "glucide": "N/A",
+    "vm": 0.25
+  },
   {
     "id": '6',
     "name": "Protein | Meat",
-    "cal": "231",
+    "cal": 250.0,
     "nutriscore": "D",
-    "glucide": "0.24",
-    "eq": "165.19"
-  }, // viande boeuf haché
+    "glucide": "N/A",
+    "vm": 0.95
+  },
   {
     "id": '7',
     "name": "Protein | Poultry",
-    "cal": "188",
+    "cal": 140.0,
     "nutriscore": "C",
-    "glucide": "0.7",
-    "eq": "46.5"
-  }, //viande poulet haché
+    "glucide": "N/A",
+    "vm": 0.90
+  },
   {
     "id": '8',
     "name": "Protein | Seafood",
-    "cal": "136",
+    "cal": 110.0,
     "nutriscore": "B",
-    "glucide": "0.1",
-    "eq": "215"
-  }, // thon en boite
-  //**************start from here********* */
+    "glucide": "N/A",
+    "vm": 0.75
+  },
   {
     "id": '9',
     "name": "Protein | Eggs",
-    "cal": "131",
+    "cal": 140.0,
     "nutriscore": "A",
-    "glucide": "1.1",
-    "eq": "285" //0.35density ==> 100/0.35
+    "glucide": "N/A",
+    "vm": 0.6
   },
   //http://www.fao.org/3/ap815e/ap815e.pdf
   {
     "id": '10',
     "name": "Protein | Beans/nuts",
-    "cal": "488",
+    "cal": 630.0,
     "nutriscore": "A",
-    "glucide": "21",
-    "eq": "166"
-  }, // nut environ 0.63density, greenbean env egal 0.53
-  //on estime à 0.6
+    "glucide": "N/A",
+    "vm": 0.55
+  },
   {
     "id": '11',
     "name": "Starches/grains | Baked Goods",
-    "cal": "298",
+    "cal": 280.0,
     "nutriscore": "D",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.4
   },
-//pour le baked cook j'ai pris les donuts comme ref
-//https://www.livestrong.com/article/289762-how-many-calories-does-a-doughnut-have/
-
   {
     "id": '12',
     "name": "Starches/grains | rice/grains/cereals",
-    "cal": "53000",
+    "cal": 95.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.7
   },
   {
     "id": '13',
     "name": "Starches/grains | Noodles/pasta",
-    "cal": "53000",
+    "cal": 90.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.56
   },
   {
     "id": '14',
     "name": "Starches/grains | Starchy Vegetables",
-    "cal": "53000",
+    "cal": 350.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.7
   },
   {
     "id": '15',
-    "name": "Non-starchy Roots",
-    "cal": "53000",
+    "name": "Starches/grains | Other",
+    "cal": 95.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.7
   },
   {
     "id": '16',
-    "name": "Starches/grains | Other",
-    "cal": "53000",
+    "name": "Soups/stews",
+    "cal": 30.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 1.0
   },
   {
     "id": '17',
-    "name": "Soups/stews",
-    "cal": "53000",
+    "name": "Herbs/spices",
+    "cal": 20.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.30
   },
   {
     "id": '18',
-    "name": "Herbs/spices",
-    "cal": "53000",
+    "name": "Dairy",
+    "cal": 330.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.35
   },
   {
     "id": '19',
-    "name": "Dairy",
-    "cal": "53000",
-    "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
-  },
-  {
-    "id": '20',
     "name": "Snacks",
-    "cal": "53000",
+    "cal": 560.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.1
   }, //
   {
-    "id": '21',
+    "id": '20',
     "name": "Sweets/desserts",
-    "cal": "53000",
+    "cal": 400.0,
     "nutriscore": "A",
-    "glucide": "11.40",
-    "eq": "215"
+    "glucide": "N/A",
+    "vm": 0.5
   }, //on prendra aussi le donut ?
   {
-    "id": '22',
+    "id": '21',
     "name": "Beverages",
-    "cal": "0",
+    "cal": 0.0,
     "nutriscore": "A",
-    "glucide": "0",
-    "eq": "0"
+    "glucide": "N/A",
+    "vm": 1.0
   }, // cf la partie boisson
   {
-    "id": '23',
+    "id": '22',
     "name": "Fats/oils/sauces",
-    "cal": "900",
+    "cal": 250.0,
     "nutriscore": "D",
-    "glucide": "0.0",
-    "eq": "109"
-  }, //vegetal oil
+    "glucide": "N/A",
+    "vm": 0.8
+  },
 
   // {"id": '7', "name": "Seafood", "cal": "143000"}, //
   //{"id": '8', "name": "Dairy", "cal": "129000"}, //
