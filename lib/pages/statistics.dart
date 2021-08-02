@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/services.dart';
+import 'package:transfer_learning_fruit_veggies/source/statistics2.dart';
 
 class Statistics extends StatefulWidget {
   @override
@@ -308,6 +308,7 @@ class _StatisticsState extends State<Statistics> {
         displayRadioButton(),
         DisplayChart(),
         AVGButton(),
+        Statistics2(),
       ],
     );
   }
