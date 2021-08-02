@@ -28,6 +28,10 @@ class _StatisticsState extends State<Statistics> {
   List<double> dataCal = [];
   int tailleData = 7;
 
+  //List Botton (week(0)/Month(1)/Year(2))
+  int valueBotton = 0;
+  List<String> titleButtonRadio = ['Week', 'Month', 'Year'];
+
   // get title of the Y axe
   String getTitlesY(value) {
     //  return (value.toString() + ' kcal');
@@ -119,6 +123,13 @@ class _StatisticsState extends State<Statistics> {
     }
   }
 
+  //change the value of the RadioButton
+  void changeRadio(int value) {
+    setState(() {
+      valueBotton = value;
+    });
+  }
+
   // ignore: slash_for_doc_comments
 /******************Widget Part *********************/
 
@@ -132,7 +143,7 @@ class _StatisticsState extends State<Statistics> {
         const Text(
           "Meal's result per week",
           style: TextStyle(
-              color: Color(0xff827daa),
+              color: Color(0xffB059EF), //B059EF ou 0xff827daa
               fontSize: 32,
               fontWeight: FontWeight.bold,
               letterSpacing: 2),
@@ -144,7 +155,7 @@ class _StatisticsState extends State<Statistics> {
         Text(
           _Today.toString().substring(0, 10),
           style: TextStyle(
-              color: Color(0xff827daa),
+              color: Color(0xffB059EF),
               fontSize: 25,
               fontWeight: FontWeight.bold,
               letterSpacing: 2),
@@ -152,6 +163,26 @@ class _StatisticsState extends State<Statistics> {
         ),
       ],
     );
+  }
+
+// display radio BUtton
+  Widget displayRadioButton() {
+    List<Widget> radioButtonList = [];
+    for (int i = 0; i < titleButtonRadio.length; i++) {
+      radioButtonList.add(RadioListTile(
+        value: i,
+        groupValue: valueBotton,
+        onChanged: (val) {
+          changeRadio(i);
+        },
+        activeColor: Theme.of(context).primaryColor,
+        controlAffinity: ListTileControlAffinity.leading,
+        title: Text(titleButtonRadio[i]),
+      ));
+    }
+    Column column = Column(children: radioButtonList);
+
+    return column;
   }
 
   //dSPLAY THE CHART WITH THE LINECHARTBAR
@@ -164,7 +195,8 @@ class _StatisticsState extends State<Statistics> {
             borderRadius: BorderRadius.all(
               Radius.circular(18),
             ),
-            color: Color(0xff232d37)), //Theme.of(context).primaryColor
+            color: Color(
+                0xff5D2ECB)), //Theme.of(context).primaryColor ou 0xff232d37
         child: Padding(
           padding: const EdgeInsets.only(
               right: 18.0, left: 12.0, top: 24, bottom: 12),
@@ -182,7 +214,7 @@ class _StatisticsState extends State<Statistics> {
       showTitles: true,
       reservedSize: axis == 0 ? 22 : 28,
       getTextStyles: (value) => const TextStyle(
-        color: Color(0xff67727d),
+        color: Color(0xffB1B1D5), //B1B1D5 ou 67727d
         fontWeight: FontWeight.bold,
         fontSize: 15,
       ),
@@ -218,8 +250,10 @@ class _StatisticsState extends State<Statistics> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         displayTitle(),
+        displayRadioButton(),
         DisplayChart(),
         AVGButton(),
+        displayRadioButton(),
         // Test for Dropdown Button
         /*     SizedBox(
           width: 80,
@@ -396,6 +430,8 @@ class _StatisticsState extends State<Statistics> {
   }
 }
 
+/*
+
 // class to choose in a list of name&icon (per day/per month/per week)
 class Item {
   final String name;
@@ -442,7 +478,7 @@ class DropdownTimingState extends State<DropdownTiming> {
   }
 }
 
-
+*/
 
 /*******In a linechartbar:
  * 
