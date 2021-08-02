@@ -31,7 +31,6 @@ class Food {
     if (volEstim != -1) map[DatabaseProvider.COLUMN_VOLESTIM] = fat;
 
     if (volumicMass != -1) map[DatabaseProvider.COLUMN_VOLUMICMASS] = fat;
-
     return map;
   }
 

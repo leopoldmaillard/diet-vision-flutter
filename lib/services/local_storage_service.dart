@@ -65,7 +65,7 @@ class DatabaseProvider {
           "$COLUMN_FAT INTEGER,"
           ")",
         );
-        print("food table created");
+        print("Food table created");
       },
     );
   }
