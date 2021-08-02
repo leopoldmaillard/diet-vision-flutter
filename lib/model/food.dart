@@ -5,14 +5,14 @@ class Food {
   int id = 0;
   String nameFood = '';
   String nutriscore = '';
-  int volEstim = -1;
-  int volumicMass = -1;
-  int mass = -1;
-  int kal = -1;
-  int protein = -1;
-  int carbohydrates = -1;
-  int sugar = -1;
-  int fat = -1;
+  int volEstim = 0;
+  int volumicMass = 0;
+  int mass = 0;
+  int kal = 0;
+  int protein = 0;
+  int carbohydrates = 0;
+  int sugar = 0;
+  int fat = 0;
 
   Food({required this.nameFood});
 
@@ -21,18 +21,16 @@ class Food {
 
     /// do not remove this line becasue the database cant autoincrement if
     /// we store it at 0
-    if (id != 0) map[DatabaseProvider.COLUMN_ID] = id;
+    map[DatabaseProvider.COLUMN_ID] = id;
     map[DatabaseProvider.COLUMN_NUTRISCORE] = nutriscore;
-    if (mass != -1) map[DatabaseProvider.COLUMN_MASS] = mass;
-    if (kal != -1) map[DatabaseProvider.COLUMN_KAL] = kal;
-    if (protein != -1) map[DatabaseProvider.COLUMN_PROTEIN] = protein;
-    if (carbohydrates != -1)
-      map[DatabaseProvider.COLUMN_CARBOHYDRATES] = carbohydrates;
-    if (sugar != -1) map[DatabaseProvider.COLUMN_SUGAR] = sugar;
-    if (fat != -1) map[DatabaseProvider.COLUMN_FAT] = fat;
-    if (volEstim != -1) map[DatabaseProvider.COLUMN_VOLESTIM] = fat;
-
-    if (volumicMass != -1) map[DatabaseProvider.COLUMN_VOLUMICMASS] = fat;
+    map[DatabaseProvider.COLUMN_MASS] = mass;
+    map[DatabaseProvider.COLUMN_KAL] = kal;
+    map[DatabaseProvider.COLUMN_PROTEIN] = protein;
+    map[DatabaseProvider.COLUMN_CARBOHYDRATES] = carbohydrates;
+    map[DatabaseProvider.COLUMN_SUGAR] = sugar;
+    map[DatabaseProvider.COLUMN_FAT] = fat;
+    map[DatabaseProvider.COLUMN_VOLESTIM] = volEstim;
+    map[DatabaseProvider.COLUMN_VOLUMICMASS] = volumicMass;
     return map;
   }
 
@@ -54,7 +52,7 @@ class Food {
     // String nameFood = 'nameFood : ' + this.nameFood + '\n';
     String volEstim = 'Volume : ' + this.volEstim.toString() + 'cm³' + '\n';
     String volumicMass =
-        'Volumic mass : ' + (this.volumicMass / 10).toString() + '\n';
+        'Volumic mass : ' + (this.volumicMass).toString() + '\n';
     String mass = 'mass food : ' + this.mass.toString() + '\n';
     String kal = this.kal.toString() + 'kcal\n';
     String protein = 'protein : ' + this.protein.toString() + 'g' + '\n';
@@ -62,14 +60,11 @@ class Food {
         'carbohydrates : ' + this.carbohydrates.toString() + 'g' + '\n';
     String sugar = 'sugar : ' + this.sugar.toString() + 'g' + '\n';
     String fat = 'fat : ' + this.fat.toString() + 'g' + '\n';
-    String finalString = (kal +
-        volEstim +
-        volumicMass +
-        mass +
-        protein +
-        carbohydrates +
-        sugar +
-        fat);
+    String finalString =
+        (kal + volEstim + protein + carbohydrates + sugar + fat);
+    // pour moi pas de sens de mettre la masse volumique d'un repas
+    // if (this.volumicMass != null) finalString += volumicMass;
+    if (this.mass != null) finalString += mass;
     return finalString;
   }
 }

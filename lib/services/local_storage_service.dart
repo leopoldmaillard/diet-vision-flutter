@@ -4,6 +4,11 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 
+/// truc à ameliorer
+/// la possibilite de mettre des doubles dans une database
+/// faire une database pour la page statistics et faire en sorte qu'on
+/// puisse récupérer les kcal de chaque food et les sommer par jour
+/// -rajouter un argument date dans la bdd pour faire le point précédent
 class DatabaseProvider {
   static const String TABLE_FOOD = "food";
   static const String COLUMN_ID = "id";

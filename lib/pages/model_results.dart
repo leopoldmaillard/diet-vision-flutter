@@ -518,20 +518,30 @@ class _SegmentationState extends State<Segmentation> {
   /* **************************************************************************/
 
   /// some function to change
-  List maxClasse(Map outputFinal) {
-    var thevalue = 0;
-    var thekey = 'Background 🏞️';
-    //k != 'Food Containers 🍽️' && k != 'Background 🏞️' &&
+  // List maxClasse(Map outputFinal) {
+  //   var thevalue = 0;
+  //   var thekey = 'Background 🏞️';
+  //   //k != 'Food Containers 🍽️' && k != 'Background 🏞️' &&
+  //   outputFinal.forEach((k, v) {
+  //     if (k != 'Food Containers 🍽️' && k != 'Background 🏞️' && v > thevalue) {
+  //       thevalue = v;
+  //       thekey = k;
+  //     }
+  //   });
+
+  //   print(thekey);
+  //   print(thevalue);
+  //   return [thekey, thevalue];
+  // }
+
+  List<Food> parseAllIngredients(Map outputFinal) {
+    List<Food> listAllIngredient = [];
     outputFinal.forEach((k, v) {
-      if (k != 'Food Containers 🍽️' && k != 'Background 🏞️' && v > thevalue) {
-        thevalue = v;
-        thekey = k;
+      if (k != 'Food Containers 🍽️' && k != 'Background 🏞️') {
+        listAllIngredient.add(parseFoodData(k, v));
       }
     });
-
-    print(thekey);
-    print(thevalue);
-    return [thekey, thevalue];
+    return listAllIngredient;
   }
 
   Food parseFoodData(String nameF, int volume) {
@@ -544,7 +554,6 @@ class _SegmentationState extends State<Segmentation> {
     food.kal = myrand.nextInt(100);
     food.carbohydrates = myrand.nextInt(100);
     food.protein = myrand.nextInt(100);
-    food.carbohydrates = myrand.nextInt(100);
     food.sugar = myrand.nextInt(25);
     food.fat = myrand.nextInt(30);
     print("Food element parsed");
@@ -553,24 +562,44 @@ class _SegmentationState extends State<Segmentation> {
     return food;
   }
 
-  /// some function to change
-  void addElementToDatabase(List keyValue) {
-    int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
-    String nameFood1 = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
-    Food food = parseFoodData(nameFood1, valuecm2);
-    DatabaseProvider.db.insert(food).then(
-          (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-            AddFood(storedFood),
-          ),
-        );
+  Food computeMealStats(List<Food> listAllIngredient) {
+    Food mealResults =
+        new Food(nameFood: "Meal" + Random().nextInt(10000).toString());
+    for (int i = 0; i < listAllIngredient.length; i++) {
+      mealResults.volEstim += listAllIngredient[i].volEstim;
+      //mealResults.mass = listAllIngredient[i].volEstim;
+      //mealResults.nutriscore = 'A';
+      mealResults.kal += listAllIngredient[i].kal;
+      mealResults.carbohydrates += listAllIngredient[i].carbohydrates;
+      mealResults.protein += listAllIngredient[i].protein;
+      mealResults.sugar += listAllIngredient[i].sugar;
+      mealResults.fat += listAllIngredient[i].fat;
+      mealResults.mass += listAllIngredient[i].mass;
+      mealResults.volumicMass += listAllIngredient[i].volumicMass;
+    }
+    return mealResults;
   }
+
+  /// some function to change
+  // void addElementToDatabase(List keyValue) {
+  //   int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
+  //   String nameFood1 = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
+  //   Food food = parseFoodData(nameFood1, valuecm2);
+  //   DatabaseProvider.db.insert(food).then(
+  //         (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+  //           AddFood(storedFood),
+  //         ),
+  //       );
+  // }
 
   //keyvalue[0] = foodNAme
   //keyvalue[1] = volum in cm3
-  void addElementToDatabaseAfterVolume(List keyValue) {
-    String nameFood1 = keyValue[0];
-    Food food = parseFoodData(nameFood1, keyValue[1]);
-    DatabaseProvider.db.insert(food).then(
+  void addElementToDatabaseAfterVolume(List<Food> allIngredient) {
+    Food myMeal = computeMealStats(allIngredient);
+    print("deuxieme test :");
+    String leresult = myMeal.toString();
+    print(leresult);
+    DatabaseProvider.db.insert(myMeal).then(
           (storedFood) => BlocProvider.of<FoodBloc>(context).add(
             AddFood(storedFood),
           ),
@@ -691,8 +720,8 @@ class _SegmentationState extends State<Segmentation> {
     }
     print("the final output");
     print(outputFinal);
-    List keyValue = maxClasse(outputFinal);
-    addElementToDatabaseAfterVolume(keyValue);
+    List<Food> allIngredientParsed = parseAllIngredients(outputFinal);
+    addElementToDatabaseAfterVolume(allIngredientParsed);
     return ListView(children: chips);
   }
 
