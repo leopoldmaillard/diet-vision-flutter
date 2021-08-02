@@ -26,52 +26,31 @@ class _StatisticsState extends State<Statistics> {
   List<FlSpot> dataMean = [];
   //data for a mounth
   List<double> dataCal = [];
-  int tailleData = 7;
+  int tailleData = 366;
 
   //List Botton (week(0)/Month(1)/Year(2))
   int valueBotton = 0;
   List<String> titleButtonRadio = ['Week', 'Month', 'Year'];
   late LineChartData dataXTitle;
 
-  // get title of the Y axe
-  String getTitlesY(value) {
-    //  return (value.toString() + ' kcal');
-    switch (value.toInt()) {
-      case 500:
-        return '500 kcal';
-      case 1000:
-        return '1000 kcal';
-      case 1500:
-        return '1500 kcal ';
-      case 2000:
-        return '2000 kcal';
-      case 2500:
-        return '2500 kcal';
-      case 3000:
-        return '3000 kcal';
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < tailleData; i++) {
+      addPoint(0.0);
     }
-    return '';
+    //fillKCalData(dataCal);
+    fillLineChart();
+    // day of the week: 1:monday,...7:sunday
+    weekDay = _Today.weekday;
+    maxValue = 2000;
   }
 
-  //get Title of the X axe
-  String getTitlesX(value) {
-    switch (value.toInt()) {
-      case 1:
-        return 'Mo';
-      case 2:
-        return 'Tu';
-      case 3:
-        return 'We';
-      case 4:
-        return 'Th';
-      case 5:
-        return 'Fr';
-      case 6:
-        return 'Sa';
-      case 7:
-        return 'Su';
-    }
-    return '';
+  @override
+  void dispose() {
+    super.dispose();
+    data = [];
+    dataCal = [];
   }
 
 //get AVG from the data
@@ -84,6 +63,8 @@ class _StatisticsState extends State<Statistics> {
     return mean / i;
   }
 
+  /* -----------CREATE DATA TO DISPLAY----------------- */
+
   //give a size and inster plot (i,0) , initialize/register data
   void fillLineChart() {
     var r = new Random();
@@ -94,7 +75,6 @@ class _StatisticsState extends State<Statistics> {
         replaceLineSpot(data, i, r.nextDouble() * 2000);
       }
     }
-    print('voici data:$data');
     dataMean = data;
   }
 
@@ -124,15 +104,7 @@ class _StatisticsState extends State<Statistics> {
     }
   }
 
-  //change the value of the RadioButton
-  void changeRadio(int value) {
-    setState(() {
-      valueBotton = value;
-    });
-  }
-
-  // ignore: slash_for_doc_comments
-/******************Widget Part *********************/
+/* ____________Widget Part________________*/
 
   // display the top list above the chart
   Widget displayTitle() {
@@ -166,7 +138,7 @@ class _StatisticsState extends State<Statistics> {
     );
   }
 
-// display radio BUtton
+// display radio Botton
   Widget displayRadioButton() {
     List<Widget> radioButtonList = [];
     for (int i = 0; i < titleButtonRadio.length; i++) {
@@ -186,7 +158,7 @@ class _StatisticsState extends State<Statistics> {
     return column;
   }
 
-  //dSPLAY THE CHART WITH THE LINECHARTBAR
+  //DISPLAY THE CHART WITH THE LINECHARTBAR
   Widget DisplayChart() {
     return AspectRatio(
       aspectRatio: 0.8, //1.70 (ratio graphic between height and width),
@@ -200,7 +172,7 @@ class _StatisticsState extends State<Statistics> {
                 0xff5D2ECB)), //Theme.of(context).primaryColor ou 0xff232d37
         child: Padding(
           padding: const EdgeInsets.only(
-              right: 18.0, left: 12.0, top: 24, bottom: 12),
+              right: 18.0, left: 12.0, top: 30, bottom: 12),
           child: LineChart(
             showAvg ? avgData() : mainData(),
           ),
@@ -209,18 +181,24 @@ class _StatisticsState extends State<Statistics> {
     );
   }
 
-  //Display axis titles
+  //Display axis titles legends (X)
   SideTitles displayAxisTitles(int axis) {
     return SideTitles(
       showTitles: true,
-      reservedSize: axis == 0 ? 22 : 28,
+      reservedSize: axis == 0 ? 22 : 28, //22
       getTextStyles: (value) => const TextStyle(
         color: Color(0xffB1B1D5), //B1B1D5 ou 67727d
         fontWeight: FontWeight.bold,
         fontSize: 15,
       ),
-      getTitles: (value) => axis == 0 ? getTitlesX(value) : getTitlesY(value),
-      margin: axis == 0 ? 8 : 12,
+      getTitles: (value) => (axis == 0 && valueBotton == 0)
+          ? getTitlesXWeek(value)
+          : (axis == 0 && valueBotton == 1)
+              ? getTitlesXMonth(value)
+              : (axis == 0 && valueBotton == 2)
+                  ? getTitlesXYear(value)
+                  : getTitlesY(value),
+      margin: axis == 0 ? 8 : 12, //8
     );
   }
 
@@ -245,50 +223,9 @@ class _StatisticsState extends State<Statistics> {
     );
   }
 
-// display the screen of statistics part
-  Widget displayStatisticScreen(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        displayTitle(),
-        displayRadioButton(),
-        DisplayChart(),
-        AVGButton(),
-        displayRadioButton(),
-        // Test for Dropdown Button
-        /*     SizedBox(
-          width: 80,
-          height: 40,
-          child: DropdownTiming(),
-        ),
-        Expanded(
-          child: DropdownTiming(),
-        ),*/
-      ],
-    );
-  }
-
-  //display data in the chart
-  LineChartBarData displayData() {
-    return LineChartBarData(
-      spots: data,
-      isCurved: true,
-      colors: gradientColors,
-      barWidth: 5,
-      isStrokeCapRound: true,
-      dotData: FlDotData(
-        show: false,
-      ),
-      belowBarData: BarAreaData(
-        show: true,
-        colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
-      ),
-    );
-  }
-
 // LineChartData ==> changer l'axe X affichage
   LineChartData displayXTitle(
-      double minX, double maxX, double minY, double maxY) {
+      int dataType, double minX, double maxX, double minY, double maxY) {
     dataXTitle = LineChartData(
         lineTouchData: LineTouchData(enabled: false),
         gridData: FlGridData(
@@ -314,7 +251,7 @@ class _StatisticsState extends State<Statistics> {
           leftTitles: displayAxisTitles(1),
         ),
 
-        // Size of the chart and display average data
+        // Size of the chart and display data
         borderData: FlBorderData(
             show: true,
             border: Border.all(color: const Color(0xff37434d), width: 1)),
@@ -323,75 +260,28 @@ class _StatisticsState extends State<Statistics> {
         minY: minY,
         maxY: maxY,
         lineBarsData: [
-          displayMeanData(),
+          displayMeanData(dataType, maxX),
         ]);
     return dataXTitle;
   }
 
   // Display the first curve between X:(0,11) et Y:(0,6)
   LineChartData mainData() {
-    double xMax;
-    if (valueBotton == 0) {
-      xMax = 7;
-    } else if (valueBotton == 1) {
-      xMax = 31;
-    } else
-      xMax = 366;
-    return displayXTitle(1, xMax, 0, maxValue);
-    /*LineChartData(
-      gridData: FlGridData(
-        show: true,
-        drawVerticalLine: true,
-
-        // lines in background
-        getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-        getDrawingVerticalLine: (value) {
-          return FlLine(
-            color: const Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-      ),
-
-      // Legends (X, Y, title)
-      // X Axis
-      titlesData: FlTitlesData(
-        show: true,
-        bottomTitles: displayAxisTitles(0),
-        // Y Axis
-        leftTitles: displayAxisTitles(1),
-      ),
-
-      // Chart Axis initialisation
-      borderData: FlBorderData(
-          show: true,
-          border: Border.all(color: const Color(0xff37434d), width: 1)),
-      minX: 1,
-      maxX: 7,
-      minY: 0,
-      maxY: maxValue,
-      // Data of the curve (add points (x,y))
-      lineBarsData: [
-        displayData(),
-      ],
-    );*/
+    return displayXTitle(0, 1, getTiming(), 0, maxValue);
   }
 
   //display mean data
-  LineChartBarData displayMeanData() {
+  LineChartBarData displayMeanData(int dataType, double maxX) {
     return LineChartBarData(
-      spots: data,
+      spots: (dataType == 0)
+          ? data.sublist(0, maxX.toInt())
+          : dataMean.sublist(0, maxX.toInt()),
       isCurved: true,
       colors: gradientColors,
       barWidth: 5,
       isStrokeCapRound: true,
       dotData: FlDotData(
-        show: false,
+        show: true,
       ),
       belowBarData: BarAreaData(
         show: true,
@@ -406,66 +296,20 @@ class _StatisticsState extends State<Statistics> {
     for (int i = 0; i < dataMean.length; i++) {
       replaceLineSpot(dataMean, i, mean);
     }
-    print('voici dataMean: $dataMean');
-    return LineChartData(
-        lineTouchData: LineTouchData(enabled: false),
-        gridData: FlGridData(
-          show: true,
-          drawHorizontalLine: true,
-          getDrawingVerticalLine: (value) {
-            return FlLine(
-              color: const Color(0xff37434d),
-              strokeWidth: 1,
-            );
-          },
-          getDrawingHorizontalLine: (value) {
-            return FlLine(
-              color: const Color(0xff37434d),
-              strokeWidth: 1,
-            );
-          },
-        ),
-        titlesData: FlTitlesData(
-          show: true,
-          bottomTitles: displayAxisTitles(0),
-          // Y Axis Legend
-          leftTitles: displayAxisTitles(1),
-        ),
-
-        // Size of the chart and display average data
-        borderData: FlBorderData(
-            show: true,
-            border: Border.all(color: const Color(0xff37434d), width: 1)),
-        minX: 1,
-        maxX: 7,
-        minY: 0,
-        maxY: maxValue,
-        lineBarsData: [
-          displayMeanData(),
-        ]);
+    return displayXTitle(1, 1, getTiming(), 0, maxValue);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    var r = new Random();
-    for (int i = 0; i < tailleData; i++) {
-      addPoint(0.0);
-    }
-    //fillKCalData(dataCal);
-    fillLineChart();
-    // day of the week: 1:monday,...7:sunday
-    weekDay = _Today.weekday;
-    print('the day: $weekDay');
-    maxValue = 2000;
-    print('calories for the week:$dataCal');
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    data = [];
-    dataCal = [];
+  // display the screen of statistics part
+  Widget displayStatisticScreen(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        displayTitle(),
+        displayRadioButton(),
+        DisplayChart(),
+        AVGButton(),
+      ],
+    );
   }
 
   @override
@@ -479,86 +323,117 @@ class _StatisticsState extends State<Statistics> {
       ],
     );
   }
-}
 
-/*
+  /* --------------------------Affichage du graphique Axis ------------------------------- */
+  // get title of the Y axe
+  String getTitlesY(value) {
+    //  return (value.toString() + ' kcal');
+    switch (value.toInt()) {
+      case 500:
+        return '500 kcal';
+      case 1000:
+        return '1000 kcal';
+      case 1500:
+        return '1500 kcal ';
+      case 2000:
+        return '2000 kcal';
+      case 2500:
+        return '2500 kcal';
+      case 3000:
+        return '3000 kcal';
+    }
+    return '';
+  }
 
-// class to choose in a list of name&icon (per day/per month/per week)
-class Item {
-  final String name;
-  const Item(this.name);
-}
+  //get Title of the X axe
+  String getTitlesXWeek(value) {
+    switch (value.toInt()) {
+      case 1:
+        return 'Mo';
+      case 2:
+        return 'Tu';
+      case 3:
+        return 'We';
+      case 4:
+        return 'Th';
+      case 5:
+        return 'Fr';
+      case 6:
+        return 'Sa';
+      case 7:
+        return 'Su';
+    }
+    return '';
+  }
 
-class DropdownTiming extends StatefulWidget {
-  const DropdownTiming({Key? key}) : super(key: key);
+  String getTitlesXMonth(double value) {
+    switch (value.toInt()) {
+      case 1:
+        return 'We1';
+      case 7:
+        return 'We2';
+      case 14:
+        return 'We3';
+      case 21:
+        return 'We4';
+    }
+    return '';
+  }
 
-  @override
-  State<DropdownTiming> createState() => DropdownTimingState();
-}
+  String getTitlesXYear(double value) {
+    switch (value.toInt()) {
+      // case 1:
+      //   return 'Jan';
+      // case 31:
+      //   return 'Feb';
+      // case 60:
+      //   return 'Mar';
+      // case 90:
+      //   return 'Apr';
+      // case 120:
+      //   return 'Mai';
+      // case 150:
+      //   return 'Jun';
+      // case 180:
+      //   return 'Jul';
+      // case 210:
+      //   return 'Aug';
+      // case 240:
+      //   return 'Sept';
+      // case 270:
+      //   return 'Oct';
+      // case 300:
+      //   return 'Nov';
+      // case 330:
+      //   return 'Dec';
+      case 1:
+        return 'Jan';
+      case 21:
+        return 'Apr';
+      case 180:
+        return 'Aug';
+      case 260:
+        return 'Nov';
+    }
+    return "";
+  }
 
-class DropdownTimingState extends State<DropdownTiming> {
-  String SelectedUser = "week";
+  //change the value of the RadioButton
+  void changeRadio(int value) {
+    setState(() {
+      valueBotton = value;
+    });
+  }
 
-  //List for the button
-  List<String> timing = <String>['day', 'week', 'month'];
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      hint: Text('Select timing'),
-      value: SelectedUser,
-      onChanged: (String? newValue) {
-        setState(() {
-          SelectedUser = newValue!;
-        });
-      },
-      items: timing.map((String time) {
-        return DropdownMenuItem(
-          value: time,
-          child: Row(
-            children: [
-              Text(
-                time,
-                style: TextStyle(color: Colors.black),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
+  //thanks to valueBottom we get the xMax of the graphic
+  double getTiming() {
+    double xMax;
+    if (valueBotton == 0) {
+      xMax = 7;
+    } else if (valueBotton == 1) {
+      xMax = 31;
+    } else
+      xMax = 366;
+    return xMax;
   }
 }
-
-*/
-
-/*******In a linechartbar:
- * 
- * /*
-        LineChartBarData(
-          spots: [
-            FlSpot(0, 3.44),
-            FlSpot(2.6, 3.44),
-          ],
-          isCurved: true,
-          colors: [
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)!,
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)!,
-          ],
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(show: true, colors: [
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)!
-                .withOpacity(0.1),
-            ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                .lerp(0.2)!
-                .withOpacity(0.1),
-          ]),
-        ),
-      ],*/
- */
