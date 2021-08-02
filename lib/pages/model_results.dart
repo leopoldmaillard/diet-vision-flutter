@@ -532,8 +532,8 @@ class _SegmentationState extends State<Segmentation> {
   /// some function to change
   void addElementToDatabase(List keyValue) {
     int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
-    String nameFood = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
-    Food food = Food(name: nameFood);
+    String nameFood1 = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
+    Food food = Food(nameFood: nameFood1);
     DatabaseProvider.db.insert(food).then(
           (storedFood) => BlocProvider.of<FoodBloc>(context).add(
             AddFood(storedFood),

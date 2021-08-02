@@ -75,7 +75,7 @@ class _HistoryMealState extends State<HistoryMeal> {
   //Display a popup on which we can do actions on these items (update, delete..)
   AlertDialog displayPopup(Food food, int index) {
     return AlertDialog(
-      title: Text(food.name),
+      title: Text(food.nameFood),
       content: Text("ID ${food.id}"), //main content, image easily integratable
       elevation: 24.0,
       actions: <Widget>[
@@ -133,7 +133,7 @@ class _HistoryMealState extends State<HistoryMeal> {
     return Card(
       child: ListTile(
         contentPadding: EdgeInsets.all(16),
-        title: Text(food.name, style: TextStyle(fontSize: 26)),
+        title: Text(food.nameFood, style: TextStyle(fontSize: 26)),
         subtitle: Text(
           "id: ${food.id}",
           style: TextStyle(fontSize: 20),
