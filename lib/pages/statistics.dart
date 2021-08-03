@@ -308,7 +308,7 @@ class _StatisticsState extends State<Statistics> {
         displayRadioButton(),
         DisplayChart(),
         AVGButton(),
-        Statistics2(),
+        //Statistics2(),
       ],
     );
   }
