@@ -13,6 +13,24 @@ class Statistics2 extends StatefulWidget {
 class _StatisticsState2 extends State<Statistics2> {
   int touchedIndex = -1;
   int numberCategorie = 5;
+  //pie chart properties
+  double fontSize = 0;
+  double radius = 0;
+  List<Color> colorPie = [
+    Color(0xff0293ee),
+    Color(0xfff8b250),
+    Color(0xff845bef),
+    Color(0xff13d38e)
+  ];
+
+  List<String> listNutritionLabel = [
+    'cal',
+    'protein',
+    'carbohydrates',
+    'sugar',
+    'fat'
+  ];
+
 /* ___________________Widget part _______________________*/
 
 //create Piechart
@@ -72,16 +90,20 @@ class _StatisticsState2 extends State<Statistics2> {
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        displayEachCategories(Color(0xff0293ee), 'First', true, 4),
-        displayEachCategories(Color(0xfff8b250), 'Second', true, 4),
-        displayEachCategories(Color(0xff845bef), 'Third', true, 4),
-        displayEachCategories(Color(0xff13d38e), 'Fourth', true, 18),
+        displayEachCategoriesLegend(
+            colorPie[0], listNutritionLabel[4], true, 4),
+        displayEachCategoriesLegend(
+            colorPie[1], listNutritionLabel[1], true, 4),
+        displayEachCategoriesLegend(
+            colorPie[2], listNutritionLabel[2], true, 4),
+        displayEachCategoriesLegend(
+            colorPie[3], listNutritionLabel[3], true, 18),
       ],
     );
   }
 
-  //WIdget for each categories colors
-  Widget displayEachCategories(
+  //Legend for each categories colors
+  Widget displayEachCategoriesLegend(
       Color color, String title, bool isSquare, double heightBox) {
     return Column(
       children: <Widget>[
@@ -97,6 +119,21 @@ class _StatisticsState2 extends State<Statistics2> {
     );
   }
 
+  //display the part of the pie chart
+  PieChartSectionData displayEachCategories(
+      Color color, double value, String title) {
+    return PieChartSectionData(
+      color: color,
+      value: value,
+      title: title,
+      radius: radius,
+      titleStyle: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xffffffff)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
@@ -108,53 +145,17 @@ class _StatisticsState2 extends State<Statistics2> {
   List<PieChartSectionData> showingSections() {
     return List.generate(4, (i) {
       final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 25.0 : 16.0;
-      final radius = isTouched ? 60.0 : 50.0;
+      fontSize = isTouched ? 25.0 : 16.0;
+      radius = isTouched ? 60.0 : 50.0;
       switch (i) {
         case 0:
-          return PieChartSectionData(
-            color: const Color(0xff0293ee),
-            value: 40,
-            title: '40%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff)),
-          );
+          return displayEachCategories(colorPie[i], 40, '40%');
         case 1:
-          return PieChartSectionData(
-            color: const Color(0xfff8b250),
-            value: 30,
-            title: '30%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff)),
-          );
+          return displayEachCategories(colorPie[i], 30, '30%');
         case 2:
-          return PieChartSectionData(
-            color: const Color(0xff845bef),
-            value: 15,
-            title: '15%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff)),
-          );
+          return displayEachCategories(colorPie[i], 15, '15%');
         case 3:
-          return PieChartSectionData(
-            color: const Color(0xff13d38e),
-            value: 15,
-            title: '15%',
-            radius: radius,
-            titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xffffffff)),
-          );
+          return displayEachCategories(colorPie[i], 15, '15%');
         default:
           throw Error();
       }
