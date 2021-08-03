@@ -17,6 +17,9 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
 
+//JSON
+import 'package:transfer_learning_fruit_veggies/source/nutrition_table.dart';
+
 const int OUTPUTSIZE = 513 * 513;
 const double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
 const double SURFACE2EUROS = pi * 12.875 * 12.875; // 521 mm2
@@ -534,7 +537,10 @@ class _SegmentationState extends State<Segmentation> {
   //   return [thekey, thevalue];
   // }
 
+  /// return a list of parsed item base on a MAP which contain
+  ///  {nameClass: volume, ...}
   List<Food> parseAllIngredients(Map outputFinal) {
+    Map<dynamic, dynamic> dataJson;
     List<Food> listAllIngredient = [];
     outputFinal.forEach((k, v) {
       if (k != 'Food Containers 🍽️' && k != 'Background 🏞️') {
@@ -544,14 +550,22 @@ class _SegmentationState extends State<Segmentation> {
     return listAllIngredient;
   }
 
+  /// parse a single Food item
   Food parseFoodData(String nameF, int volume) {
     Food food = new Food(nameFood: nameF);
+    Map<dynamic, dynamic> dataJson;
+    dataJson =
+        foodNutritionJson.firstWhere((element) => element["name"] == nameF);
+    print("the dataJson");
+    print(dataJson);
+    print(dataJson["vm"]);
+
     Random myrand = Random();
     food.volEstim = volume;
-    food.volumicMass = myrand.nextInt(100);
+    food.volumicMass = (dataJson["vm"] * 100).toInt();
     food.mass = (food.volEstim * food.volumicMass) ~/ 100;
-    food.nutriscore = 'A';
-    food.kal = myrand.nextInt(100);
+    food.nutriscore = dataJson["nutriscore"].toString();
+    food.kal = (dataJson["cal"].toInt() * food.mass / 100).toInt();
     food.carbohydrates = myrand.nextInt(100);
     food.protein = myrand.nextInt(100);
     food.sugar = myrand.nextInt(25);
@@ -563,8 +577,8 @@ class _SegmentationState extends State<Segmentation> {
   }
 
   Food computeMealStats(List<Food> listAllIngredient) {
-    Food mealResults =
-        new Food(nameFood: "Meal" + Random().nextInt(10000).toString());
+    Food mealResults = new Food(nameFood: "");
+    mealResults.nameFood = "Meal " + mealResults.id.toString();
     for (int i = 0; i < listAllIngredient.length; i++) {
       mealResults.volEstim += listAllIngredient[i].volEstim;
       //mealResults.mass = listAllIngredient[i].volEstim;
