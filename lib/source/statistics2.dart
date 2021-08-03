@@ -12,92 +12,96 @@ class Statistics2 extends StatefulWidget {
 
 class _StatisticsState2 extends State<Statistics2> {
   int touchedIndex = -1;
+  int numberCategorie = 5;
+/* ___________________Widget part _______________________*/
+
+//create Piechart
+  PieChart createPieChart() {
+    return PieChart(
+      PieChartData(
+          pieTouchData: PieTouchData(touchCallback: (pieTouchResponse) {
+            setState(() {
+              final desiredTouch =
+                  pieTouchResponse.touchInput is! PointerExitEvent &&
+                      pieTouchResponse.touchInput is! PointerUpEvent;
+              if (desiredTouch && pieTouchResponse.touchedSection != null) {
+                touchedIndex =
+                    pieTouchResponse.touchedSection!.touchedSectionIndex;
+              } else {
+                touchedIndex = -1;
+              }
+            });
+          }),
+          borderData: FlBorderData(
+            show: false,
+          ),
+          sectionsSpace: 0,
+          centerSpaceRadius: 40,
+          sections: showingSections()),
+    );
+  }
+
+//display a Card to insert a graphe
+  Card displayCard() {
+    return Card(
+      color: Colors.white,
+      child: Row(
+        children: <Widget>[
+          const SizedBox(
+            height: 18,
+          ),
+          Expanded(
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: createPieChart(),
+            ),
+          ),
+          displayPieCHartColor(),
+          const SizedBox(
+            width: 28,
+          ),
+        ],
+      ),
+    );
+  }
+
+// widget to display the pie chart categories
+  Widget displayPieCHartColor() {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        displayEachCategories(Color(0xff0293ee), 'First', true, 4),
+        displayEachCategories(Color(0xfff8b250), 'Second', true, 4),
+        displayEachCategories(Color(0xff845bef), 'Third', true, 4),
+        displayEachCategories(Color(0xff13d38e), 'Fourth', true, 18),
+      ],
+    );
+  }
+
+  //WIdget for each categories colors
+  Widget displayEachCategories(
+      Color color, String title, bool isSquare, double heightBox) {
+    return Column(
+      children: <Widget>[
+        Indicator(
+          color: color,
+          text: title,
+          isSquare: isSquare,
+        ),
+        SizedBox(
+          height: heightBox,
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 1.3,
-      child: Card(
-        color: Colors.white,
-        child: Row(
-          children: <Widget>[
-            const SizedBox(
-              height: 18,
-            ),
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: PieChart(
-                  PieChartData(
-                      pieTouchData:
-                          PieTouchData(touchCallback: (pieTouchResponse) {
-                        setState(() {
-                          final desiredTouch = pieTouchResponse.touchInput
-                                  is! PointerExitEvent &&
-                              pieTouchResponse.touchInput is! PointerUpEvent;
-                          if (desiredTouch &&
-                              pieTouchResponse.touchedSection != null) {
-                            touchedIndex = pieTouchResponse
-                                .touchedSection!.touchedSectionIndex;
-                          } else {
-                            touchedIndex = -1;
-                          }
-                        });
-                      }),
-                      borderData: FlBorderData(
-                        show: false,
-                      ),
-                      sectionsSpace: 0,
-                      centerSpaceRadius: 40,
-                      sections: showingSections()),
-                ),
-              ),
-            ),
-            Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const <Widget>[
-                Indicator(
-                  color: Color(0xff0293ee),
-                  text: 'First',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Color(0xfff8b250),
-                  text: 'Second',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Color(0xff845bef),
-                  text: 'Third',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 4,
-                ),
-                Indicator(
-                  color: Color(0xff13d38e),
-                  text: 'Fourth',
-                  isSquare: true,
-                ),
-                SizedBox(
-                  height: 18,
-                ),
-              ],
-            ),
-            const SizedBox(
-              width: 28,
-            ),
-          ],
-        ),
-      ),
+      child: displayCard(),
     );
   }
 
