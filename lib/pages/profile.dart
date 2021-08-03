@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import '../source/coinDiameter.dart';
-import '../globals.dart' as globals;
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
-  final String country;
-
-  Profile(this.country);
+  Profile();
 
   @override
   _ProfileState createState() => _ProfileState();
@@ -17,33 +15,71 @@ class _ProfileState extends State<Profile> {
   String currency = "";
   List coins = [];
   double height = 170;
-  double weight = 70;
+  double weight = 60;
+  String country = "";
+  String name = "Full Name";
+  String mail = "Email";
+  String pass = "Password";
+
+  // manage values of the textfields
+  final nameController = TextEditingController();
+  final mailController = TextEditingController();
+  final passController = TextEditingController();
+
+  @override
+  void dispose() {
+    savePreferences();
+    nameController.dispose();
+    mailController.dispose();
+    passController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    // return the coin type based on the country of the user
-    // eg. "euro", "us_dollar" etc.
-    currency = coinCountryJson.firstWhere(
-        (element) => element["country"] == this.widget.country)["coin"];
+    loadPreferences();
+  }
 
-    // return a list with the jsons entries of all the coins of this category
-    // eg. "euro" have the 50 centimes, 1 euro, 2 euros etc coins.
-    coins = coinDiameterJson
-        .where((element) => element["coin"] == currency)
-        .toList();
-
-    //Set the default coin to the last available (usually the bigger one)
+  void loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      selectedCoin = coins.last["value"];
-      globals.coinDiameter = coins.last["diameter_mm"] / 10; // Diameter cm
-      globals.coinSurface = pi *
-          (coins.last["diameter_mm"] / 2) *
-          (coins.last["diameter_mm"] / 2);
+      country = prefs.getString("country") ?? "France";
+      // return the coin type based on the country of the user
+      // eg. "euro", "us_dollar" etc.
+      currency = coinCountryJson
+          .firstWhere((element) => element["country"] == country)["coin"];
+
+      coins = coinDiameterJson
+          .where((element) => element["coin"] == currency)
+          .toList();
+
+      selectedCoin = prefs.getString("selectedCoin") ?? coins.last["value"];
+
+      //globals.coinDiameter = coins.last["diameter_mm"] / 10; // Diameter cm
+      //globals.coinSurface = pi *
+      //    (coins.last["diameter_mm"] / 2) *
+      //    (coins.last["diameter_mm"] / 2);
+
+      height = prefs.getDouble("height") ?? 170;
+      weight = prefs.getDouble("weight") ?? 70;
+      name = prefs.getString("name") ?? "Full Name";
+      mail = prefs.getString("mail") ?? "Email";
     });
   }
 
-  Widget textfield({@required String hintText = ""}) {
+  // doesn't deal with password for now
+  void savePreferences() async {
+    print("DISPOSE " + name);
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString("name", name);
+    prefs.setString("mail", mail);
+  }
+
+  Widget textfield(
+      {@required String hintText = "",
+      required TextEditingController controller,
+      required String field}) {
     return Padding(
         padding: EdgeInsets.all(10),
         child: Column(
@@ -55,6 +91,11 @@ class _ProfileState extends State<Profile> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: TextField(
+                  controller: controller,
+                  onSubmitted: (value) {
+                    field = value;
+                    print(name);
+                  },
                   decoration: InputDecoration(
                       hintText: hintText,
                       hintStyle: TextStyle(
@@ -73,6 +114,8 @@ class _ProfileState extends State<Profile> {
         ));
   }
 
+  void selectNewCoin() async {}
+
   Widget availableCoinsList() {
     return DropdownButton<String>(
       underline: Container(
@@ -85,14 +128,16 @@ class _ProfileState extends State<Profile> {
           value: e["value"],
         );
       }).toList(),
-      onChanged: (String? newValue) {
+      onChanged: (String? newValue) async {
+        final prefs = await SharedPreferences.getInstance();
         setState(() {
           selectedCoin = newValue!;
-          globals.coinDiameter = coins.firstWhere((element) =>
-                  element["value"] == selectedCoin)["diameter_mm"] /
-              10;
-          globals.coinSurface =
-              pi * (globals.coinDiameter * 5) * (globals.coinDiameter * 5);
+          prefs.setString("selectedCoin", selectedCoin);
+          //globals.coinDiameter = coins.firstWhere((element) =>
+          //        element["value"] == selectedCoin)["diameter_mm"] /
+          //    10;
+          //globals.coinSurface =
+          //    pi * (globals.coinDiameter * 5) * (globals.coinDiameter * 5);
         });
       },
       value: selectedCoin,
@@ -136,18 +181,21 @@ class _ProfileState extends State<Profile> {
                 image: AssetImage('assets/images/iconeProfile.jpg')),
           ),
         ),
-        textfield(hintText: "Full Name"),
-        textfield(hintText: "Email"),
-        textfield(hintText: "Password"),
+        textfield(hintText: name, controller: nameController, field: name),
+        textfield(hintText: mail, controller: mailController, field: mail),
+        textfield(
+            hintText: "Password", controller: passController, field: pass),
         fancyText("How tall are you : " + height.toInt().toString() + " cm"),
         Slider(
           activeColor: Theme.of(context).primaryColor,
           value: height,
           min: 120,
           max: 230,
-          onChanged: (double value) {
+          onChanged: (double value) async {
+            final prefs = await SharedPreferences.getInstance();
             setState(() {
               height = value;
+              prefs.setDouble("height", height);
             });
           },
         ),
@@ -157,13 +205,15 @@ class _ProfileState extends State<Profile> {
           value: weight,
           min: 30,
           max: 150,
-          onChanged: (double value) {
+          onChanged: (double value) async {
+            final prefs = await SharedPreferences.getInstance();
             setState(() {
               weight = value;
+              prefs.setDouble("weight", weight);
             });
           },
         ),
-        fancyText("Your country : " + widget.country),
+        fancyText("Your country : " + country),
         Row(
           children: [
             fancyText("Chose your Fiducial Marker"),

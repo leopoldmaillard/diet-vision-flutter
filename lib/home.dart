@@ -9,6 +9,7 @@ import 'package:transfer_learning_fruit_veggies/pages/statistics.dart';
 import 'package:transfer_learning_fruit_veggies/pages/profile.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -21,7 +22,6 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool showFab = true;
-  String _country = "";
 
   @override
   void initState() {
@@ -46,7 +46,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     final coordinates = new Coordinates(position.latitude, position.longitude);
     convertCoordinatesToAddress(coordinates).then((value) {
       setState(() {
-        _country = value.countryName.toString();
+        setUserCountry(value.countryName.toString());
       });
     });
   }
@@ -55,6 +55,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     var addresses =
         await Geocoder.local.findAddressesFromCoordinates(coordinates);
     return addresses.first;
+  }
+
+  Future<bool> setUserCountry(String value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    return prefs.setString("country", value);
   }
 
   @override
@@ -94,7 +100,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           HistoryMeal(),
           CameraScreen(widget.cameras),
           Statistics(),
-          Profile(_country),
+          Profile(),
         ],
       ),
     );

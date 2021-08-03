@@ -7,7 +7,7 @@ import 'dart:developer';
 import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../source/coinDiameter.dart';
 
 class Geoloc extends StatefulWidget {
@@ -45,6 +45,18 @@ class GeolocState extends State<Geoloc> {
   // Before, we need the permission
 
   void getCurrentLocation() async {
+    // TO DEBUG LOCAL STORAGE
+    final prefs = await SharedPreferences.getInstance();
+    final keys = prefs.getKeys();
+
+    final prefsMap = Map<String, dynamic>();
+    for (String key in keys) {
+      prefsMap[key] = prefs.get(key);
+    }
+
+    print(prefsMap);
+    // TO DEBUG LOCAL STORAGE
+
     var position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
