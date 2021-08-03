@@ -116,11 +116,12 @@ class _ProfileState extends State<Profile> {
         setState(() {
           selectedCoin = newValue!;
           prefs.setString("selectedCoin", selectedCoin);
-          //globals.coinDiameter = coins.firstWhere((element) =>
-          //        element["value"] == selectedCoin)["diameter_mm"] /
-          //    10;
-          //globals.coinSurface =
-          //    pi * (globals.coinDiameter * 5) * (globals.coinDiameter * 5);
+          double coinDiameter = coins.firstWhere((element) =>
+                  element["value"] == selectedCoin)["diameter_mm"] /
+              10;
+          double coinSurface = pi * (coinDiameter * 5) * (coinDiameter * 5);
+          prefs.setDouble("coinDiameterCm", coinDiameter);
+          prefs.setDouble("coinSurfaceMm2", coinSurface);
         });
       },
       value: selectedCoin,
