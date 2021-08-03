@@ -16,12 +16,14 @@ import 'package:transfer_learning_fruit_veggies/services/local_storage_service.d
 import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const int OUTPUTSIZE = 513 * 513;
 const double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
-const double SURFACE2EUROS = pi * 12.875 * 12.875; // 521 mm2
 const double COINDIAMETERPIXELS = 513 / 4;
-const double COINDIAMETERIRLCM = 1.2875 * 2;
+
+double COINDIAMETERIRLCM = 1.2875 * 2;
+double SURFACE2EUROS = pi * 12.875 * 12.875; // 521 mm2
 
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
@@ -205,9 +207,17 @@ class _SegmentationState extends State<Segmentation> {
   void initState() {
     super.initState();
     loadModel().then((value) {
-      setState(() {});
+      setState(() {
+        loadDimensions();
+      });
     });
     segmentImage(widget.imagePath);
+  }
+
+  void loadDimensions() async {
+    final prefs = await SharedPreferences.getInstance();
+    COINDIAMETERIRLCM = prefs.getDouble("coinDiameterCm")!;
+    SURFACE2EUROS = prefs.getDouble("coinSurfaceMm2")!;
   }
 
   @override
