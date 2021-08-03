@@ -570,7 +570,7 @@ class _SegmentationState extends State<Segmentation> {
     food.protein = myrand.nextInt(100);
     food.sugar = myrand.nextInt(25);
     food.fat = myrand.nextInt(30);
-    print("Food element parsed");
+    print("Food element  parsed");
     String blabla = food.toString();
     print(blabla);
     return food;
