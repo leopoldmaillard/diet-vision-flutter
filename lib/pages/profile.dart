@@ -21,17 +21,8 @@ class _ProfileState extends State<Profile> {
   String mail = "Email";
   String pass = "Password";
 
-  // manage values of the textfields
-  final nameController = TextEditingController();
-  final mailController = TextEditingController();
-  final passController = TextEditingController();
-
   @override
   void dispose() {
-    savePreferences();
-    nameController.dispose();
-    mailController.dispose();
-    passController.dispose();
     super.dispose();
   }
 
@@ -68,18 +59,10 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  // doesn't deal with password for now
-  void savePreferences() async {
-    print("DISPOSE " + name);
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString("name", name);
-    prefs.setString("mail", mail);
-  }
-
   Widget textfield(
       {@required String hintText = "",
-      required TextEditingController controller,
-      required String field}) {
+      required String field,
+      required String fieldName}) {
     return Padding(
         padding: EdgeInsets.all(10),
         child: Column(
@@ -91,10 +74,10 @@ class _ProfileState extends State<Profile> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: TextField(
-                  controller: controller,
-                  onSubmitted: (value) {
+                  onSubmitted: (value) async {
                     field = value;
-                    print(name);
+                    final prefs = await SharedPreferences.getInstance();
+                    prefs.setString(fieldName, field);
                   },
                   decoration: InputDecoration(
                       hintText: hintText,
@@ -181,10 +164,9 @@ class _ProfileState extends State<Profile> {
                 image: AssetImage('assets/images/iconeProfile.jpg')),
           ),
         ),
-        textfield(hintText: name, controller: nameController, field: name),
-        textfield(hintText: mail, controller: mailController, field: mail),
-        textfield(
-            hintText: "Password", controller: passController, field: pass),
+        textfield(hintText: name, field: name, fieldName: "name"),
+        textfield(hintText: mail, field: mail, fieldName: "mail"),
+        textfield(hintText: "Password", field: pass, fieldName: "pass"),
         fancyText("How tall are you : " + height.toInt().toString() + " cm"),
         Slider(
           activeColor: Theme.of(context).primaryColor,

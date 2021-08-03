@@ -47,6 +47,7 @@ class GeolocState extends State<Geoloc> {
   void getCurrentLocation() async {
     // TO DEBUG LOCAL STORAGE
     final prefs = await SharedPreferences.getInstance();
+    //await prefs.clear();
     final keys = prefs.getKeys();
 
     final prefsMap = Map<String, dynamic>();

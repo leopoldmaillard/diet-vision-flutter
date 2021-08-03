@@ -10,6 +10,7 @@ import 'package:transfer_learning_fruit_veggies/pages/profile.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../source/coinDiameter.dart';
 
 class Home extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -22,6 +23,8 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool showFab = true;
+  String country = "";
+  String selectedCoin = "";
 
   @override
   void initState() {
@@ -46,7 +49,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     final coordinates = new Coordinates(position.latitude, position.longitude);
     convertCoordinatesToAddress(coordinates).then((value) {
       setState(() {
-        setUserCountry(value.countryName.toString());
+        country = value.countryName.toString();
+        setUserCountry();
       });
     });
   }
@@ -57,10 +61,21 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return addresses.first;
   }
 
-  Future<bool> setUserCountry(String value) async {
+  void setUserCountry() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("country", country);
 
-    return prefs.setString("country", value);
+    // return the coin type based on the country of the user
+    // eg. "euro", "us_dollar" etc.
+    String currency = coinCountryJson
+        .firstWhere((element) => element["country"] == country)["coin"];
+
+    List coins = coinDiameterJson
+        .where((element) => element["coin"] == currency)
+        .toList();
+
+    selectedCoin = prefs.getString("selectedCoin") ?? coins.last["value"];
+    prefs.setString("selectedCoin", selectedCoin);
   }
 
   @override
