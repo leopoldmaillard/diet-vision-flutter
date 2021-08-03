@@ -12,6 +12,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../source/coinDiameter.dart';
 import 'dart:math';
+import 'package:tflite/tflite.dart';
 
 class Home extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -30,6 +31,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    loadModel();
 
     _tabController = TabController(vsync: this, initialIndex: 1, length: 5);
     _tabController.addListener(() {
@@ -41,6 +43,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       //setState(() {});
     });
     getCountry();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    Tflite.close();
+  }
+
+  loadModel() async {
+    await Tflite.loadModel(
+        model: 'assets/segmenter.tflite', labels: 'assets/labels.txt');
   }
 
   void getCountry() async {
