@@ -206,10 +206,8 @@ class _SegmentationState extends State<Segmentation> {
   @override
   void initState() {
     super.initState();
-    loadModel().then((value) {
-      setState(() {
-        loadDimensions();
-      });
+    setState(() {
+      loadDimensions();
     });
     segmentImage(widget.imagePath);
   }
@@ -218,17 +216,6 @@ class _SegmentationState extends State<Segmentation> {
     final prefs = await SharedPreferences.getInstance();
     COINDIAMETERIRLCM = prefs.getDouble("coinDiameterCm")!;
     SURFACE2EUROS = prefs.getDouble("coinSurfaceMm2")!;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    Tflite.close();
-  }
-
-  loadModel() async {
-    await Tflite.loadModel(
-        model: 'assets/segmenter.tflite', labels: 'assets/labels.txt');
   }
 
   /* **************************************************************************/
