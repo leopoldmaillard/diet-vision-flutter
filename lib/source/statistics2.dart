@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/gestures.dart';
 import 'indicator.dart';
+import 'food.dart';
 
 class Statistics2 extends StatefulWidget {
   @override
@@ -30,6 +31,59 @@ class _StatisticsState2 extends State<Statistics2> {
     'sugar',
     'fat'
   ];
+
+  List<Food> foodItemList = [];
+  int size = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    fillItemFood(foodItemList, size);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    foodItemList = [];
+  }
+
+// fill a list of Food for a day
+  void fillItemFood(List<Food> food, int taille) {
+    int kal = -1, protein = -1, carbohydrates = -1, sugar = -1, fat = -1;
+    var r = new Random();
+    for (int i = 0; i < taille; i++) {
+      kal = ((r.nextDouble()) * 200 + 10).toInt();
+      protein = ((r.nextDouble()) * 200 + 10).toInt();
+      carbohydrates = ((r.nextDouble()) * 200 + 10).toInt();
+      sugar = ((r.nextDouble()) * 200 + 10).toInt();
+      fat = ((r.nextDouble()) * 200 + 10).toInt();
+      food.add(Food(
+        nameFood: 'Cookies $i',
+        id: i,
+        kal: kal,
+        protein: protein,
+        carbohydrates: carbohydrates,
+        sugar: sugar,
+        fat: fat,
+      ));
+    }
+    print('voici la liste de food item: $food');
+  }
+
+  double giveRightCategorieQuantity(int index, int categorie) {
+    if (categorie == 0) {
+      return foodItemList[index].kal.toDouble();
+    } else if (categorie == 1) {
+      return foodItemList[index].fat.toDouble();
+    } else if (categorie == 2) {
+      return foodItemList[index].protein.toDouble();
+    } else if (categorie == 3) {
+      return foodItemList[index].carbohydrates.toDouble();
+    } else if (categorie == 4) {
+      return foodItemList[index].sugar.toDouble();
+    } else
+      return 0;
+  }
 
 /* ___________________Widget part _______________________*/
 
@@ -91,26 +145,27 @@ class _StatisticsState2 extends State<Statistics2> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         displayEachCategoriesLegend(
-            colorPie[0], listNutritionLabel[4], true, 4),
+            colorPie[0], listNutritionLabel[4], true, 4, 1, 0),
         displayEachCategoriesLegend(
-            colorPie[1], listNutritionLabel[1], true, 4),
+            colorPie[1], listNutritionLabel[1], true, 4, 1, 1),
         displayEachCategoriesLegend(
-            colorPie[2], listNutritionLabel[2], true, 4),
+            colorPie[2], listNutritionLabel[2], true, 4, 1, 2),
         displayEachCategoriesLegend(
-            colorPie[3], listNutritionLabel[3], true, 18),
+            colorPie[3], listNutritionLabel[3], true, 18, 1, 3),
       ],
     );
   }
 
   //Legend for each categories colors
-  Widget displayEachCategoriesLegend(
-      Color color, String title, bool isSquare, double heightBox) {
+  Widget displayEachCategoriesLegend(Color color, String title, bool isSquare,
+      double heightBox, int numberFood, int i) {
     return Column(
       children: <Widget>[
         Indicator(
           color: color,
           text: title,
           isSquare: isSquare,
+          quantity: giveRightCategorieQuantity(numberFood, i),
         ),
         SizedBox(
           height: heightBox,
