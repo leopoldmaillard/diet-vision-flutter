@@ -6,13 +6,13 @@ class Food {
   String nameFood = '';
   String nutriscore = '';
   int volEstim = 0;
-  int volumicMass = 0;
-  int mass = 0;
-  int kal = 0;
-  int protein = 0;
-  int carbohydrates = 0;
-  int sugar = 0;
-  int fat = 0;
+  double volumicMass = 0;
+  double mass = 0;
+  double kal = 0;
+  double protein = 0;
+  double carbohydrates = 0;
+  double sugar = 0;
+  double fat = 0;
 
   Food({required this.nameFood});
 
@@ -50,16 +50,16 @@ class Food {
 
   String toString() {
     // String nameFood = 'nameFood : ' + this.nameFood + '\n';
-    String volEstim = 'Volume : ' + this.volEstim.toString() + 'cm³' + '\n';
+    String volEstim = 'Volume : ' + this.volEstim.toString() + ' cm³' + '\n';
     String volumicMass =
-        'Volumic mass : ' + (this.volumicMass).toString() + '\n';
-    String mass = 'mass food : ' + this.mass.toString() + '\n';
-    String kal = this.kal.toString() + 'kcal\n';
-    String protein = 'protein : ' + this.protein.toString() + 'g' + '\n';
+        'Volumic mass : ' + (this.volumicMass).toString() + ' g\n';
+    String mass = 'mass food : ' + this.mass.toString() + ' g\n';
+    String kal = this.kal.toString() + ' kcal\n';
+    String protein = 'protein : ' + this.protein.toString() + ' g' + '\n';
     String carbohydrates =
-        'carbohydrates : ' + this.carbohydrates.toString() + 'g' + '\n';
-    String sugar = 'sugar : ' + this.sugar.toString() + 'g' + '\n';
-    String fat = 'fat : ' + this.fat.toString() + 'g' + '\n';
+        'carbohydrates : ' + this.carbohydrates.toString() + ' g' + '\n';
+    String sugar = 'sugar : ' + this.sugar.toString() + ' g' + '\n';
+    String fat = 'fat : ' + this.fat.toString() + ' g' + '\n';
     String finalString =
         (kal + volEstim + protein + carbohydrates + sugar + fat);
     // pour moi pas de sens de mettre la masse volumique d'un repas
