@@ -886,8 +886,21 @@ main() {
   }
 
   ActionChip displaySurfaceInfo(percent, surface, color, e) {
+    int i = surfaceSaved.keys.toList().indexOf(e.key);
     return ActionChip(
-      onPressed: () {},
+      onPressed: () {
+        setState(() {
+          _selectedClass = i;
+        });
+      },
+      shape: StadiumBorder(
+        side: BorderSide(
+          color: i == _selectedClass
+              ? Theme.of(context).primaryColor
+              : Color(color),
+          width: 2.0,
+        ),
+      ),
       avatar: CircleAvatar(
         backgroundColor: Colors.white,
         child: Text(percent.toString() + "%",
@@ -982,10 +995,37 @@ main() {
           child: displaySurfaceOrVolume(widget.volume, categories),
         ),
         displaySlider(widget.volume),
+        dislayEditButtons(widget.volume),
         displayGetVolumeEstimationButton(widget.volume),
         SizedBox(height: 25),
       ],
     );
+  }
+
+  Widget dislayEditButtons(bool volume) {
+    return volume
+        ? Container()
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ActionChip(
+                label: Text('Delete'),
+                avatar: Icon(Icons.delete),
+                onPressed: () {
+                  setState(() {
+                    surfaceSaved.remove("Soups/stews 🥣");
+                    print(surfaceSaved);
+                  });
+                },
+              ),
+              SizedBox(width: 15.0),
+              ActionChip(
+                label: Text('Edit'),
+                avatar: Icon(Icons.edit),
+                onPressed: () {},
+              )
+            ],
+          );
   }
 
   @override
