@@ -4,10 +4,24 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
 
+/// truc à ameliorer
+/// la possibilite de mettre des doubles dans une database
+/// faire une database pour la page statistics et faire en sorte qu'on
+/// puisse récupérer les kcal de chaque food et les sommer par jour
+/// -rajouter un argument date dans la bdd pour faire le point précédent
 class DatabaseProvider {
   static const String TABLE_FOOD = "food";
   static const String COLUMN_ID = "id";
-  static const String COLUMN_NAME = "name";
+  static const String COLUMN_NAMEFOOD = "nameFood";
+  static const String COLUMN_VOLESTIM = "volumeEstimation";
+  static const String COLUMN_VOLUMICMASS = "volumicMass";
+  static const String COLUMN_MASS = "mass";
+  static const String COLUMN_NUTRISCORE = "nutriscore";
+  static const String COLUMN_KAL = "kal";
+  static const String COLUMN_PROTEIN = "protein";
+  static const String COLUMN_CARBOHYDRATES = "carbohydrates";
+  static const String COLUMN_SUGAR = "sugar";
+  static const String COLUMN_FAT = "fat";
 
   DatabaseProvider._();
   static final DatabaseProvider db = DatabaseProvider._();
@@ -22,7 +36,7 @@ class DatabaseProvider {
 
     if (_database != null) {
       print("database already created and returned");
-      print(_database.toString());
+      // print(_database.toString());
       return _database!;
     }
 
@@ -44,10 +58,19 @@ class DatabaseProvider {
         await database.execute(
           "CREATE TABLE $TABLE_FOOD ("
           "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
-          "$COLUMN_NAME TEXT"
+          "$COLUMN_NAMEFOOD TEXT,"
+          "$COLUMN_VOLESTIM INTEGER,"
+          "$COLUMN_VOLUMICMASS INTEGER,"
+          "$COLUMN_NUTRISCORE TEXT,"
+          "$COLUMN_MASS INTEGER,"
+          "$COLUMN_KAL INTEGER,"
+          "$COLUMN_PROTEIN INTEGER,"
+          "$COLUMN_CARBOHYDRATES INTEGER,"
+          "$COLUMN_SUGAR INTEGER,"
+          "$COLUMN_FAT INTEGER"
           ")",
         );
-        print("food table created");
+        print("Food table created");
       },
     );
   }
@@ -58,7 +81,19 @@ class DatabaseProvider {
   Future<List<Food>> getFoods() async {
     final db = await database;
 
-    var foods = await db.query(TABLE_FOOD, columns: [COLUMN_ID, COLUMN_NAME]);
+    var foods = await db.query(TABLE_FOOD, columns: [
+      COLUMN_ID,
+      COLUMN_NAMEFOOD,
+      COLUMN_VOLESTIM,
+      COLUMN_VOLUMICMASS,
+      COLUMN_NUTRISCORE,
+      COLUMN_MASS,
+      COLUMN_KAL,
+      COLUMN_PROTEIN,
+      COLUMN_CARBOHYDRATES,
+      COLUMN_SUGAR,
+      COLUMN_FAT,
+    ]);
 
     List<Food> foodList = [];
 
@@ -76,8 +111,8 @@ class DatabaseProvider {
   Future<Food> insert(Food food) async {
     final db = await database;
     food.id = await db.insert(TABLE_FOOD, food.toMap());
-    print("food id :");
-    print(food.id);
+    print("food id : ${food.id} added to the table");
+    // print(food.id);
     return food;
   }
 
@@ -88,6 +123,7 @@ class DatabaseProvider {
   Future<int> delete(int id) async {
     final db = await database;
     //the ? will be replace by the id from whereArgs
+    print("food id : ${id} deleted from the table");
     return await db.delete(
       TABLE_FOOD,
       where: "id = ?",

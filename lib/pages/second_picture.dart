@@ -11,11 +11,13 @@ class SecondPictureScreen extends StatefulWidget {
   final CameraController controller;
   final Map surfaces;
   final Map distances;
+  //final TabController tabController;
 
   SecondPictureScreen({
     required this.controller,
     required this.surfaces,
     required this.distances,
+    //required this.tabController,
   });
 
   @override
@@ -23,6 +25,8 @@ class SecondPictureScreen extends StatefulWidget {
 }
 
 class _SecondPictureScreenState extends State<SecondPictureScreen> {
+  //late TabController tabController;
+
   @override
   void initState() {
     super.initState();
@@ -148,6 +152,7 @@ class _SecondPictureScreenState extends State<SecondPictureScreen> {
                   volume: true,
                   surfaces: widget.surfaces,
                   distances: widget.distances,
+                  //tabController: tabController,
                 ),
               ),
             );
