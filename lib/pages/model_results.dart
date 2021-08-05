@@ -878,8 +878,8 @@ main() {
     return volume
         ? Column(
             children: [
-              helpMessageUtilisationSlider(),
               _selectedClass != -1 ? sliderThickness() : Container(),
+              helpMessageUtilisationSlider(),
             ],
           )
         : Container();
