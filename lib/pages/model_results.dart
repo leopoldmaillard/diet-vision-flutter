@@ -205,7 +205,7 @@ class _SegmentationState extends State<Segmentation> {
   Map _outputClassesHeight = Map();
   Map _outputClassesDistance = Map();
   List<List<int>> minMax = [];
-  int _selectedClass = 0;
+  int _selectedClass = -1;
   Food finalMeal = Food(nameFood: "");
 
   @override
@@ -879,7 +879,7 @@ main() {
         ? Column(
             children: [
               helpMessageUtilisationSlider(),
-              sliderThickness(),
+              _selectedClass != -1 ? sliderThickness() : Container(),
             ],
           )
         : Container();
@@ -952,7 +952,9 @@ main() {
             ? Container(
                 height: SIZEWIDTH,
                 width: SIZEWIDTH,
-                child: drawThick(_selectedClass),
+                child: _selectedClass != -1
+                    ? drawThick(_selectedClass)
+                    : Container(),
               )
             : Container(),
       ],
