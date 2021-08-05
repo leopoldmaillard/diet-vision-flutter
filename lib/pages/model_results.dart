@@ -728,16 +728,13 @@ main() {
       item = widSurfKey.indexOf(widSurfKey[i]);
       surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
       volume = (thickness * surf).round();
-      // print("volumeList displayed");
-      // print(index);
-      // print(item);
-      // print(volume);
-      // print(widSurfKey[i]);
       //widSurfkey[i] cest le nameFood
       //index cest l'indice de la classe dans la variable globale
       outputFinal[widSurfKey[i].toString()] = volume;
-      chips.add(
-          displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
+      if (index != 0 && index != 24 && index != 23) {
+        chips.add(
+            displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
+      }
     }
     print("the final output");
     print(outputFinal);
@@ -906,7 +903,12 @@ main() {
             int index = categories.indexOf(e.key);
             int color = pascalVOCLabelColors[index];
             surfaceSaved[e.key] = surface;
-            return displaySurfaceInfo(percent, surface, color, e);
+            if (e.key == 'Background 🏞️' ||
+                e.key == 'Food Containers 🍽️' ||
+                e.key == 'Dining Tools 🍴') {
+              return Container();
+            } else
+              return displaySurfaceInfo(percent, surface, color, e);
           } else {
             return Container();
           }
