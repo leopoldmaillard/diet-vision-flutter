@@ -6,32 +6,15 @@
 id, name, quantity(100ml), cal(cal/100ml), masse volumique: mv (g/ml) [1 cm^3 = 1 ml]
 */
 List<Map> drinkNutritionJson = [
-  {"id": '1', "name": "Coffee", "quantity": "100", "cal": "1000", "mv": "1"},
-  {"id": '2', "name": "Coke", "quantity": "100", "cal": "42000", "mv": "1.02"},
-  {
-    "id": '3',
-    "name": "IcedTea",
-    "quantity": "100",
-    "cal": "27000",
-    "mv": "1.03"
-  },
+
+  {"id": '1', "name": "Coffee", "quantity": "100", "cal": "1", "mv": "1"},
+  {"id": '2', "name": "Coke", "quantity": "100", "cal": "42", "mv": "1.02"},
+  {"id": '3', "name": "IcedTea", "quantity": "100", "cal": "27", "mv": "1.03"},
   {"id": '4', "name": "Water", "quantity": "100", "cal": "0", "mv": "1"},
-  {"id": '5', "name": "Beer", "quantity": "100", "cal": "43000", "mv": "1"},
-  {"id": '6', "name": "Wine", "quantity": "100", "cal": "83000", "mv": "0.99"},
-  {
-    "id": '7',
-    "name": "Whiskey",
-    "quantity": "100",
-    "cal": "250000",
-    "mv": "0.93"
-  },
-  {
-    "id": '8',
-    "name": "Vodka",
-    "quantity": "100",
-    "cal": "231000",
-    "mv": "0.95"
-  },
+  {"id": '5', "name": "Beer", "quantity": "100", "cal": "43", "mv": "1"},
+  {"id": '6', "name": "Wine", "quantity": "100", "cal": "83", "mv": "0.99"},
+  {"id": '7', "name": "Whiskey", "quantity": "100", "cal": "250", "mv": "0.93"},
+  {"id": '8', "name": "Vodka", "quantity": "100", "cal": "231", "mv": "0.95"},
   {"id": '9', "name": "Tea", "quantity": "100", "cal": "1000", "mv": "1"},
 ];
 
@@ -43,7 +26,7 @@ vm (g/ml)
 List<Map> foodNutritionJson = [
   {
     "id": '1',
-    "name": "Leafy Greens",
+    "name": 'Leafy Greens 🥬',
     "cal": 20.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -51,7 +34,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '2',
-    "name": "Stem Vegetables",
+    "name": "Stem Vegetables 🥦",
     "cal": 35.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -59,7 +42,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '3',
-    "name": "Non-starchy Roots",
+    "name": "Non-starchy Roots 🍅",
     "cal": 38.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -67,7 +50,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '4',
-    "name": "Vegetables | Other",
+    "name": "Vegetables | Other 🌽",
     "cal": 25.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -75,7 +58,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '5',
-    "name": "Fruits",
+    "name": "Fruits 🍓",
     "cal": 55.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -83,7 +66,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '6',
-    "name": "Protein | Meat",
+    "name": "Protein | Meat 🥩",
     "cal": 250.0,
     "nutriscore": "D",
     "glucide": "N/A",
@@ -91,7 +74,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '7',
-    "name": "Protein | Poultry",
+    "name": "Protein | Poultry 🍗",
     "cal": 140.0,
     "nutriscore": "C",
     "glucide": "N/A",
@@ -99,7 +82,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '8',
-    "name": "Protein | Seafood",
+    "name": "Protein | Seafood 🐟",
     "cal": 110.0,
     "nutriscore": "B",
     "glucide": "N/A",
@@ -107,7 +90,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '9',
-    "name": "Protein | Eggs",
+    "name": "Protein | Eggs 🍳",
     "cal": 140.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -116,7 +99,7 @@ List<Map> foodNutritionJson = [
   //http://www.fao.org/3/ap815e/ap815e.pdf
   {
     "id": '10',
-    "name": "Protein | Beans/nuts",
+    "name": "Protein | Beans/nuts 🥜",
     "cal": 630.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -124,7 +107,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '11',
-    "name": "Starches/grains | Baked Goods",
+    "name": "Starches/grains | Baked Goods 🥐",
     "cal": 280.0,
     "nutriscore": "D",
     "glucide": "N/A",
@@ -132,7 +115,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '12',
-    "name": "Starches/grains | rice/grains/cereals",
+    "name": "Starches/grains | rice/grains/cereals 🍚",
     "cal": 95.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -140,7 +123,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '13',
-    "name": "Starches/grains | Noodles/pasta",
+    "name": "Starches/grains | Noodles/pasta 🍝",
     "cal": 90.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -148,7 +131,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '14',
-    "name": "Starches/grains | Starchy Vegetables",
+    "name": "Starches/grains | Starchy Vegetables 🥔",
     "cal": 350.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -156,7 +139,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '15',
-    "name": "Starches/grains | Other",
+    "name": "Starches/grains | Other 🌾",
     "cal": 95.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -164,7 +147,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '16',
-    "name": "Soups/stews",
+    "name": "Soups/stews 🥣",
     "cal": 30.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -172,7 +155,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '17',
-    "name": "Herbs/spices",
+    "name": "Herbs/spices 🌿",
     "cal": 20.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -180,7 +163,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '18',
-    "name": "Dairy",
+    "name": "Dairy 🥛",
     "cal": 330.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -188,7 +171,7 @@ List<Map> foodNutritionJson = [
   },
   {
     "id": '19',
-    "name": "Snacks",
+    "name": "Snacks 🍫",
     "cal": 560.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -196,7 +179,7 @@ List<Map> foodNutritionJson = [
   }, //
   {
     "id": '20',
-    "name": "Sweets/desserts",
+    "name": "Sweets/desserts 🍰",
     "cal": 400.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -204,7 +187,7 @@ List<Map> foodNutritionJson = [
   }, //on prendra aussi le donut ?
   {
     "id": '21',
-    "name": "Beverages",
+    "name": "Beverages 🥤",
     "cal": 0.0,
     "nutriscore": "A",
     "glucide": "N/A",
@@ -212,7 +195,7 @@ List<Map> foodNutritionJson = [
   }, // cf la partie boisson
   {
     "id": '22',
-    "name": "Fats/oils/sauces",
+    "name": "Fats/oils/sauces 🥫",
     "cal": 250.0,
     "nutriscore": "D",
     "glucide": "N/A",

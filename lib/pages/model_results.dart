@@ -9,6 +9,7 @@ import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
+import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 
 import 'package:transfer_learning_fruit_veggies/model/food.dart';
@@ -17,6 +18,9 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+//JSON
+import 'package:transfer_learning_fruit_veggies/source/nutrition_table.dart';
 
 const int OUTPUTSIZE = 513 * 513;
 const double COINPIXELS = pi * (513 / 16) * (513 / 16); // 3230 pixels
@@ -32,6 +36,7 @@ class DisplayPictureScreen extends StatelessWidget {
   final bool volume;
   final Map surfaces;
   final Map distances;
+  //final TabController tabController;
 
   const DisplayPictureScreen({
     Key? key,
@@ -41,6 +46,7 @@ class DisplayPictureScreen extends StatelessWidget {
     required this.volume,
     required this.surfaces,
     required this.distances,
+    //required this.tabController,
   }) : super(key: key);
 
   @override
@@ -59,12 +65,14 @@ class DisplayPictureScreen extends StatelessWidget {
         volume: this.volume,
         surfaces: this.surfaces,
         distances: this.distances,
+        //tabController: this.tabController,
       ),
     );
   }
 }
 
 class Segmentation extends StatefulWidget {
+  //TabController tabController;
   final String imagePath;
   final bool isSamsung;
   final CameraController controller;
@@ -78,6 +86,7 @@ class Segmentation extends StatefulWidget {
     required this.volume,
     required this.surfaces,
     required this.distances,
+    //required this.tabController,
   });
 
   @override
@@ -85,6 +94,7 @@ class Segmentation extends StatefulWidget {
 }
 
 class _SegmentationState extends State<Segmentation> {
+  //late TabController tabController;
 /* ****************************************************************************/
 /* *********************  FUNCTIONS SIGNATURES  *******************************/
 /* ****************************************************************************/
@@ -187,6 +197,7 @@ class _SegmentationState extends State<Segmentation> {
   /* **************************************************************************/
   /* *********************  Globals VARIABLE  *********************************/
   /* **************************************************************************/
+  //late TabController _tabController;
   var KEYS = classes.keys.toList();
   var VALUES = classes.values.toList();
   Map surfaceSaved = Map();
@@ -202,6 +213,8 @@ class _SegmentationState extends State<Segmentation> {
   Map _outputClassesDistance = Map();
   List<List<int>> minMax = [];
   int _selectedClass = 0;
+
+  Food finalMeal = Food(nameFood: "");
 
   @override
   void initState() {
@@ -284,9 +297,10 @@ class _SegmentationState extends State<Segmentation> {
       _outputClassesHeight = outputClassesHeight;
       _loading = false;
     });
+    // print(_outputClasses);
 
-    List keyValue = maxClasse();
-    addElementToDatabase(keyValue);
+    // List keyValue = maxClasse();
+    // addElementToDatabase(keyValue);
   }
 
   /* **************************************************************************/
@@ -509,33 +523,107 @@ class _SegmentationState extends State<Segmentation> {
   }
   //thickdeformee = thickReel - 9.33*xdistance
 
+  /* **************************************************************************/
+  /* **************************  DATABASE  ************************************/
+  /* **************************************************************************/
+
   /// some function to change
-  List maxClasse() {
-    var thevalue = 0;
-    var thekey = 'Background 🏞️';
-    //k != 'Food Containers 🍽️' && k != 'Background 🏞️' &&
-    _outputClasses.forEach((k, v) {
-      if (k != 'Food Containers 🍽️' && k != 'Background 🏞️' && v > thevalue) {
-        thevalue = v;
-        thekey = k;
+  // List maxClasse(Map outputFinal) {
+  //   var thevalue = 0;
+  //   var thekey = 'Background 🏞️';
+  //   //k != 'Food Containers 🍽️' && k != 'Background 🏞️' &&
+  //   outputFinal.forEach((k, v) {
+  //     if (k != 'Food Containers 🍽️' && k != 'Background 🏞️' && v > thevalue) {
+  //       thevalue = v;
+  //       thekey = k;
+  //     }
+  //   });
+
+  //   print(thekey);
+  //   print(thevalue);
+  //   return [thekey, thevalue];
+  // }
+
+  /// return a list of parsed item base on a MAP which contain
+  ///  {nameClass: volume, ...}
+  List<Food> parseAllIngredients(Map outputFinal) {
+    Map<dynamic, dynamic> dataJson;
+    List<Food> listAllIngredient = [];
+    outputFinal.forEach((k, v) {
+      if (k != 'Food Containers 🍽️' && k != 'Background 🏞️') {
+        listAllIngredient.add(parseFoodData(k, v));
       }
     });
+    return listAllIngredient;
+  }
 
-    print(thekey);
-    print(thevalue);
-    return [thekey, thevalue];
+  /// parse a single Food item
+  Food parseFoodData(String nameF, int volume) {
+    Food food = new Food(nameFood: nameF);
+    Map<dynamic, dynamic> dataJson;
+    dataJson =
+        foodNutritionJson.firstWhere((element) => element["name"] == nameF);
+    print("the dataJson");
+    print(dataJson);
+    print(dataJson["vm"]);
+
+    Random myrand = Random();
+    food.volEstim = volume;
+    food.volumicMass = (dataJson["vm"] * 100).toInt();
+    food.mass = (food.volEstim * food.volumicMass) ~/ 100;
+    food.nutriscore = dataJson["nutriscore"].toString();
+    food.kal = (dataJson["cal"].toInt() * food.mass / 100).toInt();
+    food.carbohydrates = myrand.nextInt(100);
+    food.protein = myrand.nextInt(100);
+    food.sugar = myrand.nextInt(25);
+    food.fat = myrand.nextInt(30);
+    print("Food element  parsed");
+    String blabla = food.toString();
+    print(blabla);
+    return food;
+  }
+
+  Food computeMealStats(List<Food> listAllIngredient) {
+    Food mealResults = new Food(nameFood: "");
+    mealResults.nameFood = "Meal " + mealResults.id.toString();
+    for (int i = 0; i < listAllIngredient.length; i++) {
+      mealResults.volEstim += listAllIngredient[i].volEstim;
+      //mealResults.mass = listAllIngredient[i].volEstim;
+      //mealResults.nutriscore = 'A';
+      mealResults.kal += listAllIngredient[i].kal;
+      mealResults.carbohydrates += listAllIngredient[i].carbohydrates;
+      mealResults.protein += listAllIngredient[i].protein;
+      mealResults.sugar += listAllIngredient[i].sugar;
+      mealResults.fat += listAllIngredient[i].fat;
+      mealResults.mass += listAllIngredient[i].mass;
+      mealResults.volumicMass += listAllIngredient[i].volumicMass;
+    }
+    return mealResults;
   }
 
   /// some function to change
-  void addElementToDatabase(List keyValue) {
-    int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
-    String nameFood = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
-    Food food = Food(name: nameFood);
-    DatabaseProvider.db.insert(food).then(
-          (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-            AddFood(storedFood),
-          ),
-        );
+  // void addElementToDatabase(List keyValue) {
+  //   int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
+  //   String nameFood1 = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
+  //   Food food = parseFoodData(nameFood1, valuecm2);
+  //   DatabaseProvider.db.insert(food).then(
+  //         (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+  //           AddFood(storedFood),
+  //         ),
+  //       );
+  // }
+
+  //keyvalue[0] = foodNAme
+  //keyvalue[1] = volum in cm3
+  void retrieveFinalMealIntoGlobalVar(List<Food> allIngredient) {
+    finalMeal = computeMealStats(allIngredient);
+    String leresult = finalMeal.toString();
+    print(leresult);
+    // DatabaseProvider.db.insert(myMeal).then(
+    //       (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+    //         AddFood(storedFood),
+    //       ),
+    //     );
   }
 
   /* **************************************************************************/
@@ -601,6 +689,7 @@ class _SegmentationState extends State<Segmentation> {
 
   // obtain a list of the volume and the thickness for each class segmented in the first/second picture
   Widget volumeList() {
+    Map outputFinal = Map(); // ['nameclass', volumeincm3, .....]
     List<dynamic> widSurfKey = widget.surfaces.keys.toList();
     List<dynamic> widSurfVal = widget.surfaces.values.toList();
     final chips = <Widget>[];
@@ -631,16 +720,28 @@ class _SegmentationState extends State<Segmentation> {
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
 
-      index = categories.indexOf(widSurfKey[i]);
+      index =
+          categories.indexOf(widSurfKey[i]); //real index in the global variabl
       color = pascalVOCLabelColors[index];
 
       item = widSurfKey.indexOf(widSurfKey[i]);
       surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
       volume = (thickness * surf).round();
-
+      // print("volumeList displayed");
+      // print(index);
+      // print(item);
+      // print(volume);
+      // print(widSurfKey[i]);
+      //widSurfkey[i] cest le nameFood
+      //index cest l'indice de la classe dans la variable globale
+      outputFinal[widSurfKey[i].toString()] = volume;
       chips.add(
           displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
     }
+    print("the final output");
+    print(outputFinal);
+    List<Food> allIngredientParsed = parseAllIngredients(outputFinal);
+    retrieveFinalMealIntoGlobalVar(allIngredientParsed);
     return ListView(children: chips);
   }
 
@@ -684,6 +785,7 @@ class _SegmentationState extends State<Segmentation> {
                     controller: widget.controller,
                     surfaces: surfaceSaved,
                     distances: _outputClassesDistance,
+                    //tabController: tabController,
                   ),
                 ),
               );
@@ -698,17 +800,53 @@ class _SegmentationState extends State<Segmentation> {
         : Container();
   }
 
+  Widget getDisplayValidateMenuButton() {
+    return ElevatedButton.icon(
+      icon: Icon(Icons.panorama_photosphere),
+      label: Text('Validate Menu'),
+      onPressed: () async {
+        await DatabaseProvider.db.insert(finalMeal).then(
+              (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+                AddFood(storedFood),
+              ),
+            );
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        Navigator.pop(
+            context, 'retour à prendre la photo de volume estimation');
+        Navigator.pop(
+            context, 'retour aux resultats de segmentation de limage');
+        Navigator.pop(context, 'retour à prendre la photo de limage');
+        //tabController.animateTo(4, curve: ElasticInCurve());
+        //await Navigator.popAndPushNamed(context, 'mealHistory');
+        // await Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => HistoryMeal(),
+        //   ),
+        // );
+      },
+      style: ElevatedButton.styleFrom(
+        shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(50.0),
+        ),
+        primary: Theme.of(context).primaryColor,
+      ),
+    );
+  }
+
   Widget helpMessageUtilisationSlider() {
     return Center(
-      child: Container(
-        padding: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          color: Theme.of(context).buttonColor,
-          borderRadius: BorderRadius.circular(50),
+      child: Column(children: [
+        Container(
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: Theme.of(context).buttonColor,
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: Text(
+              "Feel free to adjust the average thickness of each food item"),
         ),
-        child:
-            Text("Feel free to adjust the average thickness of each food item"),
-      ),
+        getDisplayValidateMenuButton()
+      ]),
     );
   }
 

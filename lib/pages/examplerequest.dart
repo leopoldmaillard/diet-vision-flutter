@@ -17,7 +17,7 @@ class Page2 extends StatefulWidget {
 class _Page2State extends State<Page2> {
   @override
   void initState() {
-    Food food = Food(name: "food name");
+    Food food = Food(nameFood: "food name");
     //après add on rajoute levenement qu'on veut invoquer
     // on attend de recupérer notre food, une fois que cest fait
     // on préviens le bloc qu'on a ajouté de la food et qu'on la passer
