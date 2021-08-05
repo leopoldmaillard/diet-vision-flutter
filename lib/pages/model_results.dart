@@ -637,9 +637,10 @@ class _SegmentationState extends State<Segmentation> {
       item = widSurfKey.indexOf(widSurfKey[i]);
       surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
       volume = (thickness * surf).round();
-
-      chips.add(
-          displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
+      if (index != 0 && index != 24 && index != 23) {
+        chips.add(
+            displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
+      }
     }
     return ListView(children: chips);
   }
@@ -772,7 +773,12 @@ class _SegmentationState extends State<Segmentation> {
             int index = categories.indexOf(e.key);
             int color = pascalVOCLabelColors[index];
             surfaceSaved[e.key] = surface;
-            return displaySurfaceInfo(percent, surface, color, e);
+            if (e.key == 'Background 🏞️' ||
+                e.key == 'Food Containers 🍽️' ||
+                e.key == 'Dining Tools 🍴') {
+              return Container();
+            } else
+              return displaySurfaceInfo(percent, surface, color, e);
           } else {
             return Container();
           }
