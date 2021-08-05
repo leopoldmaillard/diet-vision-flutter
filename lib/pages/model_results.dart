@@ -201,6 +201,7 @@ class _SegmentationState extends State<Segmentation> {
 
   List<List<List<int>>> _outputClassesVolume = [];
   List<List<List<int>>> _outputClassesSurface = [];
+  List<String> classVolumeName = [];
   Map _outputClassesHeight = Map();
   Map _outputClassesDistance = Map();
   List<List<int>> minMax = [];
@@ -499,6 +500,7 @@ class _SegmentationState extends State<Segmentation> {
     // and taking the x of the bottom of the thickness is quite better. (Ithink)
     minMax.add(
         [yTopThickness, xBottomThickness, yBottomThickness, xBottomThickness]);
+    classVolumeName.add(classe);
     return (yBottomThickness - yTopThickness).round();
   }
 
@@ -541,7 +543,10 @@ class _SegmentationState extends State<Segmentation> {
     Map<dynamic, dynamic> dataJson;
     List<Food> listAllIngredient = [];
     outputFinal.forEach((k, v) {
-      if (k != 'Food Containers 🍽️' && k != 'Background 🏞️') {
+      if (k != 'Food Containers 🍽️' &&
+          k != 'Background 🏞️' &&
+          k != 'Dining Tools 🍴' &&
+          k != 'Other Food ❓') {
         listAllIngredient.add(parseFoodData(k, v));
       }
     });
@@ -697,43 +702,46 @@ main() {
     var categories = classes.values.toList();
     var mykeys = widget.distances.keys.toList();
     var dist = widget.distances.values.toList();
-
+    print("VOIIIICIIII LA DIST");
+    print(mykeys);
+    print(dist);
     double thickPixels, thickness, distCoinClass, thickPixelsReal;
     //idxClass: index in the outputClasses of the current classe
     //idxClassDIst: index in the widget.distance of the current classe
     int idxClass, idxClassDist; //, index, color, item, surf, volume;
 
-    /************************  INFO IMPORTANTE ****************************************
-     * **  Si on cree ces variables en dehors de la boucle for:
-     *  (sur la deuxieme photo) on peut changer une fois le curseur sur la classe backed cook
-     *  et après on peut plus changer les classes pour ajuster la thickness*****/
-
-    int index, color, item, surf, volume;
+    int index, color, item, surf = 0, volume;
     // obtain the volume for each class segmented in the first/second picture
     for (int i = 0; i < minMax.length; i++) {
       thickPixels = (minMax[i][2].abs() - minMax[i][0].abs()).toDouble();
-      idxClass =
-          categories.indexOf(widSurfKey[i]); // replace: classes.values.toList()
+      print(classVolumeName[i]);
+      idxClass = categories
+          .indexOf(classVolumeName[i]); // replace: classes.values.toList()
+      print(idxClass);
       idxClassDist =
           mykeys.indexOf(idxClass); // replace:widget.distances.keys.toList()
+      print(idxClassDist);
       distCoinClass = dist[idxClassDist]; // replace:widget.distances.values
+      print(distCoinClass);
+
       thickPixelsReal =
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
 
-      index =
-          categories.indexOf(widSurfKey[i]); //real index in the global variabl
-      color = pascalVOCLabelColors[index];
-
-      item = widSurfKey.indexOf(widSurfKey[i]);
-      surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
-      volume = (thickness * surf).round();
-      //widSurfkey[i] cest le nameFood
-      //index cest l'indice de la classe dans la variable globale
-      outputFinal[widSurfKey[i].toString()] = volume;
-      if (index != 0 && index != 24 && index != 23) {
-        chips.add(
-            displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
+      color = pascalVOCLabelColors[idxClass];
+      print("the color :");
+      print(color);
+      item = widSurfKey.indexOf(classVolumeName[i]);
+      print("the item");
+      print(item);
+      if ((item >= 0) && (item <= 24)) {
+        surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
+        volume = (thickness * surf).round();
+        //widSurfkey[i] cest le nameFood
+        outputFinal[classVolumeName[i].toString()] = volume;
+        if (idxClass != 0 && idxClass != 24 && idxClass != 23) {
+          chips.add(displayVolumeInfo(color, widSurfKey, thickness, volume, i));
+        }
       }
     }
     print("the final output");
@@ -743,24 +751,24 @@ main() {
     return ListView(children: chips);
   }
 
-  ActionChip displayVolumeInfo(item, color, widSurfKey, thickness, volume, i) {
+  ActionChip displayVolumeInfo(color, widSurfKey, thickness, volume, i) {
     return ActionChip(
       onPressed: () {
         setState(() {
-          _selectedClass = item;
+          _selectedClass = i;
         });
       },
       backgroundColor: Color(color),
       shape: StadiumBorder(
         side: BorderSide(
-          color: item == _selectedClass
+          color: i == _selectedClass
               ? Theme.of(context).primaryColor
               : Color(color),
           width: 2.0,
         ),
       ),
       label: Text(
-        widSurfKey[i] +
+        classVolumeName[i] +
             '   ' +
             thickness.toStringAsFixed(1) +
             'cm | Vol. ' +
