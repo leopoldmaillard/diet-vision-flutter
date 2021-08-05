@@ -9,7 +9,6 @@ import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
-import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 
 import 'package:transfer_learning_fruit_veggies/model/food.dart';
@@ -36,7 +35,6 @@ class DisplayPictureScreen extends StatelessWidget {
   final bool volume;
   final Map surfaces;
   final Map distances;
-  //final TabController tabController;
 
   const DisplayPictureScreen({
     Key? key,
@@ -46,7 +44,6 @@ class DisplayPictureScreen extends StatelessWidget {
     required this.volume,
     required this.surfaces,
     required this.distances,
-    //required this.tabController,
   }) : super(key: key);
 
   @override
@@ -65,14 +62,12 @@ class DisplayPictureScreen extends StatelessWidget {
         volume: this.volume,
         surfaces: this.surfaces,
         distances: this.distances,
-        //tabController: this.tabController,
       ),
     );
   }
 }
 
 class Segmentation extends StatefulWidget {
-  //TabController tabController;
   final String imagePath;
   final bool isSamsung;
   final CameraController controller;
@@ -86,7 +81,6 @@ class Segmentation extends StatefulWidget {
     required this.volume,
     required this.surfaces,
     required this.distances,
-    //required this.tabController,
   });
 
   @override
@@ -94,7 +88,6 @@ class Segmentation extends StatefulWidget {
 }
 
 class _SegmentationState extends State<Segmentation> {
-  //late TabController tabController;
 /* ****************************************************************************/
 /* *********************  FUNCTIONS SIGNATURES  *******************************/
 /* ****************************************************************************/
@@ -197,7 +190,6 @@ class _SegmentationState extends State<Segmentation> {
   /* **************************************************************************/
   /* *********************  Globals VARIABLE  *********************************/
   /* **************************************************************************/
-  //late TabController _tabController;
   var KEYS = classes.keys.toList();
   var VALUES = classes.values.toList();
   Map surfaceSaved = Map();
@@ -213,8 +205,6 @@ class _SegmentationState extends State<Segmentation> {
   Map _outputClassesDistance = Map();
   List<List<int>> minMax = [];
   int _selectedClass = 0;
-
-  Food finalMeal = Food(nameFood: "");
 
   @override
   void initState() {
@@ -569,14 +559,15 @@ class _SegmentationState extends State<Segmentation> {
 
     Random myrand = Random();
     food.volEstim = volume;
-    food.volumicMass = (dataJson["vm"] * 100).toInt();
-    food.mass = (food.volEstim * food.volumicMass) ~/ 100;
+    food.volumicMass = roundDouble((dataJson["vm"] * 100), 2);
+    food.mass = roundDouble(
+        ((food.volEstim.toDouble() * food.volumicMass) ~/ 100).toDouble(), 2);
     food.nutriscore = dataJson["nutriscore"].toString();
-    food.kal = (dataJson["cal"].toInt() * food.mass / 100).toInt();
-    food.carbohydrates = myrand.nextInt(100);
-    food.protein = myrand.nextInt(100);
-    food.sugar = myrand.nextInt(25);
-    food.fat = myrand.nextInt(30);
+    food.kal = roundDouble((dataJson["cal"] * food.mass / 100), 2);
+    food.carbohydrates = roundDouble(myrand.nextDouble() * 100, 2);
+    food.protein = roundDouble(myrand.nextDouble() * 100, 2);
+    food.sugar = roundDouble(myrand.nextDouble() * 25, 2);
+    food.fat = roundDouble(myrand.nextDouble() * 30, 2);
     print("Food element  parsed");
     String blabla = food.toString();
     print(blabla);
@@ -601,6 +592,21 @@ class _SegmentationState extends State<Segmentation> {
     return mealResults;
   }
 
+// 2 significatif numbers after dots
+  double roundDouble(double value, int places) {
+    double mod = pow(10.0, places).toDouble();
+    return ((value * mod).round().toDouble() / mod);
+  }
+  /*
+  double roundDouble(double value, int places){ 
+   double mod = pow(10.0, places); 
+   return ((value * mod).round().toDouble() / mod); 
+}
+
+main() {
+  double num1 = roundDouble(12.3412, 2);
+  // 12.34*/
+
   /// some function to change
   // void addElementToDatabase(List keyValue) {
   //   int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
@@ -615,15 +621,16 @@ class _SegmentationState extends State<Segmentation> {
 
   //keyvalue[0] = foodNAme
   //keyvalue[1] = volum in cm3
-  void retrieveFinalMealIntoGlobalVar(List<Food> allIngredient) {
-    finalMeal = computeMealStats(allIngredient);
-    String leresult = finalMeal.toString();
+  void addElementToDatabaseAfterVolume(List<Food> allIngredient) {
+    Food myMeal = computeMealStats(allIngredient);
+    print("deuxieme test :");
+    String leresult = myMeal.toString();
     print(leresult);
-    // DatabaseProvider.db.insert(myMeal).then(
-    //       (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-    //         AddFood(storedFood),
-    //       ),
-    //     );
+    DatabaseProvider.db.insert(myMeal).then(
+          (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+            AddFood(storedFood),
+          ),
+        );
   }
 
   /* **************************************************************************/
@@ -741,7 +748,7 @@ class _SegmentationState extends State<Segmentation> {
     print("the final output");
     print(outputFinal);
     List<Food> allIngredientParsed = parseAllIngredients(outputFinal);
-    retrieveFinalMealIntoGlobalVar(allIngredientParsed);
+    addElementToDatabaseAfterVolume(allIngredientParsed);
     return ListView(children: chips);
   }
 
@@ -785,7 +792,6 @@ class _SegmentationState extends State<Segmentation> {
                     controller: widget.controller,
                     surfaces: surfaceSaved,
                     distances: _outputClassesDistance,
-                    //tabController: tabController,
                   ),
                 ),
               );
@@ -800,53 +806,17 @@ class _SegmentationState extends State<Segmentation> {
         : Container();
   }
 
-  Widget getDisplayValidateMenuButton() {
-    return ElevatedButton.icon(
-      icon: Icon(Icons.panorama_photosphere),
-      label: Text('Validate Menu'),
-      onPressed: () async {
-        await DatabaseProvider.db.insert(finalMeal).then(
-              (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-                AddFood(storedFood),
-              ),
-            );
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        Navigator.pop(
-            context, 'retour à prendre la photo de volume estimation');
-        Navigator.pop(
-            context, 'retour aux resultats de segmentation de limage');
-        Navigator.pop(context, 'retour à prendre la photo de limage');
-        //tabController.animateTo(4, curve: ElasticInCurve());
-        //await Navigator.popAndPushNamed(context, 'mealHistory');
-        // await Navigator.of(context).push(
-        //   MaterialPageRoute(
-        //     builder: (context) => HistoryMeal(),
-        //   ),
-        // );
-      },
-      style: ElevatedButton.styleFrom(
-        shape: new RoundedRectangleBorder(
-          borderRadius: new BorderRadius.circular(50.0),
-        ),
-        primary: Theme.of(context).primaryColor,
-      ),
-    );
-  }
-
   Widget helpMessageUtilisationSlider() {
     return Center(
-      child: Column(children: [
-        Container(
-          padding: EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: Theme.of(context).buttonColor,
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: Text(
-              "Feel free to adjust the average thickness of each food item"),
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Theme.of(context).buttonColor,
+          borderRadius: BorderRadius.circular(50),
         ),
-        getDisplayValidateMenuButton()
-      ]),
+        child:
+            Text("Feel free to adjust the average thickness of each food item"),
+      ),
     );
   }
 
