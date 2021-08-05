@@ -9,6 +9,7 @@ import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
+import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 
 import 'package:transfer_learning_fruit_veggies/model/food.dart';
@@ -33,6 +34,7 @@ class DisplayPictureScreen extends StatelessWidget {
   final bool volume;
   final Map surfaces;
   final Map distances;
+  //final TabController tabController;
 
   const DisplayPictureScreen({
     Key? key,
@@ -42,6 +44,7 @@ class DisplayPictureScreen extends StatelessWidget {
     required this.volume,
     required this.surfaces,
     required this.distances,
+    //required this.tabController,
   }) : super(key: key);
 
   @override
@@ -60,12 +63,14 @@ class DisplayPictureScreen extends StatelessWidget {
         volume: this.volume,
         surfaces: this.surfaces,
         distances: this.distances,
+        //tabController: this.tabController,
       ),
     );
   }
 }
 
 class Segmentation extends StatefulWidget {
+  //TabController tabController;
   final String imagePath;
   final bool isSamsung;
   final CameraController controller;
@@ -79,6 +84,7 @@ class Segmentation extends StatefulWidget {
     required this.volume,
     required this.surfaces,
     required this.distances,
+    //required this.tabController,
   });
 
   @override
@@ -86,6 +92,7 @@ class Segmentation extends StatefulWidget {
 }
 
 class _SegmentationState extends State<Segmentation> {
+  //late TabController tabController;
 /* ****************************************************************************/
 /* *********************  FUNCTIONS SIGNATURES  *******************************/
 /* ****************************************************************************/
@@ -188,6 +195,7 @@ class _SegmentationState extends State<Segmentation> {
   /* **************************************************************************/
   /* *********************  Globals VARIABLE  *********************************/
   /* **************************************************************************/
+  //late TabController _tabController;
   var KEYS = classes.keys.toList();
   var VALUES = classes.values.toList();
   Map surfaceSaved = Map();
@@ -204,9 +212,12 @@ class _SegmentationState extends State<Segmentation> {
   List<List<int>> minMax = [];
   int _selectedClass = 0;
 
+  Food finalMeal = Food(nameFood: "");
+
   @override
   void initState() {
     super.initState();
+    // tabController = TabController(vsync: this, length: tabController.length);
     loadModel().then((value) {
       setState(() {});
     });
@@ -608,16 +619,15 @@ class _SegmentationState extends State<Segmentation> {
 
   //keyvalue[0] = foodNAme
   //keyvalue[1] = volum in cm3
-  void addElementToDatabaseAfterVolume(List<Food> allIngredient) {
-    Food myMeal = computeMealStats(allIngredient);
-    print("deuxieme test :");
-    String leresult = myMeal.toString();
+  void retrieveFinalMealIntoGlobalVar(List<Food> allIngredient) {
+    finalMeal = computeMealStats(allIngredient);
+    String leresult = finalMeal.toString();
     print(leresult);
-    DatabaseProvider.db.insert(myMeal).then(
-          (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-            AddFood(storedFood),
-          ),
-        );
+    // DatabaseProvider.db.insert(myMeal).then(
+    //       (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+    //         AddFood(storedFood),
+    //       ),
+    //     );
   }
 
   /* **************************************************************************/
@@ -735,7 +745,7 @@ class _SegmentationState extends State<Segmentation> {
     print("the final output");
     print(outputFinal);
     List<Food> allIngredientParsed = parseAllIngredients(outputFinal);
-    addElementToDatabaseAfterVolume(allIngredientParsed);
+    retrieveFinalMealIntoGlobalVar(allIngredientParsed);
     return ListView(children: chips);
   }
 
@@ -779,6 +789,7 @@ class _SegmentationState extends State<Segmentation> {
                     controller: widget.controller,
                     surfaces: surfaceSaved,
                     distances: _outputClassesDistance,
+                    //tabController: tabController,
                   ),
                 ),
               );
@@ -793,17 +804,53 @@ class _SegmentationState extends State<Segmentation> {
         : Container();
   }
 
+  Widget getDisplayValidateMenuButton() {
+    return ElevatedButton.icon(
+      icon: Icon(Icons.panorama_photosphere),
+      label: Text('Validate Menu'),
+      onPressed: () async {
+        await DatabaseProvider.db.insert(finalMeal).then(
+              (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+                AddFood(storedFood),
+              ),
+            );
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        Navigator.pop(
+            context, 'retour à prendre la photo de volume estimation');
+        Navigator.pop(
+            context, 'retour aux resultats de segmentation de limage');
+        Navigator.pop(context, 'retour à prendre la photo de limage');
+        //tabController.animateTo(4, curve: ElasticInCurve());
+        //await Navigator.popAndPushNamed(context, 'mealHistory');
+        // await Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => HistoryMeal(),
+        //   ),
+        // );
+      },
+      style: ElevatedButton.styleFrom(
+        shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(50.0),
+        ),
+        primary: Theme.of(context).primaryColor,
+      ),
+    );
+  }
+
   Widget helpMessageUtilisationSlider() {
     return Center(
-      child: Container(
-        padding: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          color: Theme.of(context).buttonColor,
-          borderRadius: BorderRadius.circular(50),
+      child: Column(children: [
+        Container(
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: Theme.of(context).buttonColor,
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: Text(
+              "Feel free to adjust the average thickness of each food item"),
         ),
-        child:
-            Text("Feel free to adjust the average thickness of each food item"),
-      ),
+        getDisplayValidateMenuButton()
+      ]),
     );
   }
 

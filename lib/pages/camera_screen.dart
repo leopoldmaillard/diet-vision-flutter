@@ -8,8 +8,9 @@ import 'package:transfer_learning_fruit_veggies/model/drink.dart';
 
 class CameraScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
-
+  //late TabController tabController;
   CameraScreen(this.cameras);
+  //CameraScreen(this.cameras, this.tabController);
 
   @override
   CameraScreenState createState() {
@@ -19,6 +20,8 @@ class CameraScreen extends StatefulWidget {
 
 class CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
+  //late TabController tabController;
+
   final picker = ImagePicker();
   bool isSamsung = false;
 /* ****************************************************************************/
@@ -75,6 +78,7 @@ class CameraScreenState extends State<CameraScreen> {
           volume: false,
           surfaces: new Map(),
           distances: new Map(),
+          //tabController: tabController,
         ),
       ),
     );
@@ -110,6 +114,7 @@ class CameraScreenState extends State<CameraScreen> {
         volume: false,
         surfaces: new Map(),
         distances: new Map(),
+        //tabController: tabController,
       ),
     );
   }

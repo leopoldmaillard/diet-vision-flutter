@@ -70,6 +70,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           //CameraScreen(),
           Geoloc(),
           HistoryMeal(),
+          // CameraScreen(widget.cameras, _tabController),
           CameraScreen(widget.cameras),
           Statistics(),
           Profile(),

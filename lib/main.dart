@@ -5,6 +5,7 @@ import 'package:transfer_learning_fruit_veggies/home.dart';
 
 import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
     return BlocProvider<FoodBloc>(
       create: (context) => FoodBloc(),
       child: MaterialApp(
+        routes: {
+          'mealHistory': (context) => HistoryMeal(),
+        },
         title: "DietVision",
         theme: new ThemeData(
           primaryColor: new Color(0xff8C33FF),

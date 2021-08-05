@@ -21,7 +21,7 @@ class Food {
 
     /// do not remove this line becasue the database cant autoincrement if
     /// we store it at 0
-    map[DatabaseProvider.COLUMN_ID] = id;
+    //map[DatabaseProvider.COLUMN_ID] = id;
     map[DatabaseProvider.COLUMN_NUTRISCORE] = nutriscore;
     map[DatabaseProvider.COLUMN_MASS] = mass;
     map[DatabaseProvider.COLUMN_KAL] = kal;
@@ -35,7 +35,7 @@ class Food {
   }
 
   Food.fromMap(Map<String, dynamic> map) {
-    id = map[DatabaseProvider.COLUMN_ID];
+    //id = map[DatabaseProvider.COLUMN_ID]; soucis pour insert dans la bdd sinn
     nameFood = map[DatabaseProvider.COLUMN_NAMEFOOD];
     volEstim = map[DatabaseProvider.COLUMN_VOLESTIM];
     volumicMass = map[DatabaseProvider.COLUMN_VOLUMICMASS];
