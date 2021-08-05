@@ -35,7 +35,7 @@ class Food {
   }
 
   Food.fromMap(Map<String, dynamic> map) {
-    id = map[DatabaseProvider.COLUMN_ID]; //soucis pour insert dans la bdd sinn
+    id = map[DatabaseProvider.COLUMN_ID];
     nameFood = map[DatabaseProvider.COLUMN_NAMEFOOD];
     volEstim = map[DatabaseProvider.COLUMN_VOLESTIM];
     volumicMass = map[DatabaseProvider.COLUMN_VOLUMICMASS];
