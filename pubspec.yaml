@@ -43,6 +43,7 @@ dependencies:
   geolocator: ^6.2.1
   geocoder: ^0.2.1
   flutter_bloc: ^7.0.1
+  shared_preferences: ^2.0.6
 
 dev_dependencies:
   flutter_test:

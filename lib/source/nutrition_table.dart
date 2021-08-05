@@ -6,6 +6,7 @@
 id, name, quantity(100ml), cal(cal/100ml), masse volumique: mv (g/ml) [1 cm^3 = 1 ml]
 */
 List<Map> drinkNutritionJson = [
+
   {"id": '1', "name": "Coffee", "quantity": "100", "cal": "1", "mv": "1"},
   {"id": '2', "name": "Coke", "quantity": "100", "cal": "42", "mv": "1.02"},
   {"id": '3', "name": "IcedTea", "quantity": "100", "cal": "27", "mv": "1.03"},
