@@ -205,6 +205,7 @@ class _SegmentationState extends State<Segmentation> {
   Map _outputClassesDistance = Map();
   List<List<int>> minMax = [];
   int _selectedClass = 0;
+  Food finalMeal = Food(nameFood: "");
 
   @override
   void initState() {
@@ -622,15 +623,8 @@ main() {
   //keyvalue[0] = foodNAme
   //keyvalue[1] = volum in cm3
   void addElementToDatabaseAfterVolume(List<Food> allIngredient) {
-    Food myMeal = computeMealStats(allIngredient);
-    print("deuxieme test :");
-    String leresult = myMeal.toString();
-    print(leresult);
-    DatabaseProvider.db.insert(myMeal).then(
-          (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-            AddFood(storedFood),
-          ),
-        );
+    finalMeal = computeMealStats(allIngredient);
+    String leresult = finalMeal.toString();
   }
 
   /* **************************************************************************/
@@ -806,6 +800,39 @@ main() {
         : Container();
   }
 
+  Widget getDisplayValidateMenuButton() {
+    return ElevatedButton.icon(
+      icon: Icon(Icons.panorama_photosphere),
+      label: Text('Validate Menu'),
+      onPressed: () async {
+        await DatabaseProvider.db.insert(finalMeal).then(
+              (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+                AddFood(storedFood),
+              ),
+            );
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        Navigator.pop(
+            context, 'retour à prendre la photo de volume estimation');
+        Navigator.pop(
+            context, 'retour aux resultats de segmentation de limage');
+        Navigator.pop(context, 'retour à prendre la photo de limage');
+        //tabController.animateTo(4, curve: ElasticInCurve());
+        //await Navigator.popAndPushNamed(context, 'mealHistory');
+        // await Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => HistoryMeal(),
+        //   ),
+        // );
+      },
+      style: ElevatedButton.styleFrom(
+        shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(50.0),
+        ),
+        primary: Theme.of(context).primaryColor,
+      ),
+    );
+  }
+
   Widget helpMessageUtilisationSlider() {
     return Center(
       child: Container(
@@ -814,8 +841,7 @@ main() {
           color: Theme.of(context).buttonColor,
           borderRadius: BorderRadius.circular(50),
         ),
-        child:
-            Text("Feel free to adjust the average thickness of each food item"),
+        child: getDisplayValidateMenuButton(),
       ),
     );
   }
