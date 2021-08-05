@@ -22,6 +22,7 @@ class CameraScreenState extends State<CameraScreen> {
   late CameraController controller;
   final picker = ImagePicker();
   bool isSamsung = false;
+  String selectedCoin = "";
 /* ****************************************************************************/
 /* *********************  FUNCTIONS SIGNATURES  *******************************/
 /* ****************************************************************************/
@@ -49,7 +50,9 @@ class CameraScreenState extends State<CameraScreen> {
       if (!mounted) {
         return;
       }
-      setState(() {});
+      setState(() {
+        getSelectedCoin();
+      });
     });
   }
 
@@ -58,6 +61,11 @@ class CameraScreenState extends State<CameraScreen> {
     print("Camera 1 is disposed");
     controller.dispose();
     super.dispose();
+  }
+
+  void getSelectedCoin() async {
+    final prefs = await SharedPreferences.getInstance();
+    selectedCoin = prefs.getString("selectedCoin")!;
   }
 
   /* **************************************************************************/
@@ -121,10 +129,19 @@ class CameraScreenState extends State<CameraScreen> {
 
   Widget instructionToTakePictureOfMeal() {
     return Container(
-      child: Text(
-        "🍽️ Center your meal & put the fiducial marker in the area 🍽️",
-        textAlign: TextAlign.center,
+      child: RichText(
+        text: TextSpan(
+          style: DefaultTextStyle.of(context).style,
+          children: <TextSpan>[
+            TextSpan(text: "🍽️ Center your meal & put a "),
+            TextSpan(
+                text: selectedCoin,
+                style: TextStyle(color: Theme.of(context).primaryColor)),
+            TextSpan(text: " coin in the area 🍽️")
+          ],
+        ),
       ),
+      //textAlign: TextAlign.center,
     );
   }
 
