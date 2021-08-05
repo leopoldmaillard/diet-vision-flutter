@@ -36,7 +36,7 @@ class DatabaseProvider {
 
     if (_database != null) {
       print("database already created and returned");
-      // print(_database.toString());
+      print(_database.toString());
       return _database!;
     }
 
@@ -60,14 +60,14 @@ class DatabaseProvider {
           "$COLUMN_ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
           "$COLUMN_NAMEFOOD TEXT,"
           "$COLUMN_VOLESTIM INTEGER,"
-          "$COLUMN_VOLUMICMASS INTEGER,"
+          "$COLUMN_VOLUMICMASS REAL,"
           "$COLUMN_NUTRISCORE TEXT,"
-          "$COLUMN_MASS INTEGER,"
-          "$COLUMN_KAL INTEGER,"
-          "$COLUMN_PROTEIN INTEGER,"
-          "$COLUMN_CARBOHYDRATES INTEGER,"
-          "$COLUMN_SUGAR INTEGER,"
-          "$COLUMN_FAT INTEGER"
+          "$COLUMN_MASS REAL,"
+          "$COLUMN_KAL REAL,"
+          "$COLUMN_PROTEIN REAL,"
+          "$COLUMN_CARBOHYDRATES REAL,"
+          "$COLUMN_SUGAR REAL,"
+          "$COLUMN_FAT REAL"
           ")",
         );
         print("Food table created");

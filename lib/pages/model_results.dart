@@ -205,6 +205,7 @@ class _SegmentationState extends State<Segmentation> {
   Map _outputClassesDistance = Map();
   List<List<int>> minMax = [];
   int _selectedClass = 0;
+  Food finalMeal = Food(nameFood: "");
 
   @override
   void initState() {
@@ -622,15 +623,8 @@ main() {
   //keyvalue[0] = foodNAme
   //keyvalue[1] = volum in cm3
   void addElementToDatabaseAfterVolume(List<Food> allIngredient) {
-    Food myMeal = computeMealStats(allIngredient);
-    print("deuxieme test :");
-    String leresult = myMeal.toString();
-    print(leresult);
-    DatabaseProvider.db.insert(myMeal).then(
-          (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-            AddFood(storedFood),
-          ),
-        );
+    finalMeal = computeMealStats(allIngredient);
+    String leresult = finalMeal.toString();
   }
 
   /* **************************************************************************/
@@ -734,16 +728,13 @@ main() {
       item = widSurfKey.indexOf(widSurfKey[i]);
       surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
       volume = (thickness * surf).round();
-      // print("volumeList displayed");
-      // print(index);
-      // print(item);
-      // print(volume);
-      // print(widSurfKey[i]);
       //widSurfkey[i] cest le nameFood
       //index cest l'indice de la classe dans la variable globale
       outputFinal[widSurfKey[i].toString()] = volume;
-      chips.add(
-          displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
+      if (index != 0 && index != 24 && index != 23) {
+        chips.add(
+            displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
+      }
     }
     print("the final output");
     print(outputFinal);
@@ -806,6 +797,39 @@ main() {
         : Container();
   }
 
+  Widget getDisplayValidateMenuButton() {
+    return ElevatedButton.icon(
+      icon: Icon(Icons.panorama_photosphere),
+      label: Text('Validate Menu'),
+      onPressed: () async {
+        await DatabaseProvider.db.insert(finalMeal).then(
+              (storedFood) => BlocProvider.of<FoodBloc>(context).add(
+                AddFood(storedFood),
+              ),
+            );
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        Navigator.pop(
+            context, 'retour à prendre la photo de volume estimation');
+        Navigator.pop(
+            context, 'retour aux resultats de segmentation de limage');
+        Navigator.pop(context, 'retour à prendre la photo de limage');
+        //tabController.animateTo(4, curve: ElasticInCurve());
+        //await Navigator.popAndPushNamed(context, 'mealHistory');
+        // await Navigator.of(context).push(
+        //   MaterialPageRoute(
+        //     builder: (context) => HistoryMeal(),
+        //   ),
+        // );
+      },
+      style: ElevatedButton.styleFrom(
+        shape: new RoundedRectangleBorder(
+          borderRadius: new BorderRadius.circular(50.0),
+        ),
+        primary: Theme.of(context).primaryColor,
+      ),
+    );
+  }
+
   Widget helpMessageUtilisationSlider() {
     return Center(
       child: Container(
@@ -814,8 +838,7 @@ main() {
           color: Theme.of(context).buttonColor,
           borderRadius: BorderRadius.circular(50),
         ),
-        child:
-            Text("Feel free to adjust the average thickness of each food item"),
+        child: getDisplayValidateMenuButton(),
       ),
     );
   }
@@ -880,7 +903,12 @@ main() {
             int index = categories.indexOf(e.key);
             int color = pascalVOCLabelColors[index];
             surfaceSaved[e.key] = surface;
-            return displaySurfaceInfo(percent, surface, color, e);
+            if (e.key == 'Background 🏞️' ||
+                e.key == 'Food Containers 🍽️' ||
+                e.key == 'Dining Tools 🍴') {
+              return Container();
+            } else
+              return displaySurfaceInfo(percent, surface, color, e);
           } else {
             return Container();
           }
