@@ -1013,8 +1013,10 @@ main() {
                 avatar: Icon(Icons.delete),
                 onPressed: () {
                   setState(() {
-                    surfaceSaved.remove("Soups/stews 🥣");
-                    print(surfaceSaved);
+                    String elem = surfaceSaved.keys.elementAt(_selectedClass);
+                    _outputClasses.remove(elem);
+                    surfaceSaved.remove(elem);
+                    print(_outputClasses);
                   });
                 },
               ),
