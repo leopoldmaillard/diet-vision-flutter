@@ -995,7 +995,7 @@ main() {
           child: displaySurfaceOrVolume(widget.volume, categories),
         ),
         displaySlider(widget.volume),
-        dislayEditButtons(widget.volume),
+        _selectedClass != -1 ? dislayEditButtons(widget.volume) : Container(),
         displayGetVolumeEstimationButton(widget.volume),
         SizedBox(height: 25),
       ],
@@ -1008,23 +1008,46 @@ main() {
         : Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ActionChip(
-                label: Text('Delete'),
-                avatar: Icon(Icons.delete),
-                onPressed: () {
+              //ActionChip(
+              //  label: Text('Delete'),
+              //  avatar: Icon(Icons.delete),
+              //  onPressed: () {
+              //    setState(() {
+              //      String elem = surfaceSaved.keys.elementAt(_selectedClass);
+              //      _outputClasses.remove(elem);
+              //      surfaceSaved.remove(elem);
+              //      print(_outputClasses);
+              //    });
+              //  },
+              //),
+              SizedBox(width: 15.0),
+              DropdownButton<String>(
+                value: surfaceSaved.keys.elementAt(_selectedClass),
+                icon: const Icon(Icons.edit),
+                onChanged: (String? newValue) {
                   setState(() {
+                    // seems that we are obliged to create a new map
+                    Map newMap = {};
                     String elem = surfaceSaved.keys.elementAt(_selectedClass);
-                    _outputClasses.remove(elem);
-                    surfaceSaved.remove(elem);
-                    print(_outputClasses);
+                    _outputClasses.forEach((key, value) {
+                      if (key == elem) {
+                        newMap[newValue!] = value;
+                      } else {
+                        newMap[key] = value;
+                      }
+                    });
+                    print("AVANT ça : " + _outputClasses.toString());
+                    _outputClasses = newMap;
+                    print("TEMA ça : " + _outputClasses.toString());
                   });
                 },
-              ),
-              SizedBox(width: 15.0),
-              ActionChip(
-                label: Text('Edit'),
-                avatar: Icon(Icons.edit),
-                onPressed: () {},
+                items:
+                    this.VALUES.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               )
             ],
           );
