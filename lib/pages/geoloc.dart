@@ -27,7 +27,7 @@ class GeolocState extends State<Geoloc> {
   var locationMessage = '';
   late Address userAddress;
   String country = '';
-
+  String country2 = '';
   // obtain the address from coordinates
   /*Position _position = new Position(
       longitude: 0.0,
@@ -97,7 +97,7 @@ class GeolocState extends State<Geoloc> {
 
   // France sud/Nord
   void getFrancePosition() async {
-    getCurrentLocation();
+    // getCurrentLocation();
     int lati = int.parse(latitude.split(".")[0]);
     int longi = int.parse(longitude.split(".")[0]);
     print(lati);
@@ -129,7 +129,7 @@ class GeolocState extends State<Geoloc> {
         SizedBox(
           height: 20,
         ),
-        Text("Ou alors: ${_address.addressLine ?? '-'}"),
+        Text("Ou alors: ${_address.addressLine}"),
       ],
     );
   }
@@ -137,6 +137,9 @@ class GeolocState extends State<Geoloc> {
   @override
   Widget build(BuildContext context) {
     getCurrentLocation();
+    // print('here the address of the user: ${_address.addressLine}');
+    // print('country: ${_address.countryName}');
+    // print('country avec la val globale: $country');
     return new Center(
       child: Column(
         children: [

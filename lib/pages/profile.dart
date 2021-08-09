@@ -36,6 +36,7 @@ class _ProfileState extends State<Profile> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       country = prefs.getString("country") ?? "France";
+      print('this is my country: $country');
       // return the coin type based on the country of the user
       // eg. "euro", "us_dollar" etc.
       currency = coinCountryJson

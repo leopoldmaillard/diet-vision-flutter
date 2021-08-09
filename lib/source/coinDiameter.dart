@@ -254,7 +254,7 @@ List<Map> coinCountryJson = [
 
   //dollar
   //American
-  {"id": '37', "coin": "american_dollar", "country": "Etats-Unis"},
+  {"id": '37', "coin": "american_dollar", "country": "États-Unis"},
   {"id": '38', "coin": "american_dollar", "country": "Porto_Rico"},
   {"id": '39', "coin": "american_dollar", "country": "El_Salvador"},
   {"id": '40', "coin": "american_dollar", "country": "Equateur"},
