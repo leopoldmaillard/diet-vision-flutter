@@ -13,6 +13,7 @@ class Food {
   double carbohydrates = 0;
   double sugar = 0;
   double fat = 0;
+  int dateSinceEpoch = 0;
 
   Food({required this.nameFood});
 
@@ -31,12 +32,13 @@ class Food {
     map[DatabaseProvider.COLUMN_FAT] = fat;
     map[DatabaseProvider.COLUMN_VOLESTIM] = volEstim;
     map[DatabaseProvider.COLUMN_VOLUMICMASS] = volumicMass;
+    map[DatabaseProvider.COLUMN_DATE] = dateSinceEpoch;
     return map;
   }
 
   Food.fromMap(Map<String, dynamic> map) {
     id = map[DatabaseProvider.COLUMN_ID];
-    nameFood = map[DatabaseProvider.COLUMN_NAMEFOOD];
+    nameFood = "Meal " + id.toString();
     volEstim = map[DatabaseProvider.COLUMN_VOLESTIM];
     volumicMass = map[DatabaseProvider.COLUMN_VOLUMICMASS];
     nutriscore = map[DatabaseProvider.COLUMN_NUTRISCORE];
@@ -46,6 +48,7 @@ class Food {
     carbohydrates = map[DatabaseProvider.COLUMN_CARBOHYDRATES];
     sugar = map[DatabaseProvider.COLUMN_SUGAR];
     fat = map[DatabaseProvider.COLUMN_FAT];
+    dateSinceEpoch = map[DatabaseProvider.COLUMN_DATE];
   }
 
   String toString() {
@@ -60,11 +63,36 @@ class Food {
         'carbohydrates : ' + this.carbohydrates.toString() + ' g' + '\n';
     String sugar = 'sugar : ' + this.sugar.toString() + ' g' + '\n';
     String fat = 'fat : ' + this.fat.toString() + ' g' + '\n';
+
+    String date = 'date : ' + datetoString() + '\n';
+    String hour = 'hour : ' + dateHourtoString() + '\n';
+    //full format date : date + hour
+    // String date = 'date : ' +
+    //     DateTime.fromMillisecondsSinceEpoch(dateSinceEpoch).toString() +
+    //     '\n';
+    //format in millisecond from epoch of the date
+    // String date = 'date:' + dateSinceEpoch.toString() + '\n';
     String finalString =
-        (kal + volEstim + protein + carbohydrates + sugar + fat);
+        (kal + volEstim + protein + carbohydrates + sugar + fat + date + hour);
     // pour moi pas de sens de mettre la masse volumique d'un repas
     // if (this.volumicMass != null) finalString += volumicMass;
     if (this.mass != null) finalString += mass;
     return finalString;
+  }
+
+  String datetoString() {
+    var mydate = DateTime.fromMillisecondsSinceEpoch(dateSinceEpoch);
+    String y = mydate.year.toString();
+    String m = mydate.month.toString();
+    String d = mydate.day.toString();
+    return "$y-$m-$d";
+  }
+
+  String dateHourtoString() {
+    var mydate = DateTime.fromMillisecondsSinceEpoch(dateSinceEpoch);
+    String h = mydate.hour.toString();
+    String m = mydate.minute.toString();
+    String s = mydate.second.toString();
+    return "$h:$m:$s";
   }
 }

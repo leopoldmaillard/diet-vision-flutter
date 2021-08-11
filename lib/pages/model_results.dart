@@ -582,7 +582,7 @@ class _SegmentationState extends State<Segmentation> {
 
   Food computeMealStats(List<Food> listAllIngredient) {
     Food mealResults = new Food(nameFood: "");
-    mealResults.nameFood = "Meal " + mealResults.id.toString();
+    //mealResults.nameFood = "Meal " + mealResults.id.toString();
     for (int i = 0; i < listAllIngredient.length; i++) {
       mealResults.volEstim += listAllIngredient[i].volEstim;
       //mealResults.mass = listAllIngredient[i].volEstim;
@@ -595,6 +595,9 @@ class _SegmentationState extends State<Segmentation> {
       mealResults.mass += listAllIngredient[i].mass;
       mealResults.volumicMass += listAllIngredient[i].volumicMass;
     }
+    var currentDate = new DateTime.now();
+    mealResults.dateSinceEpoch = currentDate.millisecondsSinceEpoch;
+
     return mealResults;
   }
 
@@ -603,27 +606,6 @@ class _SegmentationState extends State<Segmentation> {
     double mod = pow(10.0, places).toDouble();
     return ((value * mod).round().toDouble() / mod);
   }
-  /*
-  double roundDouble(double value, int places){ 
-   double mod = pow(10.0, places); 
-   return ((value * mod).round().toDouble() / mod); 
-}
-
-main() {
-  double num1 = roundDouble(12.3412, 2);
-  // 12.34*/
-
-  /// some function to change
-  // void addElementToDatabase(List keyValue) {
-  //   int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
-  //   String nameFood1 = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
-  //   Food food = parseFoodData(nameFood1, valuecm2);
-  //   DatabaseProvider.db.insert(food).then(
-  //         (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-  //           AddFood(storedFood),
-  //         ),
-  //       );
-  // }
 
   //keyvalue[0] = foodNAme
   //keyvalue[1] = volum in cm3
