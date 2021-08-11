@@ -1005,21 +1005,21 @@ main() {
   Widget dislayEditButtons(bool volume) {
     return volume
         ? Container()
-        : Row(
+        : Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              //ActionChip(
-              //  label: Text('Delete'),
-              //  avatar: Icon(Icons.delete),
-              //  onPressed: () {
-              //    setState(() {
-              //      String elem = surfaceSaved.keys.elementAt(_selectedClass);
-              //      _outputClasses.remove(elem);
-              //      surfaceSaved.remove(elem);
-              //      print(_outputClasses);
-              //    });
-              //  },
-              //),
+              ActionChip(
+                label: Text('Delete'),
+                avatar: Icon(Icons.delete),
+                onPressed: () {
+                  setState(() {
+                    String elem = surfaceSaved.keys.elementAt(_selectedClass);
+                    _outputClasses.remove(elem);
+                    surfaceSaved.remove(elem);
+                    print(_outputClasses);
+                  });
+                },
+              ),
               SizedBox(width: 15.0),
               DropdownButton<String>(
                 value: surfaceSaved.keys.elementAt(_selectedClass),
