@@ -44,6 +44,7 @@ dependencies:
   geocoder: ^0.2.1
   flutter_bloc: ^7.0.1
   shared_preferences: ^2.0.6
+  intl: ^0.16.1
 
 dev_dependencies:
   flutter_test:
