@@ -1,4 +1,11 @@
 import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
+import 'dart:math';
+
+// 2 significatif numbers after dots
+double roundDouble(double value, int places) {
+  double mod = pow(10.0, places).toDouble();
+  return ((value * mod).round().toDouble() / mod);
+}
 
 class Food {
   // static int cpt = 0;
@@ -54,15 +61,21 @@ class Food {
   String toString() {
     // String nameFood = 'nameFood : ' + this.nameFood + '\n';
     String volEstim = 'Volume : ' + this.volEstim.toString() + ' cm³' + '\n';
-    String volumicMass =
-        'Volumic mass : ' + (this.volumicMass).toString() + ' g\n';
-    String mass = 'mass food : ' + this.mass.toString() + ' g\n';
-    String kal = this.kal.toString() + ' kcal\n';
-    String protein = 'protein : ' + this.protein.toString() + ' g' + '\n';
-    String carbohydrates =
-        'carbohydrates : ' + this.carbohydrates.toString() + ' g' + '\n';
-    String sugar = 'sugar : ' + this.sugar.toString() + ' g' + '\n';
-    String fat = 'fat : ' + this.fat.toString() + ' g' + '\n';
+    String volumicMass = 'Volumic mass : ' +
+        (roundDouble(this.volumicMass, 2)).toString() +
+        ' g\n';
+    String mass =
+        'mass food : ' + roundDouble(this.mass, 2).toString() + ' g\n';
+    String kal = roundDouble(this.kal, 2).toString() + ' kcal\n';
+    String protein =
+        'protein : ' + roundDouble(this.protein, 2).toString() + ' g' + '\n';
+    String carbohydrates = 'carbohydrates : ' +
+        roundDouble(this.carbohydrates, 2).toString() +
+        ' g' +
+        '\n';
+    String sugar =
+        'sugar : ' + roundDouble(this.sugar, 2).toString() + ' g' + '\n';
+    String fat = 'fat : ' + roundDouble(this.fat, 2).toString() + ' g' + '\n';
 
     String date = 'date : ' + datetoString() + '\n';
     String hour = 'hour : ' + dateHourtoString() + '\n';
