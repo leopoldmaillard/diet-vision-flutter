@@ -214,64 +214,140 @@ List<Map> coinDiameterJson = [
 
 List<Map> coinCountryJson = [
   // Europe
-  {"id": '1', "coin": "euro", "country": "Allemagne"},
-  {"id": '2', "coin": "euro", "country": "Andorre"},
-  {"id": '3', "coin": "euro", "country": "Autriche"},
-  {"id": '4', "coin": "euro", "country": "Belgique"},
-  {"id": '5', "coin": "euro", "country": "Chypre"},
-  {"id": '6', "coin": "euro", "country": "Espagne"},
-  {"id": '7', "coin": "euro", "country": "Estonie"},
-  {"id": '8', "coin": "euro", "country": "Finlande"},
-  {"id": '9', "coin": "euro", "country": "France"},
-  {"id": '10', "coin": "euro", "country": "Grèce"},
-  {"id": '11', "coin": "euro", "country": "Irlande"},
-  {"id": '12', "coin": "euro", "country": "Italie"},
-  {"id": '13', "coin": "euro", "country": "Kosovo"},
-  {"id": '14', "coin": "euro", "country": "Lettonie"},
-  {"id": '15', "coin": "euro", "country": "Lituanie"},
-  {"id": '16', "coin": "euro", "country": "Luxembourg"},
-  {"id": '17', "coin": "euro", "country": "Malte"},
-  {"id": '18', "coin": "euro", "country": "Monaco"},
-  {"id": '19', "coin": "euro", "country": "Monténégro"},
-  {"id": '20', "coin": "euro", "country": "Pays-Bas"},
-  {"id": '21', "coin": "euro", "country": "Portugal"},
-  {"id": '22', "coin": "euro", "country": "Saint-Martin"},
-  {"id": '23', "coin": "euro", "country": "Slovaquie"},
-  {"id": '24', "coin": "euro", "country": "Slovénie"},
-  {"id": '25', "coin": "euro", "country": "Vatican"},
+  {"id": '1', "coin": "euro", "country": "Germany", "code": "DE"},
+  {"id": '2', "coin": "euro", "country": "Andorra", "code": "AD"},
+  {"id": '3', "coin": "euro", "country": "Austria", "code": "AT"},
+  {"id": '4', "coin": "euro", "country": "Belgium", "code": "BE"},
+  {"id": '5', "coin": "euro", "country": "Cyprus", "code": "CY"},
+  {"id": '6', "coin": "euro", "country": "Spain", "code": "ES"},
+  {"id": '7', "coin": "euro", "country": "Estonia", "code": "EE"},
+  {"id": '8', "coin": "euro", "country": "Finland", "code": "FI"},
+  {"id": '9', "coin": "euro", "country": "France", "code": "FR"},
+  {"id": '10', "coin": "euro", "country": "Greece", "code": "GR"},
+  {"id": '11', "coin": "euro", "country": "Irelande", "code": "IE"},
+  {"id": '12', "coin": "euro", "country": "Italy", "code": "IT"},
+  {"id": '14', "coin": "euro", "country": "Letton", "code": "LV"},
+  {"id": '15', "coin": "euro", "country": "Lithuania", "code": "LT"},
+  {"id": '16', "coin": "euro", "country": "Luxembourg", "code": "LU"},
+  {"id": '17', "coin": "euro", "country": "Malta", "code": "MT"},
+  {"id": '18', "coin": "euro", "country": "Monaco", "code": "MC"},
+  {"id": '19', "coin": "euro", "country": "Montenegro", "code": "ME"},
+  {"id": '20', "coin": "euro", "country": "Netherlands", "code": "NL"},
+  {"id": '21', "coin": "euro", "country": "Portugal", "code": "PT"},
+  {"id": '22', "coin": "euro", "country": "Saint Martin", "code": "MF"},
+  {"id": '23', "coin": "euro", "country": "Slovakia", "code": "SK"},
+  {"id": '24', "coin": "euro", "country": "SlovéniA", "code": "SI"},
+  {"id": '25', "coin": "euro", "country": "Vatican", "code": "VA"},
   //Livre Sterling
-  {"id": '26', "coin": "livre_sterling", "country": "Royaume-Uni"},
-  {"id": '27', "coin": "livre_sterling", "country": "Angleterre"},
-  {"id": '28', "coin": "livre_sterling", "country": "Ecosse"},
-  {"id": '29', "coin": "livre_sterling", "country": "Jersey"},
-  {"id": '30', "coin": "livre_sterling", "country": "Gibraltar"},
-  {"id": '31', "coin": "livre_sterling", "country": "Pays_de_Galles"},
-  {"id": '32', "coin": "livre_sterling", "country": "Ile_de_Man"},
-  {"id": '33', "coin": "livre_sterling", "country": "Irlande_du_Nord"},
-  {"id": '34', "coin": "livre_sterling", "country": "Guernesey"},
-  {"id": '35', "coin": "livre_sterling", "country": "Georgie_Sud"},
-  {"id": '36', "coin": "livre_sterling", "country": "Sainte-Hélène"},
+  {
+    "id": '26',
+    "coin": "livre_sterling",
+    "country": "United Kingdom",
+    "code": "GB"
+  },
+  {"id": '27', "coin": "livre_sterling", "country": "England", "code": "ENG"},
+  {"id": '28', "coin": "livre_sterling", "country": "Scotland", "code": "SCT"},
+  {"id": '29', "coin": "livre_sterling", "country": "Jersey", "code": "JE"},
+  {"id": '30', "coin": "livre_sterling", "country": "Gibraltar", "code": "GI"},
+  {
+    "id": '31',
+    "coin": "livre_sterling",
+    "country": "Pays de Galles",
+    "code": "WAL"
+  },
+  {
+    "id": '32',
+    "coin": "livre_sterling",
+    "country": "Isle of Man",
+    "code": "IM"
+  },
+  {"id": '34', "coin": "livre_sterling", "country": "Guernsey", "code": "GG"},
+  {
+    "id": '35',
+    "coin": "livre_sterling",
+    "country": "Georgie South",
+    "code": "GE"
+  },
+  {
+    "id": '36',
+    "coin": "livre_sterling",
+    "country": "Saint Helena",
+    "code": "SH"
+  },
 
   //dollar
   //American
-  {"id": '37', "coin": "american_dollar", "country": "États-Unis"},
-  {"id": '38', "coin": "american_dollar", "country": "Porto_Rico"},
-  {"id": '39', "coin": "american_dollar", "country": "El_Salvador"},
-  {"id": '40', "coin": "american_dollar", "country": "Equateur"},
-  {"id": '41', "coin": "american_dollar", "country": "Iles_Turks_et_Caîques"},
-  {"id": '42', "coin": "american_dollar", "country": "Panama"},
-  {"id": '43', "coin": "american_dollar", "country": "Somalie"},
-  {"id": '44', "coin": "american_dollar", "country": "Zimbabwe"},
-  {"id": '45', "coin": "american_dollar", "country": "Guam"},
-  {"id": '46', "coin": "american_dollar", "country": "Iles_Vierges_Etats-Unis"},
-  {"id": '47', "coin": "american_dollar", "country": "Palaos"},
-  {"id": '48', "coin": "american_dollar", "country": "Iles_Marshall"},
-  {"id": '49', "coin": "american_dollar", "country": "Samoa_americaines"},
-  {"id": '50', "coin": "american_dollar", "country": "Micronésie"},
-  {"id": '51', "coin": "american_dollar", "country": "Iles_Mariannes_du_Nord"},
-  {"id": '52', "coin": "american_dollar", "country": "Pays-Bas_caribéens"},
-  {"id": '53', "coin": "american_dollar", "country": "Bonaire"},
-
+  {
+    "id": '37',
+    "coin": "american_dollar",
+    "country": "United States",
+    "code": "US"
+  },
+  {
+    "id": '38',
+    "coin": "american_dollar",
+    "country": "Puerto Rico",
+    "code": "PR"
+  },
+  {
+    "id": '39',
+    "coin": "american_dollar",
+    "country": "El Salvador",
+    "code": "SV"
+  },
+  {
+    "id": '40',
+    "coin": "american_dollar",
+    "country": "Equatorial Guinea",
+    "code": "GQ"
+  },
+  {
+    "id": '41',
+    "coin": "american_dollar",
+    "country": "Turks and Caicos Islands",
+    "code": "TC"
+  },
+  {"id": '42', "coin": "american_dollar", "country": "Panama", "code": "PA"},
+  {"id": '43', "coin": "american_dollar", "country": "Somalia", "code": "SO"},
+  {"id": '44', "coin": "american_dollar", "country": "Zimbabwe", "code": "ZW"},
+  {"id": '45', "coin": "american_dollar", "country": "Guam", "code": "GU"},
+  {
+    "id": '46',
+    "coin": "american_dollar",
+    "country": "Virgin Islands, U.S.",
+    "code": "VI"
+  },
+  {"id": '47', "coin": "american_dollar", "country": "Palau", "code": "PW"},
+  {
+    "id": '48',
+    "coin": "american_dollar",
+    "country": "Marshall Islands",
+    "code": "MH"
+  },
+  {
+    "id": '49',
+    "coin": "american_dollar",
+    "country": "AmericanSamoa",
+    "code": "AS"
+  },
+  {
+    "id": '50',
+    "coin": "american_dollar",
+    "country": "Micronesia, Federated States of Micronesia",
+    "code": "FM"
+  },
+  {
+    "id": '51',
+    "coin": "american_dollar",
+    "country": "Northern Mariana Islands",
+    "code": "MP"
+  },
+  {
+    "id": '52',
+    "coin": "american_dollar",
+    "country": "Caribbean Netherlands",
+    "code": "BQ"
+  },
   //Canadien
-  {"id": '54', "coin": "canadien_dollar", "country": "Canada"},
+  {"id": '54', "coin": "canadien_dollar", "country": "Canada", "code": "CA"},
 ];
