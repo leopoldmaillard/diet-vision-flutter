@@ -984,8 +984,12 @@ main() {
   }
 
   Widget dislayEditButtons(bool volume) {
+    var categories = classes.values.toList();
     var allClassesSet = Set.from(this.VALUES);
     var representedSet = Set.from(surfaceSaved.keys);
+    List<String> intersection =
+        List.from(allClassesSet.difference(representedSet));
+
     return volume
         ? Container()
         : Column(
@@ -999,6 +1003,7 @@ main() {
                     String elem = surfaceSaved.keys.elementAt(_selectedClass);
                     _outputClasses.remove(elem);
                     surfaceSaved.remove(elem);
+                    _selectedClass = -1;
                   });
                 },
               ),
@@ -1013,18 +1018,21 @@ main() {
                     String elem = surfaceSaved.keys.elementAt(_selectedClass);
                     surfaceSaved.forEach((key, value) {
                       if (key == elem) {
-                        newMap[newValue!] = value;
+                        newMap[newValue!] = [
+                          value[0],
+                          value[1],
+                          pascalVOCLabelColors[categories.indexOf(newValue)]
+                        ];
                       } else {
                         newMap[key] = value;
                       }
                     });
-                    print("AVANT ça : " + surfaceSaved.toString());
                     surfaceSaved = newMap;
-                    print("TEMA ça : " + surfaceSaved.toString());
                   });
                 },
-                items:
-                    this.VALUES.map<DropdownMenuItem<String>>((String value) {
+                items: (intersection +
+                        [surfaceSaved.keys.elementAt(_selectedClass)])
+                    .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
                     child: Text(value),
