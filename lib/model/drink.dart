@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
 
+enum drinkEnum {
+  EMPTY,
+  NODRINK,
+  SODA,
+  ICEDTEAD,
+  WATER,
+  JUICE,
+  BEER,
+  WINE,
+  WHISKEY,
+  COCKTAIL
+}
 //initial value for beverage button
 String dropdownValue = "1";
 /* Json Format variable for the drop down List button of beverage */
