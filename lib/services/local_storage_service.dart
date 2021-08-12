@@ -112,7 +112,7 @@ class DatabaseProvider {
 
   Future<List<Food>> get15minFoods() async {
     var currentDate = new DateTime.now().millisecondsSinceEpoch;
-    var dateLastWeek = currentDate - 42 * 60 * 1000;
+    var dateLastWeek = currentDate - 15 * 60 * 1000;
     final db = await database;
     var myquery = await db.rawQuery('SELECT * FROM ' +
         TABLE_FOOD +
@@ -146,16 +146,13 @@ class DatabaseProvider {
   Future<List<Food>> getTodayFoods() async {
     final db = await database;
     var currentMidnight = lastMidnight().millisecondsSinceEpoch;
-
     var myquery = await db.rawQuery('SELECT * FROM ' +
         TABLE_FOOD +
         ' WHERE ' +
         COLUMN_DATE +
         '>= ' +
         currentMidnight.toString());
-    print(myquery);
     List<Food> foodList = [];
-
     myquery.forEach((currentFood) {
       Food food = Food.fromMap(currentFood);
       foodList.add(food);
@@ -178,10 +175,7 @@ class DatabaseProvider {
 
     myquery.forEach((currentFood) {
       Food food = Food.fromMap(currentFood);
-      // if ((food.dateSinceEpoch <= currentDate) &&
-      //     (currentDate - food.dateSinceEpoch <= 7 * 24 * 3600 * 1000)) {
       foodList.add(food);
-      //}
     });
     return foodList;
   }
