@@ -287,9 +287,24 @@ class _SegmentationState extends State<Segmentation> {
       _outputClassesVolume = outputClassesVolume;
       _outputClassesDistance = outputClassesDistance;
       _outputClassesHeight = outputClassesHeight;
+
+      var categories = classes.values.toList();
+      _outputClasses.entries.forEach((e) {
+        int percent = ((e.value / OUTPUTSIZE) * 100).round();
+        if (percent > 1) {
+          int surface = (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
+          int index = categories.indexOf(e.key);
+          int color = pascalVOCLabelColors[index];
+
+          if (!(e.key == 'Background 🏞️' ||
+              e.key == 'Food Containers 🍽️' ||
+              e.key == 'Dining Tools 🍴')) {
+            surfaceSaved[e.key] = [surface, percent, color];
+          }
+        }
+      });
       _loading = false;
     });
-    // print(_outputClasses);
 
     // List keyValue = maxClasse();
     // addElementToDatabase(keyValue);
@@ -532,8 +547,6 @@ class _SegmentationState extends State<Segmentation> {
   //     }
   //   });
 
-  //   print(thekey);
-  //   print(thevalue);
   //   return [thekey, thevalue];
   // }
 
@@ -559,9 +572,6 @@ class _SegmentationState extends State<Segmentation> {
     Map<dynamic, dynamic> dataJson;
     dataJson =
         foodNutritionJson.firstWhere((element) => element["name"] == nameF);
-    print("the dataJson");
-    print(dataJson);
-    print(dataJson["vm"]);
 
     Random myrand = Random();
     food.volEstim = volume;
@@ -574,9 +584,7 @@ class _SegmentationState extends State<Segmentation> {
     food.protein = roundDouble(myrand.nextDouble() * 100, 2);
     food.sugar = roundDouble(myrand.nextDouble() * 25, 2);
     food.fat = roundDouble(myrand.nextDouble() * 30, 2);
-    print("Food element  parsed");
     String blabla = food.toString();
-    print(blabla);
     return food;
   }
 
@@ -702,9 +710,6 @@ main() {
     var categories = classes.values.toList();
     var mykeys = widget.distances.keys.toList();
     var dist = widget.distances.values.toList();
-    print("VOIIIICIIII LA DIST");
-    print(mykeys);
-    print(dist);
     double thickPixels, thickness, distCoinClass, thickPixelsReal;
     //idxClass: index in the outputClasses of the current classe
     //idxClassDIst: index in the widget.distance of the current classe
@@ -714,28 +719,21 @@ main() {
     // obtain the volume for each class segmented in the first/second picture
     for (int i = 0; i < minMax.length; i++) {
       thickPixels = (minMax[i][2].abs() - minMax[i][0].abs()).toDouble();
-      print(classVolumeName[i]);
       idxClass = categories
           .indexOf(classVolumeName[i]); // replace: classes.values.toList()
-      print(idxClass);
       idxClassDist =
           mykeys.indexOf(idxClass); // replace:widget.distances.keys.toList()
-      print(idxClassDist);
       distCoinClass = dist[idxClassDist]; // replace:widget.distances.values
-      print(distCoinClass);
 
       thickPixelsReal =
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
 
       color = pascalVOCLabelColors[idxClass];
-      print("the color :");
-      print(color);
+
       item = widSurfKey.indexOf(classVolumeName[i]);
-      print("the item");
-      print(item);
       if ((item >= 0) && (item <= 24)) {
-        surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
+        surf = widSurfVal[item][0]; //replace: widget.surfaces.values.toList();
         volume = (thickness * surf).round();
         //widSurfkey[i] cest le nameFood
         outputFinal[classVolumeName[i].toString()] = volume;
@@ -744,8 +742,6 @@ main() {
         }
       }
     }
-    print("the final output");
-    print(outputFinal);
     List<Food> allIngredientParsed = parseAllIngredients(outputFinal);
     addElementToDatabaseAfterVolume(allIngredientParsed);
     return ListView(children: chips);
@@ -815,7 +811,6 @@ main() {
                 AddFood(storedFood),
               ),
             );
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         Navigator.pop(
             context, 'retour à prendre la photo de volume estimation');
         Navigator.pop(
@@ -916,23 +911,9 @@ main() {
 
   ListView surfaceList(categories) {
     return ListView(
-      children: _outputClasses.entries.map(
+      children: surfaceSaved.entries.map(
         (e) {
-          int percent = ((e.value / OUTPUTSIZE) * 100).round();
-          if (percent > 1) {
-            int surface = (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
-            int index = categories.indexOf(e.key);
-            int color = pascalVOCLabelColors[index];
-            surfaceSaved[e.key] = surface;
-            if (e.key == 'Background 🏞️' ||
-                e.key == 'Food Containers 🍽️' ||
-                e.key == 'Dining Tools 🍴') {
-              return Container();
-            } else
-              return displaySurfaceInfo(percent, surface, color, e);
-          } else {
-            return Container();
-          }
+          return displaySurfaceInfo(e.value[1], e.value[0], e.value[2], e);
         },
       ).toList(),
     );
@@ -1003,6 +984,8 @@ main() {
   }
 
   Widget dislayEditButtons(bool volume) {
+    var allClassesSet = Set.from(this.VALUES);
+    var representedSet = Set.from(surfaceSaved.keys);
     return volume
         ? Container()
         : Column(
@@ -1016,7 +999,6 @@ main() {
                     String elem = surfaceSaved.keys.elementAt(_selectedClass);
                     _outputClasses.remove(elem);
                     surfaceSaved.remove(elem);
-                    print(_outputClasses);
                   });
                 },
               ),
@@ -1029,16 +1011,16 @@ main() {
                     // seems that we are obliged to create a new map
                     Map newMap = {};
                     String elem = surfaceSaved.keys.elementAt(_selectedClass);
-                    _outputClasses.forEach((key, value) {
+                    surfaceSaved.forEach((key, value) {
                       if (key == elem) {
                         newMap[newValue!] = value;
                       } else {
                         newMap[key] = value;
                       }
                     });
-                    print("AVANT ça : " + _outputClasses.toString());
-                    _outputClasses = newMap;
-                    print("TEMA ça : " + _outputClasses.toString());
+                    print("AVANT ça : " + surfaceSaved.toString());
+                    surfaceSaved = newMap;
+                    print("TEMA ça : " + surfaceSaved.toString());
                   });
                 },
                 items:
