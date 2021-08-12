@@ -28,6 +28,7 @@ class GeolocState extends State<Geoloc> {
   late Address userAddress;
   String country = '';
   String country2 = '';
+  String countryCode = '';
   // obtain the address from coordinates
   /*Position _position = new Position(
       longitude: 0.0,
@@ -78,12 +79,14 @@ class GeolocState extends State<Geoloc> {
     // create coordinates from lat and long
     final coordinates = new Coordinates(lat, long);
     convertCoordinatesToAddress(coordinates).then((value) {
+      countryCode = value.countryCode.toString();
+      print(countryCode);
       _address = value;
       country = value.countryName.toString();
     });
     //passing this to the lat/long variable (string)
     // country = _address.toString();
-    var a = longitude = "$long";
+    longitude = "$long";
     latitude = "$lat";
   }
 
