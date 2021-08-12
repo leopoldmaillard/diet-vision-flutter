@@ -565,15 +565,16 @@ class _SegmentationState extends State<Segmentation> {
 
     Random myrand = Random();
     food.volEstim = volume;
-    food.volumicMass = roundDouble((dataJson["vm"] * 100), 2);
-    food.mass = roundDouble(
-        ((food.volEstim.toDouble() * food.volumicMass) ~/ 100).toDouble(), 2);
+    food.volumicMass = dataJson["vm"];
+    food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
     food.nutriscore = dataJson["nutriscore"].toString();
     food.kal = roundDouble((dataJson["cal"] * food.mass / 100), 2);
-    food.carbohydrates = roundDouble(myrand.nextDouble() * 100, 2);
-    food.protein = roundDouble(myrand.nextDouble() * 100, 2);
-    food.sugar = roundDouble(myrand.nextDouble() * 25, 2);
-    food.fat = roundDouble(myrand.nextDouble() * 30, 2);
+    food.fat = roundDouble((dataJson["fat"] * food.mass / 100), 2);
+    food.protein = roundDouble((dataJson["protein"] * food.mass / 100), 2);
+    food.sugar = roundDouble((dataJson["sugar"] * food.mass / 100), 2);
+    food.carbohydrates =
+        roundDouble((dataJson["carbohydrates"] * food.mass / 100), 2);
+
     print("Food element  parsed");
     String blabla = food.toString();
     print(blabla);

@@ -1,12 +1,13 @@
-// 100 ml
-//ajout coffe and tea
-// density: g/ml
-
+/*
+Database for this JSON:
+https://docs.google.com/spreadsheets/d/1X1sPuft4cAvtiTXAFU1oabpTz5xuHhgKZi5MVBJw578/edit#gid=0
+also taken from 
+https://docs.google.com/spreadsheets/d/1snqE6leDkZlL61qQ4g-vUmiFjizJyN1OCVAhwWWKSm4/edit#gid=2024304766
+*/
 /*
 id, name, quantity(100ml), cal(cal/100ml), masse volumique: mv (g/ml) [1 cm^3 = 1 ml]
 */
 List<Map> drinkNutritionJson = [
-
   {"id": '1', "name": "Coffee", "quantity": "100", "cal": "1", "mv": "1"},
   {"id": '2', "name": "Coke", "quantity": "100", "cal": "42", "mv": "1.02"},
   {"id": '3', "name": "IcedTea", "quantity": "100", "cal": "27", "mv": "1.03"},
@@ -27,15 +28,22 @@ List<Map> foodNutritionJson = [
   {
     "id": '1',
     "name": 'Leafy Greens 🥬',
-    "cal": 20.0,
+    "cal": 21.0,
+    "fat": 0.2,
+    "protein": 1.2,
+    "carbohydrates": 4.42,
+    "sugar": 1.88,
     "nutriscore": "A",
-    "glucide": "N/A",
     "vm": 0.10
   },
   {
     "id": '2',
     "name": "Stem Vegetables 🥦",
-    "cal": 35.0,
+    "cal": 28.0,
+    "fat": 0.17,
+    "protein": 1.49,
+    "carbohydrates": 6.45,
+    "sugar": 1.88,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.60
@@ -43,7 +51,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '3',
     "name": "Non-starchy Roots 🍅",
-    "cal": 38.0,
+    "cal": 59,
+    "fat": 3,
+    "protein": 0.73,
+    "carbohydrates": 7.94,
+    "sugar": 3.33,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.60
@@ -51,7 +63,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '4',
     "name": "Vegetables | Other 🌽",
-    "cal": 25.0,
+    "cal": 18,
+    "fat": 0.11,
+    "protein": 0.95,
+    "carbohydrates": 3.99,
+    "sugar": 2.48,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.20
@@ -59,7 +75,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '5',
     "name": "Fruits 🍓",
-    "cal": 55.0,
+    "cal": 57,
+    "fat": 0.15,
+    "protein": 0.28,
+    "carbohydrates": 13.6,
+    "sugar": 10.04,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.25
@@ -67,7 +87,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '6',
     "name": "Protein | Meat 🥩",
-    "cal": 250.0,
+    "cal": 260,
+    "fat": 16.82,
+    "protein": 25.54,
+    "carbohydrates": 0,
+    "sugar": 0,
     "nutriscore": "D",
     "glucide": "N/A",
     "vm": 0.95
@@ -75,7 +99,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '7',
     "name": "Protein | Poultry 🍗",
-    "cal": 140.0,
+    "cal": 271,
+    "fat": 13.95,
+    "protein": 19.22,
+    "carbohydrates": 17.25,
+    "sugar": 0.4,
     "nutriscore": "C",
     "glucide": "N/A",
     "vm": 0.90
@@ -83,7 +111,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '8',
     "name": "Protein | Seafood 🐟",
-    "cal": 110.0,
+    "cal": 188,
+    "fat": 9.06,
+    "protein": 25.08,
+    "carbohydrates": 0.1,
+    "sugar": 0.04,
     "nutriscore": "B",
     "glucide": "N/A",
     "vm": 0.75
@@ -91,7 +123,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '9',
     "name": "Protein | Eggs 🍳",
-    "cal": 140.0,
+    "cal": 209,
+    "fat": 14.97,
+    "protein": 15.64,
+    "carbohydrates": 1.52,
+    "sugar": 1.06,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.6
@@ -100,23 +136,33 @@ List<Map> foodNutritionJson = [
   {
     "id": '10',
     "name": "Protein | Beans/nuts 🥜",
-    "cal": 630.0,
+    "cal": 605,
+    "fat": 53.62,
+    "protein": 19.59,
+    "carbohydrates": 21.04,
+    "sugar": 4.53,
     "nutriscore": "A",
-    "glucide": "N/A",
     "vm": 0.55
   },
   {
     "id": '11',
     "name": "Starches/grains | Baked Goods 🥐",
-    "cal": 280.0,
+    "cal": 270,
+    "fat": 3.42,
+    "protein": 8.62,
+    "carbohydrates": 50.09,
+    "sugar": 3.14,
     "nutriscore": "D",
-    "glucide": "N/A",
     "vm": 0.4
   },
   {
     "id": '12',
     "name": "Starches/grains | rice/grains/cereals 🍚",
-    "cal": 95.0,
+    "cal": 129,
+    "fat": 0.28,
+    "protein": 2.67,
+    "carbohydrates": 27.99,
+    "sugar": 0.05,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.7
@@ -124,7 +170,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '13',
     "name": "Starches/grains | Noodles/pasta 🍝",
-    "cal": 90.0,
+    "cal": 157,
+    "fat": 0.92,
+    "protein": 5.76,
+    "carbohydrates": 30.68,
+    "sugar": 0.56,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.56
@@ -132,7 +182,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '14',
     "name": "Starches/grains | Starchy Vegetables 🥔",
-    "cal": 350.0,
+    "cal": 113,
+    "fat": 4.22,
+    "protein": 1.86,
+    "carbohydrates": 16.81,
+    "sugar": 1.43,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.7
@@ -140,7 +194,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '15',
     "name": "Starches/grains | Other 🌾",
-    "cal": 95.0,
+    "cal": 113,
+    "fat": 4.22,
+    "protein": 1.86,
+    "carbohydrates": 16.81,
+    "sugar": 1.43,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.7
@@ -148,7 +206,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '16',
     "name": "Soups/stews 🥣",
-    "cal": 30.0,
+    "cal": 28,
+    "fat": 0.79,
+    "protein": 0.86,
+    "carbohydrates": 4.89,
+    "sugar": 1.57,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 1.0
@@ -156,7 +218,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '17',
     "name": "Herbs/spices 🌿",
-    "cal": 20.0,
+    "cal": 315,
+    "fat": 12.75,
+    "protein": 10.63,
+    "carbohydrates": 60.73,
+    "sugar": 1.71,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.30
@@ -164,7 +230,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '18',
     "name": "Dairy 🥛",
-    "cal": 330.0,
+    "cal": 334,
+    "fat": 27.68,
+    "protein": 20.75,
+    "carbohydrates": 0.45,
+    "sugar": 0.45,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.35
@@ -172,7 +242,11 @@ List<Map> foodNutritionJson = [
   {
     "id": '19',
     "name": "Snacks 🍫",
-    "cal": 560.0,
+    "cal": 515,
+    "fat": 25.91,
+    "protein": 1.34,
+    "carbohydrates": 69.23,
+    "sugar": 3.36,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.1
@@ -180,15 +254,23 @@ List<Map> foodNutritionJson = [
   {
     "id": '20',
     "name": "Sweets/desserts 🍰",
-    "cal": 400.0,
+    "cal": 401,
+    "fat": 16.95,
+    "protein": 2.94,
+    "carbohydrates": 63.55,
+    "sugar": 47.22,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 0.5
-  }, //on prendra aussi le donut ?
+  },
   {
     "id": '21',
     "name": "Beverages 🥤",
-    "cal": 0.0,
+    "cal": 48,
+    "fat": 0.12,
+    "protein": 0.68,
+    "carbohydrates": 11.45,
+    "sugar": 8.31,
     "nutriscore": "A",
     "glucide": "N/A",
     "vm": 1.0
@@ -196,12 +278,13 @@ List<Map> foodNutritionJson = [
   {
     "id": '22',
     "name": "Fats/oils/sauces 🥫",
-    "cal": 250.0,
-    "nutriscore": "D",
+    "cal": 688,
+    "fat": 77.8,
+    "protein": 0,
+    "carbohydrates": 0.3,
+    "sugar": 0.3,
+    "nutriscore": "Z",
     "glucide": "N/A",
     "vm": 0.8
   },
-
-  // {"id": '7', "name": "Seafood", "cal": "143000"}, //
-  //{"id": '8', "name": "Dairy", "cal": "129000"}, //
 ];
