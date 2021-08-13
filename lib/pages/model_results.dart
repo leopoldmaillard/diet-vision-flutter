@@ -18,7 +18,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transfer_learning_fruit_veggies/model/drink.dart';
-import 'dart:convert';
 
 //JSON
 import 'package:transfer_learning_fruit_veggies/source/nutrition_table.dart';
@@ -552,7 +551,12 @@ class _SegmentationState extends State<Segmentation> {
         listAllIngredient.add(parseFoodData(k, v));
       }
     });
-    listAllIngredient.add(parseDrinkData("Beverages 🥤"));
+    // String idButton;
+    // idButton = (int.parse(dropdownValue)).toString();
+    Map<dynamic, dynamic> dataJsonDrink;
+    dataJsonDrink =
+        myJson.firstWhere((element) => element["id"] == dropdownValue);
+    listAllIngredient.add(parseDrinkData(dataJsonDrink["name"]));
     return listAllIngredient;
   }
 
@@ -586,7 +590,7 @@ class _SegmentationState extends State<Segmentation> {
     Food food = new Food(nameFood: nameF);
     Map<dynamic, dynamic> dataJson;
     dataJson =
-        foodNutritionJson.firstWhere((element) => element["name"] == nameF);
+        drinkNutritionJson.firstWhere((element) => element["name"] == nameF);
     print("the dataJson");
     print(dataJson);
     print(dataJson["vm"]);
