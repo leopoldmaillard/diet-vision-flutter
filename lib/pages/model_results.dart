@@ -891,11 +891,7 @@ main() {
   ActionChip displaySurfaceInfo(percent, surface, color, e) {
     int i = surfaceSaved.keys.toList().indexOf(e.key);
     return ActionChip(
-      onPressed: () {
-        setState(() {
-          _selectedClass = i;
-        });
-      },
+      onPressed: () {},
       shape: StadiumBorder(
         side: BorderSide(
           color: i == _selectedClass
@@ -983,8 +979,8 @@ main() {
         Expanded(
           child: displaySurfaceOrVolume(widget.volume, categories),
         ),
-        displaySlider(widget.volume),
         _selectedClass != -1 ? dislayEditButtons(widget.volume) : Container(),
+        displaySlider(widget.volume),
         displayGetVolumeEstimationButton(widget.volume),
         SizedBox(height: 25),
       ],
