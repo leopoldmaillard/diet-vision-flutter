@@ -198,6 +198,7 @@ class _SegmentationState extends State<Segmentation> {
   var _outputPNG; // Mask
   var _outputRAW; // classic picture taken
   Map _outputClasses = Map();
+  Map classVolumeDistance = Map();
 
   List<List<List<int>>> _outputClassesVolume = [];
   List<List<List<int>>> _outputClassesSurface = [];
@@ -289,20 +290,32 @@ class _SegmentationState extends State<Segmentation> {
       _outputClassesHeight = outputClassesHeight;
 
       var categories = classes.values.toList();
-      _outputClasses.entries.forEach((e) {
-        int percent = ((e.value / OUTPUTSIZE) * 100).round();
-        if (percent > 1) {
-          int surface = (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
-          int index = categories.indexOf(e.key);
-          int color = pascalVOCLabelColors[index];
+      if (!widget.volume) {
+        _outputClasses.entries.forEach((e) {
+          int percent = ((e.value / OUTPUTSIZE) * 100).round();
+          if (percent > 1) {
+            int surface = (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
+            int index = categories.indexOf(e.key);
+            int color = pascalVOCLabelColors[index];
 
-          if (!(e.key == 'Background 🏞️' ||
-              e.key == 'Food Containers 🍽️' ||
-              e.key == 'Dining Tools 🍴')) {
-            surfaceSaved[e.key] = [surface, percent, color];
+            if (!(e.key == 'Background 🏞️' ||
+                e.key == 'Food Containers 🍽️' ||
+                e.key == 'Dining Tools 🍴')) {
+              surfaceSaved[e.key] = [surface, percent, color];
+            }
           }
-        }
+        });
+      } else
+        surfaceSaved = widget.surfaces;
+
+      classVolumeName.forEach((element) {
+        classVolumeDistance[element] = [
+          widget.distances[VALUES.indexOf(element)], // distance
+          surfaceSaved[element][0]
+        ];
       });
+      print(surfaceSaved);
+      print(classVolumeDistance);
       _loading = false;
     });
 
@@ -706,24 +719,20 @@ main() {
     Map outputFinal = Map(); // ['nameclass', volumeincm3, .....]
     List<dynamic> widSurfKey = widget.surfaces.keys.toList();
     List<dynamic> widSurfVal = widget.surfaces.values.toList();
-    final chips = <Widget>[];
     var categories = classes.values.toList();
     var mykeys = widget.distances.keys.toList();
     var dist = widget.distances.values.toList();
     double thickPixels, thickness, distCoinClass, thickPixelsReal;
-    //idxClass: index in the outputClasses of the current classe
-    //idxClassDIst: index in the widget.distance of the current classe
     int idxClass, idxClassDist; //, index, color, item, surf, volume;
-
     int index, color, item, surf = 0, volume;
-    // obtain the volume for each class segmented in the first/second picture
-    for (int i = 0; i < minMax.length; i++) {
+
+    Widget hey = ListView(
+        children: classVolumeDistance.entries.map((e) {
+      int i = classVolumeDistance.keys.toList().indexOf(e.key);
       thickPixels = (minMax[i][2].abs() - minMax[i][0].abs()).toDouble();
-      idxClass = categories
-          .indexOf(classVolumeName[i]); // replace: classes.values.toList()
-      idxClassDist =
-          mykeys.indexOf(idxClass); // replace:widget.distances.keys.toList()
-      distCoinClass = dist[idxClassDist]; // replace:widget.distances.values
+      idxClass = categories.indexOf(e.key); // replace: classes.values.toList()
+
+      distCoinClass = e.value[0]; // replace:widget.distances.values
 
       thickPixelsReal =
           getPixelConsideringPerspective(thickPixels, distCoinClass);
@@ -731,23 +740,22 @@ main() {
 
       color = pascalVOCLabelColors[idxClass];
 
-      item = widSurfKey.indexOf(classVolumeName[i]);
-      if ((item >= 0) && (item <= 24)) {
-        surf = widSurfVal[item][0]; //replace: widget.surfaces.values.toList();
-        volume = (thickness * surf).round();
-        //widSurfkey[i] cest le nameFood
-        outputFinal[classVolumeName[i].toString()] = volume;
-        if (idxClass != 0 && idxClass != 24 && idxClass != 23) {
-          chips.add(displayVolumeInfo(color, widSurfKey, thickness, volume, i));
-        }
-      }
-    }
+      item = widSurfKey.indexOf(e.key);
+
+      surf = e.value[1]; //replace: widget.surfaces.values.toList();
+      volume = (thickness * surf).round();
+      //widSurfkey[i] cest le nameFood
+      outputFinal[e.key] = volume;
+
+      return displayVolumeInfo(color, thickness, volume, i);
+    }).toList());
     List<Food> allIngredientParsed = parseAllIngredients(outputFinal);
     addElementToDatabaseAfterVolume(allIngredientParsed);
-    return ListView(children: chips);
+
+    return hey;
   }
 
-  ActionChip displayVolumeInfo(color, widSurfKey, thickness, volume, i) {
+  ActionChip displayVolumeInfo(color, thickness, volume, i) {
     return ActionChip(
       onPressed: () {
         setState(() {
@@ -764,7 +772,7 @@ main() {
         ),
       ),
       label: Text(
-        classVolumeName[i] +
+        classVolumeDistance.keys.elementAt(i) +
             '   ' +
             thickness.toStringAsFixed(1) +
             'cm | Vol. ' +
@@ -986,11 +994,11 @@ main() {
   Widget dislayEditButtons(bool volume) {
     var categories = classes.values.toList();
     var allClassesSet = Set.from(this.VALUES);
-    var representedSet = Set.from(surfaceSaved.keys);
+    var representedSet = Set.from(classVolumeDistance.keys);
     List<String> intersection =
         List.from(allClassesSet.difference(representedSet));
 
-    return volume
+    return !volume
         ? Container()
         : Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1000,38 +1008,36 @@ main() {
                 avatar: Icon(Icons.delete),
                 onPressed: () {
                   setState(() {
-                    String elem = surfaceSaved.keys.elementAt(_selectedClass);
-                    _outputClasses.remove(elem);
-                    surfaceSaved.remove(elem);
+                    String elem =
+                        classVolumeDistance.keys.elementAt(_selectedClass);
+                    classVolumeDistance.remove(elem);
+                    //surfaceSaved.remove(elem);
                     _selectedClass = -1;
                   });
                 },
               ),
               SizedBox(width: 15.0),
               DropdownButton<String>(
-                value: surfaceSaved.keys.elementAt(_selectedClass),
+                value: classVolumeDistance.keys.elementAt(_selectedClass),
                 icon: const Icon(Icons.edit),
                 onChanged: (String? newValue) {
                   setState(() {
                     // seems that we are obliged to create a new map
-                    Map newMap = {};
-                    String elem = surfaceSaved.keys.elementAt(_selectedClass);
-                    surfaceSaved.forEach((key, value) {
+                    Map newMap = Map();
+                    String elem =
+                        classVolumeDistance.keys.elementAt(_selectedClass);
+                    classVolumeDistance.forEach((key, value) {
                       if (key == elem) {
-                        newMap[newValue!] = [
-                          value[0],
-                          value[1],
-                          pascalVOCLabelColors[categories.indexOf(newValue)]
-                        ];
+                        newMap[newValue!] = value;
                       } else {
                         newMap[key] = value;
                       }
                     });
-                    surfaceSaved = newMap;
+                    classVolumeDistance = newMap;
                   });
                 },
                 items: (intersection +
-                        [surfaceSaved.keys.elementAt(_selectedClass)])
+                        [classVolumeDistance.keys.elementAt(_selectedClass)])
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
