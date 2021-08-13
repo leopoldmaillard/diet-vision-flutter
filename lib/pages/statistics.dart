@@ -1,4 +1,5 @@
-import 'dart:math';
+//import 'dart:html';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:quiver/core.dart';
@@ -21,55 +22,34 @@ class _StatisticsState extends State<Statistics> {
   double maxValue = 0;
   bool showAvg = false;
 
-  // get AVG
-  LineChartBarData curve = new LineChartBarData();
+  List<FlSpot> dataMean = [];
+
+  /* Data used for the display of statistics */
   //points to add on chart
   List<FlSpot> data = [];
-  List<FlSpot> dataMean = [];
-  //data for a mounth
-  List<double> dataCal = [];
   int tailleData = 366;
 
   //List Botton (week(0)/Month(1)/Year(2))
   int valueBotton = 0;
   List<String> titleButtonRadio = ['Week', 'Month', 'Year'];
   late LineChartData dataXTitle;
-
-  //Use of a Food list
-  List<Food> itemListDay = [];
-  // Food finalMeal = Food(nameFood: "");
-  // finalMeal.volEstim = 15;
+  bool Graphdisplayed = false;
 
   @override
   void initState() {
     super.initState();
-    for (int i = 0; i < tailleData; i++) {
-      addPoint(0.0);
-    }
-    //fillKCalData(dataCal);
-    fillLineChart();
     // day of the week: 1:monday,...7:sunday
     weekDay = _Today.weekday;
     maxValue = 2000;
-    //test food avg
-    //fillItemFood(itemListDay, 9);
-    //print('avg food item for a day is: ${getAvgFoodItem(itemListDay)}');
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    data = [];
-    dataCal = [];
-    itemListDay = [];
+    Graphdisplayed = false;
   }
 
 //get AVG from the data
-  double getAvg() {
+  double getAvg(List<FlSpot> dataPoints) {
     double mean = 0;
     int i = 0;
-    for (i = 0; i < data.length; i++) {
-      mean = mean + data[i].y;
+    for (i = 0; i < dataPoints.length; i++) {
+      mean = mean + dataPoints[i].y;
     }
     return mean / i;
   }
@@ -86,63 +66,39 @@ class _StatisticsState extends State<Statistics> {
   }
 
   /* -----------CREATE DATA TO DISPLAY----------------- */
-
-  //give a size and inster plot (i,0) , initialize/register data
-  void fillLineChart() {
-    var r = new Random();
-    for (int i = 0; i < tailleData; i++) {
-      if (data.length < 0) {
-        data.add(FlSpot(i.toDouble() + 1, 1000));
-      } else {
-        replaceLineSpot(data, i, r.nextDouble() * 2000);
-      }
+  //give a size and inster plot (i,kal) , initialize/register data
+  List<FlSpot> fillLineChartCal(List<Food> listFood) {
+    List<FlSpot> dataPoints = [];
+    for (int i = 0; i < listFood.length; i++) {
+      addPoint(dataPoints, listFood[i].kal, i + 1);
     }
-    dataMean = data;
+    return dataPoints;
+  }
+
+  //give a size and inster plot (i,meankal) , initialize/register mean data
+  List<FlSpot> fillMeanLineChartCal(List<Food> listFood) {
+    List<FlSpot> dataPoints = [];
+    for (int i = 0; i < listFood.length; i++) {
+      addPoint(dataPoints, getAvgFoodItem(listFood).toDouble(), i + 1);
+    }
+    return dataPoints;
   }
 
   //change the value at the index given
-  void replaceLineSpot(List<FlSpot> da, int index, double value) {
+  void replaceLineSpot(List<FlSpot> dataPoints, int index, double value) {
     double x;
-    x = da[index].x;
-    da[index] = FlSpot(x, value);
+    x = dataPoints[index].x;
+    dataPoints[index] = FlSpot(x, value);
   }
 
   //add a point in the list
-  void addPoint(double value) {
-    data.add(FlSpot(data.length.toDouble() + 1, value));
+  void addPoint(List<FlSpot> pointList, double value, int index) {
+    pointList.add(FlSpot(index.toDouble(), value));
   }
 
   //remove a point
-  void removePoint(int index) {
-    data.removeAt(index);
-  }
-
-  //add points (y) in the dataCalories
-  void fillKCalData(List<double> Calories) {
-    var rng = new Random();
-    double minVal = 200;
-    for (int i = 0; i < Calories.length; i++) {
-      Calories.add((rng.nextDouble() + 200) * (maxValue - minVal));
-    }
-  }
-
-//fill a list of Food for a day
-  void fillItemFood(List<Food> food, int taille) {
-    double kal = -1, protein = -1, carbohydrates = -1, sugar = -1, fat = -1;
-    var r = new Random();
-    for (int i = 0; i < taille; i++) {
-      kal = ((r.nextDouble()) * 200 + 10);
-      protein = ((r.nextDouble()) * 200 + 10);
-      carbohydrates = ((r.nextDouble()) * 200 + 10);
-      sugar = ((r.nextDouble()) * 200 + 10);
-      fat = ((r.nextDouble()) * 200 + 10);
-      Food myfood = Food(nameFood: 'numero $i');
-      myfood.id = i;
-      myfood.kal = kal;
-      myfood.protein = protein;
-      food.add(myfood);
-    }
-    print('voici la liste de food item: $food');
+  void removePoint(List<FlSpot> dataPoints, int index) {
+    dataPoints.removeAt(index);
   }
 
 /* ____________Widget Part________________*/
@@ -180,7 +136,7 @@ class _StatisticsState extends State<Statistics> {
   }
 
 // display radio Botton
-  Widget displayRadioButton() {
+  Widget displayRadioButton(List<Food> mylist) {
     List<Widget> radioButtonList = [];
     for (int i = 0; i < titleButtonRadio.length; i++) {
       radioButtonList.add(RadioListTile(
@@ -200,7 +156,7 @@ class _StatisticsState extends State<Statistics> {
   }
 
   //DISPLAY THE CHART WITH THE LINECHARTBAR
-  Widget DisplayChart() {
+  Widget DisplayChart(List<Food> mylist) {
     return AspectRatio(
       aspectRatio: 0.8, //1.70 (ratio graphic between height and width),
       child: Container(
@@ -215,7 +171,9 @@ class _StatisticsState extends State<Statistics> {
           padding: const EdgeInsets.only(
               right: 18.0, left: 12.0, top: 30, bottom: 12),
           child: LineChart(
-            showAvg ? avgData() : mainData(),
+            showAvg
+                ? mainAVGData(mylist)
+                : mainData(mylist), //avgData(mylist, dataMean)
           ),
         ),
       ),
@@ -226,7 +184,7 @@ class _StatisticsState extends State<Statistics> {
   SideTitles displayAxisTitles(int axis) {
     return SideTitles(
       showTitles: true,
-      reservedSize: axis == 0 ? 22 : 28, //22
+      reservedSize: axis == 0 ? 22 : 28,
       getTextStyles: (value) => const TextStyle(
         color: Color(0xffB1B1D5), //B1B1D5 ou 67727d
         fontWeight: FontWeight.bold,
@@ -238,8 +196,10 @@ class _StatisticsState extends State<Statistics> {
               ? getTitlesXMonth(value)
               : (axis == 0 && valueBotton == 2)
                   ? getTitlesXYear(value)
-                  : getTitlesY(value),
-      margin: axis == 0 ? 8 : 12, //8
+                  : (axis == 1)
+                      ? getTitlesY(value)
+                      : getTitlesY(value),
+      margin: axis == 0 ? 8 : 12,
     );
   }
 
@@ -252,6 +212,9 @@ class _StatisticsState extends State<Statistics> {
         onPressed: () {
           setState(() {
             showAvg = !showAvg;
+            if (Graphdisplayed == true) {
+              Graphdisplayed = false;
+            }
           });
         },
         child: Text(
@@ -265,13 +228,19 @@ class _StatisticsState extends State<Statistics> {
   }
 
 // LineChartData ==> changer l'axe X affichage
-  LineChartData displayXTitle(
-      int dataType, double minX, double maxX, double minY, double maxY) {
+  LineChartData displayXTitle(int dataType, double minX, double maxX,
+      double minY, double maxY, List<Food> foodList) {
+    List<FlSpot> listPoints = [];
+    if (dataType == 0) {
+      listPoints = data;
+    } else
+      listPoints = dataMean;
     dataXTitle = LineChartData(
         lineTouchData: LineTouchData(enabled: false),
         gridData: FlGridData(
           show: true,
           drawHorizontalLine: true,
+          drawVerticalLine: true,
           getDrawingVerticalLine: (value) {
             return FlLine(
               color: const Color(0xff37434d),
@@ -301,22 +270,45 @@ class _StatisticsState extends State<Statistics> {
         minY: minY,
         maxY: maxY,
         lineBarsData: [
-          displayMeanData(dataType, maxX),
+          displayMeanData(maxX, listPoints, foodList),
         ]);
     return dataXTitle;
   }
 
-  // Display the first curve between X:(0,11) et Y:(0,6)
-  LineChartData mainData() {
-    return displayXTitle(0, 1, getTiming(), 0, maxValue);
+  // Display the first curve between X:(0,time) et Y:(0,kcal max +50)
+  LineChartData mainData(List<Food> foodList) {
+    data = fillLineChartCal(foodList);
+    maxValue = maxCal(foodList) + 50; //max cal in the food list
+    double maxX =
+        getTiming(foodList); //return the number of item in the food list
+    double minX = 1; //(chart display first element at 1 index)
+    return displayXTitle(0, minX, maxX, 0, maxValue, foodList);
   }
 
-  //display mean data
-  LineChartBarData displayMeanData(int dataType, double maxX) {
+  // Display avg in the second curve between X:(0,time) et Y:(0,kcal max +50)
+  LineChartData mainAVGData(List<Food> foodList) {
+    dataMean = fillMeanLineChartCal(foodList);
+    maxValue = maxCal(foodList) + 50; //max cal in the food list
+    double maxX =
+        getTiming(foodList); //return the number of item in the food list
+    double minX = 1; //(chart display first element at 1 index)
+    return displayXTitle(1, minX, maxX, 0, maxValue, foodList);
+  }
+
+  // return the max kcal of a food list
+  double maxCal(List<Food> foodList) {
+    List<double> cal = [];
+    for (int i = 0; i < foodList.length; i++) {
+      cal.add(foodList[i].kal);
+    }
+    return cal.reduce(math.max);
+  }
+
+  //display mean data or data in the graph
+  LineChartBarData displayMeanData(
+      double maxX, List<FlSpot> listPoints, List<Food> listFood) {
     return LineChartBarData(
-      spots: (dataType == 0)
-          ? data.sublist(0, maxX.toInt())
-          : dataMean.sublist(0, maxX.toInt()),
+      spots: listPoints,
       isCurved: true,
       colors: gradientColors,
       barWidth: 5,
@@ -331,42 +323,25 @@ class _StatisticsState extends State<Statistics> {
     );
   }
 
-  // Output: average of the first curve
-  LineChartData avgData() {
-    double mean = getAvg();
-    for (int i = 0; i < dataMean.length; i++) {
-      replaceLineSpot(dataMean, i, mean);
-    }
-    return displayXTitle(1, 1, getTiming(), 0, maxValue);
-  }
-
   // display the screen of statistics part
   Widget displayStatisticScreen(BuildContext context, List<Food> mylist) {
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     print(mylist);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        displayTitle(),
-        displayRadioButton(),
-        DisplayChart(),
-        AVGButton(),
-        //Statistics2(),
-      ],
-    );
+    print(mylist[0].datetoString()); //date: y-m-d
+    if (Graphdisplayed == false) {
+      Graphdisplayed = true;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          displayTitle(),
+          displayRadioButton(mylist),
+          DisplayChart(mylist),
+          AVGButton(),
+          //Statistics2(),
+        ],
+      );
+    } else
+      return Container();
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   fillLineChart();
-  //   return Stack(
-  //     children: <Widget>[
-  //       SingleChildScrollView(
-  //         child: displayStatisticScreen(context),
-  //       ),
-  //     ],
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -410,18 +385,24 @@ class _StatisticsState extends State<Statistics> {
   String getTitlesY(value) {
     //  return (value.toString() + ' kcal');
     switch (value.toInt()) {
-      case 500:
-        return '500 kcal';
+      // case 50:
+      //   return '50';
+      case 100:
+        return '100';
+      case 200:
+        return '200';
+      // case 250:
+      //   return '250';
       case 1000:
-        return '1000 kcal';
+        return '1000';
       case 1500:
-        return '1500 kcal ';
+        return '1500';
       case 2000:
-        return '2000 kcal';
+        return '2000';
       case 2500:
-        return '2500 kcal';
+        return '2500';
       case 3000:
-        return '3000 kcal';
+        return '3000';
     }
     return '';
   }
@@ -503,64 +484,32 @@ class _StatisticsState extends State<Statistics> {
   void changeRadio(int value) {
     setState(() {
       valueBotton = value;
+      if (Graphdisplayed == true) {
+        Graphdisplayed = false;
+      }
     });
   }
 
   //thanks to valueBottom we get the xMax of the graphic
-  double getTiming() {
+  double getTiming(List<Food> foodList) {
     double xMax;
+    double maxItem = foodList.length.toDouble();
     if (valueBotton == 0) {
-      xMax = 7;
+      if (maxItem < 7) {
+        xMax = maxItem;
+      } else
+        xMax = 7;
     } else if (valueBotton == 1) {
-      xMax = 31;
-    } else
-      xMax = 366;
-    return xMax;
+      if (maxItem < 31) {
+        xMax = maxItem;
+      } else
+        xMax = 31;
+    } else {
+      if (maxItem < 366) {
+        xMax = maxItem;
+      } else
+        xMax = 366;
+    }
+    return maxItem; // for 3 meal ==> return 3
   }
 }
-
-// //class Food
-// class Food {
-//   // static int cpt = 0;
-//   int id = 0;
-//   String nameFood = '';
-//   String nutriscore = '';
-//   int volEstim = -1;
-//   int volumicMass = -1;
-//   int mass = -1;
-//   int kal = -1;
-//   int protein = -1;
-//   int carbohydrates = -1;
-//   int sugar = -1;
-//   int fat = -1;
-
-//   Food({
-//     required this.nameFood,
-//     required this.id,
-//     required this.kal,
-//     required this.protein,
-//     required this.carbohydrates,
-//     required this.sugar,
-//     required this.fat,
-//   });
-
-//   String toString() {
-//     String nameFood = 'nameFood : ' + this.nameFood + '\n';
-//     // String volEstim = 'Volume : ' + this.volEstim.toString() + 'cm³' + '\n';
-//     // String volumicMass =
-//     //     'Volumic mass : ' + (this.volumicMass).toString() + '\n';
-//     // String mass = 'mass food : ' + this.mass.toString() + '\n';
-//     String kal = this.kal.toString() + 'kcal\n';
-//     // String protein = 'protein : ' + this.protein.toString() + 'g' + '\n';
-//     // String carbohydrates =
-//     //     'carbohydrates : ' + this.carbohydrates.toString() + 'g' + '\n';
-//     // String sugar = 'sugar : ' + this.sugar.toString() + 'g' + '\n';
-//     // String fat = 'fat : ' + this.fat.toString() + 'g' + '\n';
-//     String finalString =
-//         (nameFood + kal); //+ volEstim + protein + carbohydrates + sugar + fat);
-//     // pour moi pas de sens de mettre la masse volumique d'un repas
-//     // if (this.volumicMass != null) finalString += volumicMass;
-//     // if (this.mass != null) finalString += mass;
-//     return finalString;
-//   }
-// }
