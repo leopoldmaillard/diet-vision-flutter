@@ -17,6 +17,8 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transfer_learning_fruit_veggies/model/drink.dart';
+import 'dart:convert';
 
 //JSON
 import 'package:transfer_learning_fruit_veggies/source/nutrition_table.dart';
@@ -550,6 +552,7 @@ class _SegmentationState extends State<Segmentation> {
         listAllIngredient.add(parseFoodData(k, v));
       }
     });
+    listAllIngredient.add(parseDrinkData("Beverages 🥤"));
     return listAllIngredient;
   }
 
@@ -561,9 +564,7 @@ class _SegmentationState extends State<Segmentation> {
         foodNutritionJson.firstWhere((element) => element["name"] == nameF);
     print("the dataJson");
     print(dataJson);
-    print(dataJson["vm"]);
 
-    Random myrand = Random();
     food.volEstim = volume;
     food.volumicMass = dataJson["vm"];
     food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
@@ -576,6 +577,37 @@ class _SegmentationState extends State<Segmentation> {
         roundDouble((dataJson["carbohydrates"] * food.mass / 100), 2);
 
     print("Food element  parsed");
+    String blabla = food.toString();
+    print(blabla);
+    return food;
+  }
+
+  Food parseDrinkData(String nameF) {
+    Food food = new Food(nameFood: nameF);
+    Map<dynamic, dynamic> dataJson;
+    dataJson =
+        foodNutritionJson.firstWhere((element) => element["name"] == nameF);
+    print("the dataJson");
+    print(dataJson);
+    print(dataJson["vm"]);
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    drinkEnum.values.forEach((v) {
+      print('value: $v, index: ${v.index}');
+      if (v.index == int.parse(dropdownValue)) {
+        food.volEstim = 250;
+        food.volumicMass = dataJson["vm"];
+        food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
+        food.nutriscore = dataJson["nutriscore"].toString();
+        food.kal = roundDouble((dataJson["cal"] * food.mass / 100), 2);
+        food.fat = roundDouble((dataJson["fat"] * food.mass / 100), 2);
+        food.protein = roundDouble((dataJson["protein"] * food.mass / 100), 2);
+        food.sugar = roundDouble((dataJson["sugar"] * food.mass / 100), 2);
+        food.carbohydrates =
+            roundDouble((dataJson["carbohydrates"] * food.mass / 100), 2);
+      }
+    });
+
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     String blabla = food.toString();
     print(blabla);
     return food;
@@ -798,7 +830,6 @@ class _SegmentationState extends State<Segmentation> {
                 AddFood(storedFood),
               ),
             );
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         Navigator.pop(
             context, 'retour à prendre la photo de volume estimation');
         Navigator.pop(
