@@ -598,7 +598,11 @@ class _SegmentationState extends State<Segmentation> {
     drinkEnum.values.forEach((v) {
       print('value: $v, index: ${v.index}');
       if (v.index == int.parse(dropdownValue)) {
-        food.volEstim = 250;
+        if (dataJson["name"] == "Select your drink  ") {
+          food.volEstim = 0;
+        } else {
+          food.volEstim = 250;
+        }
         food.volumicMass = dataJson["vm"];
         food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
         food.nutriscore = dataJson["nutriscore"].toString();
