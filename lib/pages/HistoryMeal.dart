@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/events/set_food.dart';
 import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
-
+import 'package:transfer_learning_fruit_veggies/pages/FoodFormUpdateDatabase.dart';
 import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/model/food.dart';
@@ -79,6 +79,7 @@ class _HistoryMealState extends State<HistoryMeal> {
       content: Text("ID ${food.id}"), //main content, image easily integratable
       elevation: 24.0,
       actions: <Widget>[
+        displayUpdateButton(food, index),
         displayDeleteButton(food, index),
         displayCancelButton(),
       ],
@@ -110,6 +111,17 @@ class _HistoryMealState extends State<HistoryMeal> {
     );
   }
 
+  Widget displayUpdateButton(Food food, int index) {
+    return TextButton(
+      onPressed: () => Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FoodForm(food: food, foodIndex: index),
+        ),
+      ),
+      child: Text("Update"),
+    );
+  }
   /* **************************************************************************/
   /* ****************************  General Design  ****************************/
   /* **************************************************************************/
