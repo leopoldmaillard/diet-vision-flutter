@@ -187,6 +187,35 @@ class _SegmentationState extends State<Segmentation> {
     '[192, 64, 64, 255]': 'Other Food ❓'
   };
 
+  static var classes2 = {
+    [0, 0, 0, 255]: 'Background 🏞️',
+    [128, 0, 0, 255]: 'Leafy Greens 🥬',
+    [0, 128, 0, 255]: 'Stem Vegetables 🥦',
+    [128, 128, 0, 255]: 'Non-starchy Roots 🍅',
+    [0, 0, 128, 255]: 'Vegetables | Other 🌽',
+    [128, 0, 128, 255]: 'Fruits 🍓',
+    [0, 128, 128, 255]: 'Protein | Meat 🥩',
+    [128, 128, 128, 255]: 'Protein | Poultry 🍗',
+    [64, 0, 0, 255]: 'Protein | Seafood 🐟',
+    [192, 0, 0, 255]: 'Protein | Eggs 🍳',
+    [64, 128, 0, 255]: 'Protein | Beans/nuts 🥜',
+    [192, 128, 0, 255]: 'Starches/grains | Baked Goods 🥐',
+    [64, 0, 128, 255]: 'Starches/grains | rice/grains/cereals 🍚',
+    [192, 0, 128, 255]: 'Starches/grains | Noodles/pasta 🍝',
+    [255, 64, 64, 255]: 'Starches/grains | Starchy Vegetables 🥔',
+    [192, 128, 128, 255]: 'Starches/grains | Other 🌾',
+    [0, 64, 0, 255]: 'Soups/stews 🥣',
+    [128, 64, 0, 255]: 'Herbs/spices 🌿',
+    [0, 192, 0, 255]: 'Dairy 🥛',
+    [128, 192, 0, 255]: 'Snacks 🍫',
+    [0, 64, 128, 255]: 'Sweets/desserts 🍰',
+    [128, 64, 64, 255]: 'Beverages 🥤',
+    [64, 64, 128, 255]: 'Fats/oils/sauces 🥫',
+    [64, 64, 64, 255]: 'Food Containers 🍽️',
+    [192, 192, 192, 255]: 'Dining Tools 🍴',
+    [192, 64, 64, 255]: 'Other Food ❓'
+  };
+
   /* **************************************************************************/
   /* *********************  Globals VARIABLE  *********************************/
   /* **************************************************************************/
@@ -1013,9 +1042,28 @@ main() {
                 icon: const Icon(Icons.edit),
                 onChanged: (String? newValue) {
                   setState(() {
+                    Iterable<List<int>> pixels = partition(_outputRAW, 4);
                     // seems that we are obliged to create a new map
                     Map newMap = {};
+                    String e;
+                    var i;
                     String elem = surfaceSaved.keys.elementAt(_selectedClass);
+                    pixels.forEach((element) {
+                      e = element.toString();
+                      i = KEYS.indexOf(e);
+                      if (classes[e] == elem) {
+                        print("BEFORE : " + element.toString());
+                        element =
+                            classes2.keys.toList()[VALUES.indexOf(newValue!)];
+                        print("AFTER : " + element.toString());
+                      }
+                    });
+                    print(count);
+                    List<int> bytes =
+                        pixels.toList().expand((element) => element).toList();
+                    var wallah = IMG.Image.fromBytes(513, 513, bytes);
+
+                    _outputPNG = IMG.encodePng(wallah);
                     surfaceSaved.forEach((key, value) {
                       if (key == elem) {
                         newMap[newValue!] = [
