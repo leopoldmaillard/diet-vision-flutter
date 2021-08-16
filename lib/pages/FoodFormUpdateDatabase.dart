@@ -232,7 +232,7 @@ class FoodFormState extends State<FoodForm> {
                       print("aaaaaaaaa");
                       print(widget.food);
                       print("bbbbbbbbb");
-                      print(widget.food.nameFood);
+                      widget.food.nameUpdated = _name;
 
                       DatabaseProvider.db.update(widget.food).then(
                             (storedFood) =>

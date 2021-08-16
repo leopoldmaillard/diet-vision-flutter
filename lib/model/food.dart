@@ -11,6 +11,7 @@ class Food {
   // static int cpt = 0;
   int id = 0;
   String nameFood = '';
+  String nameUpdated = '';
   String nutriscore = '';
   int volEstim = 0;
   double volumicMass = 0;
@@ -30,6 +31,9 @@ class Food {
     /// do not remove this line becasue the database cant autoincrement if
     /// we store it at 0
     //map[DatabaseProvider.COLUMN_ID] = id;
+    print(nameFood);
+    map[DatabaseProvider.COLUMN_NAMEFOOD] =
+        (nameFood == '' ? "Meal" : nameFood);
     map[DatabaseProvider.COLUMN_NUTRISCORE] = nutriscore;
     map[DatabaseProvider.COLUMN_MASS] = mass;
     map[DatabaseProvider.COLUMN_KAL] = kal;
@@ -45,7 +49,7 @@ class Food {
 
   Food.fromMap(Map<String, dynamic> map) {
     id = map[DatabaseProvider.COLUMN_ID];
-    nameFood = "Meal " + id.toString();
+    nameFood = map[DatabaseProvider.COLUMN_NAMEFOOD];
     volEstim = map[DatabaseProvider.COLUMN_VOLESTIM];
     volumicMass = map[DatabaseProvider.COLUMN_VOLUMICMASS];
     nutriscore = map[DatabaseProvider.COLUMN_NUTRISCORE];
