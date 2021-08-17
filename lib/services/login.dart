@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:transfer_learning_fruit_veggies/fhome.dart';
 import 'package:transfer_learning_fruit_veggies/mainOriginal.dart';
+import 'verify.dart';
 
 // This file is the design/screen part of the authentification part in an app
 
@@ -58,19 +59,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Theme.of(context).accentColor,
                   child: Text('Signin'),
                   onPressed: () {
-                    auth.signInWithEmailAndPassword(
-                        email: _email, password: _password);
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MyApp()));
+                    auth
+                        .signInWithEmailAndPassword(
+                            email: _email, password: _password)
+                        .then((_) => {
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) => FHomeScreen()))
+                            });
                   }),
               RaisedButton(
                   color: Theme.of(context).accentColor,
                   child: Text('Signup'),
                   onPressed: () {
-                    auth.createUserWithEmailAndPassword(
-                        email: _email, password: _password);
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => MyApp()));
+                    auth
+                        .createUserWithEmailAndPassword(
+                            email: _email, password: _password)
+                        .then((_) => {
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) => VerifyScreen()))
+                            });
                   })
             ],
           ),
