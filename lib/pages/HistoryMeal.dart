@@ -34,6 +34,11 @@ class _HistoryMealState extends State<HistoryMeal> {
     retrieveDatabase();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   // execute a query to retrieve database store in db variable
   void retrieveDatabase() {
     DatabaseProvider.db.getTodayFoods().then(
@@ -91,7 +96,7 @@ class _HistoryMealState extends State<HistoryMeal> {
         BlocProvider.of<FoodBloc>(context).add(
           DeleteFood(index),
         );
-        Navigator.pop(context);
+        Navigator.of(context, rootNavigator: true).pop();
       },
     );
   }
@@ -105,7 +110,7 @@ class _HistoryMealState extends State<HistoryMeal> {
 
   Widget displayCancelButton() {
     return TextButton(
-      onPressed: () => Navigator.pop(context),
+      onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
       child: Text("Cancel"),
     );
   }
