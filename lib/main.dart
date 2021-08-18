@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/home.dart';
-
+import 'package:transfer_learning_fruit_veggies/pages/onboarding_screen.dart';
 import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
@@ -29,7 +29,9 @@ class MyApp extends StatelessWidget {
           primaryColor: new Color(0xff8C33FF),
         ),
         debugShowCheckedModeBanner: false,
-        home: new Home(cameras: cameras),
+        home: (1 == 1)
+            ? OnBoardingScreen(cameras: cameras)
+            : Home(cameras: cameras),
       ),
     );
   }
