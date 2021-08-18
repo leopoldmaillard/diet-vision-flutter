@@ -12,7 +12,6 @@ class VerifyScreen extends StatefulWidget {
 
 class _VerifyScreenState extends State<VerifyScreen> {
   final auth = FirebaseAuth.instance;
-  var cUser;
 
   Timer timer = Timer(Duration(seconds: 0), () {
     print('');
@@ -32,11 +31,18 @@ class _VerifyScreenState extends State<VerifyScreen> {
     FirebaseUser user =
         await auth.currentUser(); //User user = auth.currentUser;
     user.sendEmailVerification();
-    cUser = user;
 
-    //create a timer to verify each 5 seconds if the mail is verrified by the user
-    timer = Timer.periodic(Duration(seconds: 5), (timer) {
-      checkEmailVerified(user);
+    Future(() async {
+      timer = Timer.periodic(Duration(seconds: 3), (timer) async {
+        await FirebaseAuth.instance.currentUser()
+          ..reload();
+        var user = await FirebaseAuth.instance.currentUser();
+        if (user.isEmailVerified) {
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => FHomeScreen()));
+          timer.cancel();
+        }
+      });
     });
   }
 
@@ -51,20 +57,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
     // var user = auth.currentUser;
     return Scaffold(
       body: Center(
-        child: Text("""An e-mail has been sent,r
+        child: Text("""An e-mail has been sent,
                  please verify"""),
       ),
     );
-  }
-
-  // in the case where the email is verified, the timer is delated and the user can go on the homepage
-  Future<void> checkEmailVerified(var u) async {
-    u = auth.currentUser;
-    await u.reload();
-    if (u.emailVerified) {
-      timer.cancel();
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => FHomeScreen()));
-    }
   }
 }

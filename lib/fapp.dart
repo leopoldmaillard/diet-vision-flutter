@@ -6,6 +6,7 @@ class FApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Login App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
           accentColor: Colors.deepPurpleAccent, primarySwatch: Colors.grey),
       home: LoginScreen(),
