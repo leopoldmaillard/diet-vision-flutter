@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:quiver/core.dart';
 import 'package:transfer_learning_fruit_veggies/source/statistics2.dart';
 
 class Statistics extends StatefulWidget {
@@ -33,6 +34,11 @@ class _StatisticsState extends State<Statistics> {
   List<String> titleButtonRadio = ['Week', 'Month', 'Year'];
   late LineChartData dataXTitle;
 
+  //Use of a Food list
+  List<Food> itemListDay = [];
+  // Food finalMeal = Food(nameFood: "");
+  // finalMeal.volEstim = 15;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +50,9 @@ class _StatisticsState extends State<Statistics> {
     // day of the week: 1:monday,...7:sunday
     weekDay = _Today.weekday;
     maxValue = 2000;
+    //test food avg
+    fillItemFood(itemListDay, 9);
+    print('avg food item for a day is: ${getAvgFoodItem(itemListDay)}');
   }
 
   @override
@@ -51,6 +60,7 @@ class _StatisticsState extends State<Statistics> {
     super.dispose();
     data = [];
     dataCal = [];
+    itemListDay = [];
   }
 
 //get AVG from the data
@@ -61,6 +71,17 @@ class _StatisticsState extends State<Statistics> {
       mean = mean + data[i].y;
     }
     return mean / i;
+  }
+
+  // the avg of a food item in a list
+  //add an integer to choose the category (protein, glucide..) ? Or made the avg for all categories
+  int getAvgFoodItem(List<Food> food) {
+    double mean = 0;
+    for (int i = 0; i < food.length; i++) {
+      mean += food[i].kal;
+    }
+    mean = mean / food.length;
+    return mean.toInt();
   }
 
   /* -----------CREATE DATA TO DISPLAY----------------- */
@@ -102,6 +123,29 @@ class _StatisticsState extends State<Statistics> {
     for (int i = 0; i < Calories.length; i++) {
       Calories.add((rng.nextDouble() + 200) * (maxValue - minVal));
     }
+  }
+
+// fill a list of Food for a day
+  void fillItemFood(List<Food> food, int taille) {
+    int kal = -1, protein = -1, carbohydrates = -1, sugar = -1, fat = -1;
+    var r = new Random();
+    for (int i = 0; i < taille; i++) {
+      kal = ((r.nextDouble()) * 200 + 10).toInt();
+      protein = ((r.nextDouble()) * 200 + 10).toInt();
+      carbohydrates = ((r.nextDouble()) * 200 + 10).toInt();
+      sugar = ((r.nextDouble()) * 200 + 10).toInt();
+      fat = ((r.nextDouble()) * 200 + 10).toInt();
+      food.add(Food(
+        nameFood: 'numero $i',
+        id: i,
+        kal: kal,
+        protein: protein,
+        carbohydrates: carbohydrates,
+        sugar: sugar,
+        fat: fat,
+      ));
+    }
+    print('voici la liste de food item: $food');
   }
 
 /* ____________Widget Part________________*/
@@ -308,7 +352,7 @@ class _StatisticsState extends State<Statistics> {
         displayRadioButton(),
         DisplayChart(),
         AVGButton(),
-        //Statistics2(),
+        Statistics2(),
       ],
     );
   }
@@ -436,5 +480,51 @@ class _StatisticsState extends State<Statistics> {
     } else
       xMax = 366;
     return xMax;
+  }
+}
+
+//class Food
+class Food {
+  // static int cpt = 0;
+  int id = 0;
+  String nameFood = '';
+  String nutriscore = '';
+  int volEstim = -1;
+  int volumicMass = -1;
+  int mass = -1;
+  int kal = -1;
+  int protein = -1;
+  int carbohydrates = -1;
+  int sugar = -1;
+  int fat = -1;
+
+  Food({
+    required this.nameFood,
+    required this.id,
+    required this.kal,
+    required this.protein,
+    required this.carbohydrates,
+    required this.sugar,
+    required this.fat,
+  });
+
+  String toString() {
+    String nameFood = 'nameFood : ' + this.nameFood + '\n';
+    // String volEstim = 'Volume : ' + this.volEstim.toString() + 'cm³' + '\n';
+    // String volumicMass =
+    //     'Volumic mass : ' + (this.volumicMass).toString() + '\n';
+    // String mass = 'mass food : ' + this.mass.toString() + '\n';
+    String kal = this.kal.toString() + 'kcal\n';
+    // String protein = 'protein : ' + this.protein.toString() + 'g' + '\n';
+    // String carbohydrates =
+    //     'carbohydrates : ' + this.carbohydrates.toString() + 'g' + '\n';
+    // String sugar = 'sugar : ' + this.sugar.toString() + 'g' + '\n';
+    // String fat = 'fat : ' + this.fat.toString() + 'g' + '\n';
+    String finalString =
+        (nameFood + kal); //+ volEstim + protein + carbohydrates + sugar + fat);
+    // pour moi pas de sens de mettre la masse volumique d'un repas
+    // if (this.volumicMass != null) finalString += volumicMass;
+    // if (this.mass != null) finalString += mass;
+    return finalString;
   }
 }

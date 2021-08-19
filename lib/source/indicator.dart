@@ -6,6 +6,7 @@ class Indicator extends StatelessWidget {
   final bool isSquare;
   final double size;
   final Color textColor;
+  final double quantity;
 
   const Indicator({
     Key? key,
@@ -14,6 +15,7 @@ class Indicator extends StatelessWidget {
     required this.isSquare,
     this.size = 16,
     this.textColor = const Color(0xff505050),
+    this.quantity = 0.0,
   }) : super(key: key);
 
   @override
@@ -32,7 +34,7 @@ class Indicator extends StatelessWidget {
           width: 4,
         ),
         Text(
-          text,
+          text + ' ($quantity g)',
           style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
         )

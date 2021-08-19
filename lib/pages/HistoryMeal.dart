@@ -36,7 +36,7 @@ class _HistoryMealState extends State<HistoryMeal> {
 
   // execute a query to retrieve database store in db variable
   void retrieveDatabase() {
-    DatabaseProvider.db.getFoods().then(
+    DatabaseProvider.db.getTodayFoods().then(
       (foodList) {
         BlocProvider.of<FoodBloc>(context).add(
           SetFoods(foodList),

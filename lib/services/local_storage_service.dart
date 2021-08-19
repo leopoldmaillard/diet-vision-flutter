@@ -22,6 +22,7 @@ class DatabaseProvider {
   static const String COLUMN_CARBOHYDRATES = "carbohydrates";
   static const String COLUMN_SUGAR = "sugar";
   static const String COLUMN_FAT = "fat";
+  static const String COLUMN_DATE = "date";
 
   DatabaseProvider._();
   static final DatabaseProvider db = DatabaseProvider._();
@@ -67,7 +68,8 @@ class DatabaseProvider {
           "$COLUMN_PROTEIN REAL,"
           "$COLUMN_CARBOHYDRATES REAL,"
           "$COLUMN_SUGAR REAL,"
-          "$COLUMN_FAT REAL"
+          "$COLUMN_FAT REAL,"
+          "$COLUMN_DATE INTEGER"
           ")",
         );
         print("Food table created");
@@ -93,7 +95,9 @@ class DatabaseProvider {
       COLUMN_CARBOHYDRATES,
       COLUMN_SUGAR,
       COLUMN_FAT,
+      COLUMN_DATE,
     ]);
+    List<Map> myquery = await db.rawQuery('SELECT * FROM ' + TABLE_FOOD);
 
     List<Food> foodList = [];
 
@@ -103,6 +107,99 @@ class DatabaseProvider {
       foodList.add(food);
     });
 
+    return foodList;
+  }
+
+  Future<List<Food>> get15minFoods() async {
+    var currentDate = new DateTime.now().millisecondsSinceEpoch;
+    var dateLastWeek = currentDate - 15 * 60 * 1000;
+    final db = await database;
+    var myquery = await db.rawQuery('SELECT * FROM ' +
+        TABLE_FOOD +
+        ' WHERE ' +
+        COLUMN_DATE +
+        '>= ' +
+        dateLastWeek.toString());
+
+    List<Food> foodList = [];
+
+    myquery.forEach((currentFood) {
+      Food food = Food.fromMap(currentFood);
+      foodList.add(food);
+    });
+    print("food list :");
+    print(foodList);
+    return foodList;
+  }
+
+//    var moonLanding = DateTime.parse(lastMidnight.toString());
+// print("Current date");
+//     print(currentDate);
+//     print(currentDate.millisecondsSinceEpoch);
+  DateTime lastMidnight() {
+    var currentDate = new DateTime.now();
+    var lastMidnight =
+        DateTime(currentDate.year, currentDate.month, currentDate.day);
+    return lastMidnight;
+  }
+
+  Future<List<Food>> getTodayFoods() async {
+    final db = await database;
+    var currentMidnight = lastMidnight().millisecondsSinceEpoch;
+    var myquery = await db.rawQuery('SELECT * FROM ' +
+        TABLE_FOOD +
+        ' WHERE ' +
+        COLUMN_DATE +
+        '>= ' +
+        currentMidnight.toString());
+    List<Food> foodList = [];
+    myquery.forEach((currentFood) {
+      Food food = Food.fromMap(currentFood);
+      foodList.add(food);
+    });
+    return foodList;
+  }
+
+  Future<List<Food>> getWeekFoods() async {
+    var currentDate = new DateTime.now().millisecondsSinceEpoch;
+    var dateLastWeek = currentDate - 7 * 24 * 3600 * 1000;
+    final db = await database;
+    var myquery = await db.rawQuery('SELECT * FROM ' +
+        TABLE_FOOD +
+        'WHERE ' +
+        COLUMN_DATE +
+        '>= ' +
+        dateLastWeek.toString());
+
+    List<Food> foodList = [];
+
+    myquery.forEach((currentFood) {
+      Food food = Food.fromMap(currentFood);
+      foodList.add(food);
+    });
+    return foodList;
+  }
+
+  Future<List<Food>> getMonthFoods() async {
+    var currentDate = new DateTime.now().millisecondsSinceEpoch;
+    var dateLastWeek = currentDate - 30 * 7 * 24 * 3600 * 1000;
+    final db = await database;
+    var myquery = await db.rawQuery('SELECT * FROM ' +
+        TABLE_FOOD +
+        'WHERE ' +
+        COLUMN_DATE +
+        '>= ' +
+        dateLastWeek.toString());
+
+    List<Food> foodList = [];
+
+    myquery.forEach((currentFood) {
+      Food food = Food.fromMap(currentFood);
+      // if ((food.dateSinceEpoch <= currentDate) &&
+      //     (currentDate - food.dateSinceEpoch <= 7 * 24 * 3600 * 1000)) {
+      foodList.add(food);
+      //}
+    });
     return foodList;
   }
 

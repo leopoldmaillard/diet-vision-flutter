@@ -17,6 +17,7 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transfer_learning_fruit_veggies/model/drink.dart';
 
 //JSON
 import 'package:transfer_learning_fruit_veggies/source/nutrition_table.dart';
@@ -201,10 +202,11 @@ class _SegmentationState extends State<Segmentation> {
 
   List<List<List<int>>> _outputClassesVolume = [];
   List<List<List<int>>> _outputClassesSurface = [];
+  List<String> classVolumeName = [];
   Map _outputClassesHeight = Map();
   Map _outputClassesDistance = Map();
   List<List<int>> minMax = [];
-  int _selectedClass = 0;
+  int _selectedClass = -1;
   Food finalMeal = Food(nameFood: "");
 
   @override
@@ -499,6 +501,7 @@ class _SegmentationState extends State<Segmentation> {
     // and taking the x of the bottom of the thickness is quite better. (Ithink)
     minMax.add(
         [yTopThickness, xBottomThickness, yBottomThickness, xBottomThickness]);
+    classVolumeName.add(classe);
     return (yBottomThickness - yTopThickness).round();
   }
 
@@ -541,10 +544,19 @@ class _SegmentationState extends State<Segmentation> {
     Map<dynamic, dynamic> dataJson;
     List<Food> listAllIngredient = [];
     outputFinal.forEach((k, v) {
-      if (k != 'Food Containers 🍽️' && k != 'Background 🏞️') {
+      if (k != 'Food Containers 🍽️' &&
+          k != 'Background 🏞️' &&
+          k != 'Dining Tools 🍴' &&
+          k != 'Other Food ❓') {
         listAllIngredient.add(parseFoodData(k, v));
       }
     });
+    // String idButton;
+    // idButton = (int.parse(dropdownValue)).toString();
+    Map<dynamic, dynamic> dataJsonDrink;
+    dataJsonDrink =
+        myJson.firstWhere((element) => element["id"] == dropdownValue);
+    listAllIngredient.add(parseDrinkData(dataJsonDrink["name"]));
     return listAllIngredient;
   }
 
@@ -556,20 +568,54 @@ class _SegmentationState extends State<Segmentation> {
         foodNutritionJson.firstWhere((element) => element["name"] == nameF);
     print("the dataJson");
     print(dataJson);
-    print(dataJson["vm"]);
 
-    Random myrand = Random();
     food.volEstim = volume;
-    food.volumicMass = roundDouble((dataJson["vm"] * 100), 2);
-    food.mass = roundDouble(
-        ((food.volEstim.toDouble() * food.volumicMass) ~/ 100).toDouble(), 2);
+    food.volumicMass = dataJson["vm"];
+    food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
     food.nutriscore = dataJson["nutriscore"].toString();
     food.kal = roundDouble((dataJson["cal"] * food.mass / 100), 2);
-    food.carbohydrates = roundDouble(myrand.nextDouble() * 100, 2);
-    food.protein = roundDouble(myrand.nextDouble() * 100, 2);
-    food.sugar = roundDouble(myrand.nextDouble() * 25, 2);
-    food.fat = roundDouble(myrand.nextDouble() * 30, 2);
+    food.fat = roundDouble((dataJson["fat"] * food.mass / 100), 2);
+    food.protein = roundDouble((dataJson["protein"] * food.mass / 100), 2);
+    food.sugar = roundDouble((dataJson["sugar"] * food.mass / 100), 2);
+    food.carbohydrates =
+        roundDouble((dataJson["carbohydrates"] * food.mass / 100), 2);
+
     print("Food element  parsed");
+    String blabla = food.toString();
+    print(blabla);
+    return food;
+  }
+
+  Food parseDrinkData(String nameF) {
+    Food food = new Food(nameFood: nameF);
+    Map<dynamic, dynamic> dataJson;
+    dataJson =
+        drinkNutritionJson.firstWhere((element) => element["name"] == nameF);
+    print("the dataJson");
+    print(dataJson);
+    print(dataJson["vm"]);
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    drinkEnum.values.forEach((v) {
+      print('value: $v, index: ${v.index}');
+      if (v.index == int.parse(dropdownValue)) {
+        if (dataJson["name"] == "Select your drink  ") {
+          food.volEstim = 0;
+        } else {
+          food.volEstim = 250;
+        }
+        food.volumicMass = dataJson["vm"];
+        food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
+        food.nutriscore = dataJson["nutriscore"].toString();
+        food.kal = roundDouble((dataJson["cal"] * food.mass / 100), 2);
+        food.fat = roundDouble((dataJson["fat"] * food.mass / 100), 2);
+        food.protein = roundDouble((dataJson["protein"] * food.mass / 100), 2);
+        food.sugar = roundDouble((dataJson["sugar"] * food.mass / 100), 2);
+        food.carbohydrates =
+            roundDouble((dataJson["carbohydrates"] * food.mass / 100), 2);
+      }
+    });
+
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     String blabla = food.toString();
     print(blabla);
     return food;
@@ -577,7 +623,7 @@ class _SegmentationState extends State<Segmentation> {
 
   Food computeMealStats(List<Food> listAllIngredient) {
     Food mealResults = new Food(nameFood: "");
-    mealResults.nameFood = "Meal " + mealResults.id.toString();
+    //mealResults.nameFood = "Meal " + mealResults.id.toString();
     for (int i = 0; i < listAllIngredient.length; i++) {
       mealResults.volEstim += listAllIngredient[i].volEstim;
       //mealResults.mass = listAllIngredient[i].volEstim;
@@ -590,6 +636,9 @@ class _SegmentationState extends State<Segmentation> {
       mealResults.mass += listAllIngredient[i].mass;
       mealResults.volumicMass += listAllIngredient[i].volumicMass;
     }
+    var currentDate = new DateTime.now();
+    mealResults.dateSinceEpoch = currentDate.millisecondsSinceEpoch;
+
     return mealResults;
   }
 
@@ -598,27 +647,6 @@ class _SegmentationState extends State<Segmentation> {
     double mod = pow(10.0, places).toDouble();
     return ((value * mod).round().toDouble() / mod);
   }
-  /*
-  double roundDouble(double value, int places){ 
-   double mod = pow(10.0, places); 
-   return ((value * mod).round().toDouble() / mod); 
-}
-
-main() {
-  double num1 = roundDouble(12.3412, 2);
-  // 12.34*/
-
-  /// some function to change
-  // void addElementToDatabase(List keyValue) {
-  //   int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
-  //   String nameFood1 = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
-  //   Food food = parseFoodData(nameFood1, valuecm2);
-  //   DatabaseProvider.db.insert(food).then(
-  //         (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-  //           AddFood(storedFood),
-  //         ),
-  //       );
-  // }
 
   //keyvalue[0] = foodNAme
   //keyvalue[1] = volum in cm3
@@ -697,43 +725,46 @@ main() {
     var categories = classes.values.toList();
     var mykeys = widget.distances.keys.toList();
     var dist = widget.distances.values.toList();
-
+    print("VOIIIICIIII LA DIST");
+    print(mykeys);
+    print(dist);
     double thickPixels, thickness, distCoinClass, thickPixelsReal;
     //idxClass: index in the outputClasses of the current classe
     //idxClassDIst: index in the widget.distance of the current classe
     int idxClass, idxClassDist; //, index, color, item, surf, volume;
 
-    /************************  INFO IMPORTANTE ****************************************
-     * **  Si on cree ces variables en dehors de la boucle for:
-     *  (sur la deuxieme photo) on peut changer une fois le curseur sur la classe backed cook
-     *  et après on peut plus changer les classes pour ajuster la thickness*****/
-
-    int index, color, item, surf, volume;
+    int index, color, item, surf = 0, volume;
     // obtain the volume for each class segmented in the first/second picture
     for (int i = 0; i < minMax.length; i++) {
       thickPixels = (minMax[i][2].abs() - minMax[i][0].abs()).toDouble();
-      idxClass =
-          categories.indexOf(widSurfKey[i]); // replace: classes.values.toList()
+      print(classVolumeName[i]);
+      idxClass = categories
+          .indexOf(classVolumeName[i]); // replace: classes.values.toList()
+      print(idxClass);
       idxClassDist =
           mykeys.indexOf(idxClass); // replace:widget.distances.keys.toList()
+      print(idxClassDist);
       distCoinClass = dist[idxClassDist]; // replace:widget.distances.values
+      print(distCoinClass);
+
       thickPixelsReal =
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
 
-      index =
-          categories.indexOf(widSurfKey[i]); //real index in the global variabl
-      color = pascalVOCLabelColors[index];
-
-      item = widSurfKey.indexOf(widSurfKey[i]);
-      surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
-      volume = (thickness * surf).round();
-      //widSurfkey[i] cest le nameFood
-      //index cest l'indice de la classe dans la variable globale
-      outputFinal[widSurfKey[i].toString()] = volume;
-      if (index != 0 && index != 24 && index != 23) {
-        chips.add(
-            displayVolumeInfo(item, color, widSurfKey, thickness, volume, i));
+      color = pascalVOCLabelColors[idxClass];
+      print("the color :");
+      print(color);
+      item = widSurfKey.indexOf(classVolumeName[i]);
+      print("the item");
+      print(item);
+      if ((item >= 0) && (item <= 24)) {
+        surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
+        volume = (thickness * surf).round();
+        //widSurfkey[i] cest le nameFood
+        outputFinal[classVolumeName[i].toString()] = volume;
+        if (idxClass != 0 && idxClass != 24 && idxClass != 23) {
+          chips.add(displayVolumeInfo(color, widSurfKey, thickness, volume, i));
+        }
       }
     }
     print("the final output");
@@ -743,24 +774,24 @@ main() {
     return ListView(children: chips);
   }
 
-  ActionChip displayVolumeInfo(item, color, widSurfKey, thickness, volume, i) {
+  ActionChip displayVolumeInfo(color, widSurfKey, thickness, volume, i) {
     return ActionChip(
       onPressed: () {
         setState(() {
-          _selectedClass = item;
+          _selectedClass = i;
         });
       },
       backgroundColor: Color(color),
       shape: StadiumBorder(
         side: BorderSide(
-          color: item == _selectedClass
+          color: i == _selectedClass
               ? Theme.of(context).primaryColor
               : Color(color),
           width: 2.0,
         ),
       ),
       label: Text(
-        widSurfKey[i] +
+        classVolumeName[i] +
             '   ' +
             thickness.toStringAsFixed(1) +
             'cm | Vol. ' +
@@ -807,7 +838,6 @@ main() {
                 AddFood(storedFood),
               ),
             );
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         Navigator.pop(
             context, 'retour à prendre la photo de volume estimation');
         Navigator.pop(
@@ -870,8 +900,8 @@ main() {
     return volume
         ? Column(
             children: [
+              _selectedClass != -1 ? sliderThickness() : Container(),
               helpMessageUtilisationSlider(),
-              sliderThickness(),
             ],
           )
         : Container();
@@ -944,7 +974,9 @@ main() {
             ? Container(
                 height: SIZEWIDTH,
                 width: SIZEWIDTH,
-                child: drawThick(_selectedClass),
+                child: _selectedClass != -1
+                    ? drawThick(_selectedClass)
+                    : Container(),
               )
             : Container(),
       ],
