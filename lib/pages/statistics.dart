@@ -51,6 +51,7 @@ class _StatisticsState extends State<Statistics> {
   //know which first day of a week we have in the database
   int firstDay = 0;
   List<String> WeekDays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+  List<String> WeekMonths = ['1', '7', '14', '21', '30'];
   @override
   void initState() {
     super.initState();
@@ -60,26 +61,26 @@ class _StatisticsState extends State<Statistics> {
     Graphdisplayed = false;
   }
 
-//get AVG from the data
-  double getAvg(List<FlSpot> dataPoints) {
-    double mean = 0;
-    int i = 0;
-    for (i = 0; i < dataPoints.length; i++) {
-      mean = mean + dataPoints[i].y;
-    }
-    return mean / i;
-  }
+// //get AVG from the data
+//   double getAvg(List<FlSpot> dataPoints) {
+//     double mean = 0;
+//     int i = 0;
+//     for (i = 0; i < dataPoints.length; i++) {
+//       mean = mean + dataPoints[i].y;
+//     }
+//     return mean / i;
+//   }
 
-  // the avg of a food item in a list
-  //add an integer to choose the category (protein, glucide..) ? Or made the avg for all categories
-  int getAvgFoodItem(List<Food> food) {
-    double mean = 0;
-    for (int i = 0; i < food.length; i++) {
-      mean += food[i].kal;
-    }
-    mean = mean / food.length;
-    return mean.toInt();
-  }
+  // // the avg of a food item in a list
+  // //add an integer to choose the category (protein, glucide..) ? Or made the avg for all categories
+  // int getAvgFoodItem(List<Food> food) {
+  //   double mean = 0;
+  //   for (int i = 0; i < food.length; i++) {
+  //     mean += food[i].kal;
+  //   }
+  //   mean = mean / food.length;
+  //   return mean.toInt();
+  // }
 
   // the avg of a food item in a list
   //add an integer to choose the category (protein, glucide..) ? Or made the avg for all categories
@@ -117,15 +118,6 @@ class _StatisticsState extends State<Statistics> {
       }
     }
     print('ca passe ligne 95');
-    return dataPoints;
-  }
-
-  //give a size and inster plot (i,meankal) , initialize/register mean data
-  List<FlSpot> fillMeanLineChart(List<Food> listFood) {
-    List<FlSpot> dataPoints = [];
-    for (int i = 0; i < listFood.length; i++) {
-      addPoint(dataPoints, getAvgFoodItem(listFood).toDouble(), i + 1);
-    }
     return dataPoints;
   }
 
@@ -267,9 +259,7 @@ class _StatisticsState extends State<Statistics> {
               ? getTitlesXMonth(value)
               : (axis == 0 && valueBotton == 2)
                   ? getTitlesXDay(value)
-                  : (axis == 1)
-                      ? getTitlesY(4 * value)
-                      : getTitlesY(4 * value),
+                  : getTitlesY(value),
       margin: axis == 0 ? 8 : 12,
     );
   }
@@ -307,7 +297,7 @@ class _StatisticsState extends State<Statistics> {
     } else
       listPoints = dataMean;
     dataXTitle = LineChartData(
-        lineTouchData: LineTouchData(enabled: false),
+        lineTouchData: LineTouchData(enabled: true),
         gridData: FlGridData(
           show: true,
           drawHorizontalLine: true,
@@ -351,7 +341,10 @@ class _StatisticsState extends State<Statistics> {
     data = fillLineChartCal(foodList);
     //max cal in the food list
     maxValue = maxCalSum(data) + 50;
-    minValue = minCalSum(data);
+    if (minCalSum(data) > 100)
+      minValue = minCalSum(data);
+    else
+      minValue = 0;
     double maxX = getTimingCal(data);
     // double maxX =
     //     getTiming(foodList); //return the number of item in the food list
@@ -365,20 +358,18 @@ class _StatisticsState extends State<Statistics> {
     maxValue = maxCalSum(data) + 50; //max cal in the food list
     minValue = minCalSum(data);
     double maxX = getTimingCal(data);
-    // double maxX =
-    //getTiming(foodList); //return the number of item in the food list
     double minX = 1; //(chart display first element at 1 index)
     return displayXTitle(1, minX, maxX, minValue, maxValue, foodList);
   }
 
-  // return the max kcal of a food list
-  double maxCal(List<Food> foodList) {
-    List<double> cal = [];
-    for (int i = 0; i < foodList.length; i++) {
-      cal.add(foodList[i].kal);
-    }
-    return cal.reduce(math.max);
-  }
+  // // return the max kcal of a food list
+  // double maxCal(List<Food> foodList) {
+  //   List<double> cal = [];
+  //   for (int i = 0; i < foodList.length; i++) {
+  //     cal.add(foodList[i].kal);
+  //   }
+  //   return cal.reduce(math.max);
+  // }
 
   //return the max of sum of kcal for a day
   double maxCalSum(List<FlSpot> listPoints) {
@@ -402,7 +393,7 @@ class _StatisticsState extends State<Statistics> {
   LineChartBarData displayMeanData(double maxX, List<FlSpot> listPoints) {
     return LineChartBarData(
       spots: listPoints,
-      isCurved: true,
+      isCurved: false,
       colors: gradientColors,
       barWidth: 5,
       isStrokeCapRound: true,
@@ -483,6 +474,8 @@ class _StatisticsState extends State<Statistics> {
     switch (value.toInt()) {
       case 0:
         return '0';
+      case 50:
+        return '50';
       case 100:
         return '100';
       case 200:
@@ -534,13 +527,13 @@ class _StatisticsState extends State<Statistics> {
   //Display the number of the week in case of the index of the food
   String getTitlesXMonth(double value) {
     switch (value.toInt()) {
-      case 1:
+      case 6:
         return 'We1';
-      case 7:
+      case 13:
         return 'We2';
-      case 14:
-        return 'We3';
       case 21:
+        return 'We3';
+      case 30:
         return 'We4';
     }
     return '';
@@ -568,28 +561,28 @@ class _StatisticsState extends State<Statistics> {
     });
   }
 
-  //thanks to valueBottom we get the xMax of the graphic
-  double getTiming(List<Food> foodList) {
-    double xMax = 0;
-    double maxItem = foodList.length.toDouble();
-    if (valueBotton == 2) {
-      if (maxItem < 10) {
-        xMax = maxItem + 1;
-      } else
-        xMax = 4;
-    } else if (valueBotton == 0) {
-      if (maxItem < 7) {
-        xMax = maxItem + 1;
-      } else
-        xMax = 7;
-    } else if (valueBotton == 1) {
-      if (maxItem < 30) {
-        xMax = maxItem + 1;
-      } else
-        xMax = 31;
-    }
-    return xMax; // for 3 meal ==> return 3
-  }
+  // //thanks to valueBottom we get the xMax of the graphic
+  // double getTiming(List<Food> foodList) {
+  //   double xMax = 0;
+  //   double maxItem = foodList.length.toDouble();
+  //   if (valueBotton == 2) {
+  //     if (maxItem < 10) {
+  //       xMax = maxItem + 1;
+  //     } else
+  //       xMax = 4;
+  //   } else if (valueBotton == 0) {
+  //     if (maxItem < 7) {
+  //       xMax = maxItem + 1;
+  //     } else
+  //       xMax = 7;
+  //   } else if (valueBotton == 1) {
+  //     if (maxItem < 30) {
+  //       xMax = maxItem + 1;
+  //     } else
+  //       xMax = 31;
+  //   }
+  //   return xMax; // for 3 meal ==> return 3
+  // }
 
   double getTimingCal(List<FlSpot> listPoints) {
     double maxItem = listPoints.length.toDouble();
@@ -656,7 +649,6 @@ class _StatisticsState extends State<Statistics> {
     int day = 0;
     int dayselected = getDay(myList[day]);
     firstDay = getWeekDay(myList[day]);
-    print('dayselected: $dayselected');
     SumKcal = filled(0, 7);
     for (int i = 0; i < size; i++) {
       if (getDay(myList[i]) == dayselected) {
@@ -668,10 +660,41 @@ class _StatisticsState extends State<Statistics> {
           SumKcal[day] += myList[i].kal;
         } else
           dayselected += 1;
-        // if (i + 1 < size) dayselected = getDay(myList[i + 1]);
       }
     }
-    print(SumKcal);
+    print('pour la semaine: $SumKcal');
+    return SumKcal;
+  }
+
+  // get a list of calories for a Month
+  List<double> getSumMonth(List<Food> myList) {
+    int size = myList.length;
+    List<double> SumKcal = [];
+    int day = 0;
+    int dayselected = getDay(myList[day]);
+    int monthSelected = getMonth(myList[0]);
+    firstDay = getWeekDay(myList[day]);
+    SumKcal = filled(0, 31);
+    for (int i = 0; i < size; i++) {
+      if (getMonth(myList[i]) == monthSelected) {
+        if (getDay(myList[i]) == dayselected) {
+          SumKcal[day] += myList[i].kal;
+        } else {
+          day += 1;
+          if (getDay(myList[i]) == (dayselected + 1)) {
+            dayselected = getDay(myList[i]);
+            SumKcal[day] += myList[i].kal;
+          } else
+            dayselected += 1;
+        }
+      } else {
+        monthSelected += 1;
+        dayselected = getDay(myList[i]);
+        day += 1;
+        SumKcal[day] += myList[i].kal;
+      }
+    }
+    print('pour le mois: $SumKcal');
     return SumKcal;
   }
 
@@ -682,28 +705,6 @@ class _StatisticsState extends State<Statistics> {
       liste.add(value);
     }
     return liste;
-  }
-
-// get a list of calories for the month
-  List<double> getSumMonth(List<Food> myList) {
-    int size = myList.length;
-    List<double> SumKcal = [];
-    int month = 0;
-    int monthselected = getMonth(myList[month]);
-    print('AAAAAAAAAAA month selected:  $monthselected');
-    SumKcal = filled(0, 31);
-    for (int i = 0; i < size; i++) {
-      if (getMonth(myList[i]) == monthselected) {
-        SumKcal[month] += myList[i].kal;
-      } else {
-        if (month < 12) {
-          month += 1;
-        } else
-          month = 1;
-        if (i + 1 < size) monthselected = getMonth(myList[i + 1]);
-      }
-    }
-    return SumKcal;
   }
 
   int getDay(Food myFood) {
@@ -721,9 +722,4 @@ class _StatisticsState extends State<Statistics> {
   int getWeekDay(Food myFood) {
     return DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).weekday;
   }
-
-  // String getTime(Food myFood) {
-  //   return '${DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).hour} h ' +
-  //       '${DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).minute} min';
-  // }
 }
