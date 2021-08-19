@@ -1,11 +1,22 @@
 //import 'dart:html';
 import 'dart:math' as math;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:quiver/core.dart';
 import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/model/food.dart';
+import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
+import 'package:transfer_learning_fruit_veggies/events/set_food.dart';
+
+/**
+ * Fonctions potentielles à enlever:
+ * filllinechart
+ * fillmeanlinechart
+ * maxcal
+ * getavgfooditem
+ * getTiming
+ */
 
 class Statistics extends StatefulWidget {
   @override
@@ -18,8 +29,10 @@ class _StatisticsState extends State<Statistics> {
     const Color(0xff02d39a),
   ];
   DateTime _Today = new DateTime.now();
+  int epoch = new DateTime.now().millisecondsSinceEpoch;
   int weekDay = 0; //monday .. (1=mond, ... 7=sunday)
   double maxValue = 0;
+  double minValue = 0;
   bool showAvg = false;
 
   List<FlSpot> dataMean = [];
@@ -31,10 +44,13 @@ class _StatisticsState extends State<Statistics> {
 
   //List Botton (week(0)/Month(1)/Year(2))
   int valueBotton = 0;
-  List<String> titleButtonRadio = ['Week', 'Month', 'Year'];
+  List<String> titleButtonRadio = ['Week', 'Month', 'Day'];
   late LineChartData dataXTitle;
   bool Graphdisplayed = false;
-
+  List<double> Calories = [];
+  //know which first day of a week we have in the database
+  int firstDay = 0;
+  List<String> WeekDays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
   @override
   void initState() {
     super.initState();
@@ -65,23 +81,73 @@ class _StatisticsState extends State<Statistics> {
     return mean.toInt();
   }
 
-  /* -----------CREATE DATA TO DISPLAY----------------- */
-  //give a size and inster plot (i,kal) , initialize/register data
-  List<FlSpot> fillLineChartCal(List<Food> listFood) {
-    List<FlSpot> dataPoints = [];
-    for (int i = 0; i < listFood.length; i++) {
-      addPoint(dataPoints, listFood[i].kal, i + 1);
+  // the avg of a food item in a list
+  //add an integer to choose the category (protein, glucide..) ? Or made the avg for all categories
+  int getAvgFoodItemCal(List<FlSpot> listPoints) {
+    double mean = 0;
+    for (int i = 0; i < listPoints.length; i++) {
+      mean += listPoints[i].y;
     }
+    mean = mean / listPoints.length;
+    return mean.toInt();
+  }
+
+  /* -----------CREATE DATA TO DISPLAY----------------- */
+  // give a size and inster plot (i,kal) , initialize/register data
+  // List<FlSpot> fillLineChartCal(List<Food> listFood) {
+  //   List<FlSpot> dataPoints = [];
+  //   for (int i = 0; i < listFood.length; i++) {
+  //     addPoint(dataPoints, listFood[i].kal, i + 1);
+  //   }
+  //   return dataPoints;
+  // }
+
+  List<FlSpot> fillLineChartCal(List<Food> listFood) {
+    List<double> liste = [];
+    List<FlSpot> dataPoints = [];
+    print('ca passe ici ligne 84');
+    if (valueBotton == 0 || valueBotton == 1) {
+      liste = SumKcal(listFood);
+      for (int i = 0; i < liste.length; i++) {
+        addPoint(dataPoints, liste[i], i + 1);
+      }
+    } else {
+      for (int i = 0; i < listFood.length; i++) {
+        addPoint(dataPoints, listFood[i].kal, i + 1);
+      }
+    }
+    print('ca passe ligne 95');
     return dataPoints;
   }
 
   //give a size and inster plot (i,meankal) , initialize/register mean data
-  List<FlSpot> fillMeanLineChartCal(List<Food> listFood) {
+  List<FlSpot> fillMeanLineChart(List<Food> listFood) {
     List<FlSpot> dataPoints = [];
     for (int i = 0; i < listFood.length; i++) {
       addPoint(dataPoints, getAvgFoodItem(listFood).toDouble(), i + 1);
     }
     return dataPoints;
+  }
+
+  //give a size and inster plot (i,meankal) , initialize/register mean data
+  List<FlSpot> fillMeanLineChartCal(List<FlSpot> listPoints) {
+    List<FlSpot> dataPoints = [];
+    for (int i = 0; i < data.length; i++) {
+      addPoint(dataPoints, getAvgFoodItemCal(listPoints).toDouble(), i + 1);
+    }
+    return dataPoints;
+  }
+
+  List<double> SumKcal(List<Food> mylist) {
+    List<double> listCal = [];
+    print('ca passe ligne 110');
+    if (valueBotton == 0) {
+      listCal = getSumWeek(mylist);
+    } else if (valueBotton == 1) {
+      listCal = getSumMonth(mylist);
+    }
+    print('ca passe ligne 116: LIST DE KAL SUMMED: $listCal');
+    return listCal;
   }
 
   //change the value at the index given
@@ -144,6 +210,7 @@ class _StatisticsState extends State<Statistics> {
         groupValue: valueBotton,
         onChanged: (val) {
           changeRadio(i);
+          Database();
         },
         activeColor: Theme.of(context).primaryColor,
         controlAffinity: ListTileControlAffinity.leading,
@@ -181,7 +248,11 @@ class _StatisticsState extends State<Statistics> {
   }
 
   //Display axis titles legends (X)
-  SideTitles displayAxisTitles(int axis) {
+  SideTitles displayAxisTitles(int axis, List<Food> mylist) {
+    int indexDay = 0;
+    if (mylist.length != 0) {
+      indexDay = getWeekDay(mylist[0]);
+    }
     return SideTitles(
       showTitles: true,
       reservedSize: axis == 0 ? 22 : 28,
@@ -191,14 +262,14 @@ class _StatisticsState extends State<Statistics> {
         fontSize: 15,
       ),
       getTitles: (value) => (axis == 0 && valueBotton == 0)
-          ? getTitlesXWeek(value)
+          ? getTitlesXWeek(value, indexDay)
           : (axis == 0 && valueBotton == 1)
               ? getTitlesXMonth(value)
               : (axis == 0 && valueBotton == 2)
-                  ? getTitlesXYear(value)
+                  ? getTitlesXDay(value)
                   : (axis == 1)
-                      ? getTitlesY(value)
-                      : getTitlesY(value),
+                      ? getTitlesY(4 * value)
+                      : getTitlesY(4 * value),
       margin: axis == 0 ? 8 : 12,
     );
   }
@@ -229,7 +300,7 @@ class _StatisticsState extends State<Statistics> {
 
 // LineChartData ==> changer l'axe X affichage
   LineChartData displayXTitle(int dataType, double minX, double maxX,
-      double minY, double maxY, List<Food> foodList) {
+      double minY, double maxY, mylist) {
     List<FlSpot> listPoints = [];
     if (dataType == 0) {
       listPoints = data;
@@ -256,9 +327,9 @@ class _StatisticsState extends State<Statistics> {
         ),
         titlesData: FlTitlesData(
           show: true,
-          bottomTitles: displayAxisTitles(0),
+          bottomTitles: displayAxisTitles(0, mylist),
           // Y Axis Legend
-          leftTitles: displayAxisTitles(1),
+          leftTitles: displayAxisTitles(1, mylist),
         ),
 
         // Size of the chart and display data
@@ -270,7 +341,7 @@ class _StatisticsState extends State<Statistics> {
         minY: minY,
         maxY: maxY,
         lineBarsData: [
-          displayMeanData(maxX, listPoints, foodList),
+          displayMeanData(maxX, listPoints),
         ]);
     return dataXTitle;
   }
@@ -278,21 +349,26 @@ class _StatisticsState extends State<Statistics> {
   // Display the first curve between X:(0,time) et Y:(0,kcal max +50)
   LineChartData mainData(List<Food> foodList) {
     data = fillLineChartCal(foodList);
-    maxValue = maxCal(foodList) + 50; //max cal in the food list
-    double maxX =
-        getTiming(foodList); //return the number of item in the food list
+    //max cal in the food list
+    maxValue = maxCalSum(data) + 50;
+    minValue = minCalSum(data);
+    double maxX = getTimingCal(data);
+    // double maxX =
+    //     getTiming(foodList); //return the number of item in the food list
     double minX = 1; //(chart display first element at 1 index)
-    return displayXTitle(0, minX, maxX, 0, maxValue, foodList);
+    return displayXTitle(0, minX, maxX, minValue, maxValue, foodList);
   }
 
   // Display avg in the second curve between X:(0,time) et Y:(0,kcal max +50)
   LineChartData mainAVGData(List<Food> foodList) {
-    dataMean = fillMeanLineChartCal(foodList);
-    maxValue = maxCal(foodList) + 50; //max cal in the food list
-    double maxX =
-        getTiming(foodList); //return the number of item in the food list
+    dataMean = fillMeanLineChartCal(data);
+    maxValue = maxCalSum(data) + 50; //max cal in the food list
+    minValue = minCalSum(data);
+    double maxX = getTimingCal(data);
+    // double maxX =
+    //getTiming(foodList); //return the number of item in the food list
     double minX = 1; //(chart display first element at 1 index)
-    return displayXTitle(1, minX, maxX, 0, maxValue, foodList);
+    return displayXTitle(1, minX, maxX, minValue, maxValue, foodList);
   }
 
   // return the max kcal of a food list
@@ -304,9 +380,26 @@ class _StatisticsState extends State<Statistics> {
     return cal.reduce(math.max);
   }
 
+  //return the max of sum of kcal for a day
+  double maxCalSum(List<FlSpot> listPoints) {
+    List<double> cal = [];
+    for (int i = 0; i < listPoints.length; i++) {
+      cal.add(listPoints[i].y);
+    }
+    return cal.reduce(math.max);
+  }
+
+  //return the min value of the sum of meal per day
+  double minCalSum(List<FlSpot> listPoints) {
+    List<double> cal = [];
+    for (int i = 0; i < listPoints.length; i++) {
+      cal.add(listPoints[i].y);
+    }
+    return cal.reduce(math.min);
+  }
+
   //display mean data or data in the graph
-  LineChartBarData displayMeanData(
-      double maxX, List<FlSpot> listPoints, List<Food> listFood) {
+  LineChartBarData displayMeanData(double maxX, List<FlSpot> listPoints) {
     return LineChartBarData(
       spots: listPoints,
       isCurved: true,
@@ -325,20 +418,23 @@ class _StatisticsState extends State<Statistics> {
 
   // display the screen of statistics part
   Widget displayStatisticScreen(BuildContext context, List<Food> mylist) {
-    print(mylist);
-    print(mylist[0].datetoString()); //date: y-m-d
+    //date: y-m-d
     if (Graphdisplayed == false) {
       Graphdisplayed = true;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          displayTitle(),
-          displayRadioButton(mylist),
-          DisplayChart(mylist),
-          AVGButton(),
-          //Statistics2(),
-        ],
-      );
+      if (mylist.length == 0) {
+        return Text(
+            'You can go on the camera screen and take pictures of your meal');
+      } else
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            displayTitle(),
+            displayRadioButton(mylist),
+            DisplayChart(mylist),
+            AVGButton(),
+            //Statistics2(),
+          ],
+        );
     } else
       return Container();
   }
@@ -385,14 +481,12 @@ class _StatisticsState extends State<Statistics> {
   String getTitlesY(value) {
     //  return (value.toString() + ' kcal');
     switch (value.toInt()) {
-      // case 50:
-      //   return '50';
+      case 0:
+        return '0';
       case 100:
         return '100';
       case 200:
         return '200';
-      // case 250:
-      //   return '250';
       case 1000:
         return '1000';
       case 1500:
@@ -407,27 +501,37 @@ class _StatisticsState extends State<Statistics> {
     return '';
   }
 
-  //get Title of the X axe
-  String getTitlesXWeek(value) {
+  String getTitlesXWeek(value, int indexDay) {
     switch (value.toInt()) {
       case 1:
-        return 'Mo';
+        return indexDayWeek(1, indexDay);
       case 2:
-        return 'Tu';
+        return indexDayWeek(2, indexDay);
       case 3:
-        return 'We';
+        return indexDayWeek(3, indexDay);
       case 4:
-        return 'Th';
+        return indexDayWeek(4, indexDay);
       case 5:
-        return 'Fr';
+        return indexDayWeek(5, indexDay);
       case 6:
-        return 'Sa';
+        return indexDayWeek(6, indexDay);
       case 7:
-        return 'Su';
+        return indexDayWeek(7, indexDay);
     }
     return '';
   }
 
+  //give the right day in function of the index of the day in a week
+  String indexDayWeek(int casei, int index) {
+    if ((index + casei) < 9) {
+      return WeekDays[index + casei - 2];
+    } else {
+      int reste = index + casei - 9;
+      return WeekDays[reste];
+    }
+  }
+
+  //Display the number of the week in case of the index of the food
   String getTitlesXMonth(double value) {
     switch (value.toInt()) {
       case 1:
@@ -442,42 +546,16 @@ class _StatisticsState extends State<Statistics> {
     return '';
   }
 
-  String getTitlesXYear(double value) {
+  //Display the number of the week in case of the index of the food
+  String getTitlesXDay(double value) {
+    // String first = getTime(myList[0]);
     switch (value.toInt()) {
-      // case 1:
-      //   return 'Jan';
-      // case 31:
-      //   return 'Feb';
-      // case 60:
-      //   return 'Mar';
-      // case 90:
-      //   return 'Apr';
-      // case 120:
-      //   return 'Mai';
-      // case 150:
-      //   return 'Jun';
-      // case 180:
-      //   return 'Jul';
-      // case 210:
-      //   return 'Aug';
-      // case 240:
-      //   return 'Sept';
-      // case 270:
-      //   return 'Oct';
-      // case 300:
-      //   return 'Nov';
-      // case 330:
-      //   return 'Dec';
       case 1:
-        return 'Jan';
-      case 21:
-        return 'Apr';
-      case 180:
-        return 'Aug';
-      case 260:
-        return 'Nov';
+        return 'morning';
+      case 3:
+        return 'afternoon';
     }
-    return "";
+    return '';
   }
 
   //change the value of the RadioButton
@@ -492,24 +570,160 @@ class _StatisticsState extends State<Statistics> {
 
   //thanks to valueBottom we get the xMax of the graphic
   double getTiming(List<Food> foodList) {
-    double xMax;
+    double xMax = 0;
     double maxItem = foodList.length.toDouble();
-    if (valueBotton == 0) {
+    if (valueBotton == 2) {
+      if (maxItem < 10) {
+        xMax = maxItem + 1;
+      } else
+        xMax = 4;
+    } else if (valueBotton == 0) {
       if (maxItem < 7) {
-        xMax = maxItem;
+        xMax = maxItem + 1;
       } else
         xMax = 7;
     } else if (valueBotton == 1) {
-      if (maxItem < 31) {
-        xMax = maxItem;
+      if (maxItem < 30) {
+        xMax = maxItem + 1;
       } else
         xMax = 31;
-    } else {
-      if (maxItem < 366) {
-        xMax = maxItem;
-      } else
-        xMax = 366;
     }
+    return xMax; // for 3 meal ==> return 3
+  }
+
+  double getTimingCal(List<FlSpot> listPoints) {
+    double maxItem = listPoints.length.toDouble();
     return maxItem; // for 3 meal ==> return 3
   }
+
+  /* _________________DATABASE AND FOOD LIST_____________ */
+  // List<FlSpot> getFoodListTiming(List<Food> foodList) {
+  //   List<FlSpot> listPoints = [];
+  //   int size = 0;
+  //   if (valueBotton == 0) {
+  //     size = 7;
+  //   }
+  //   if (valueBotton == 1) {
+  //     size = 30;
+  //   }
+  //   if (valueBotton == 2) {
+  //     size = 365;
+  //   }
+
+  //   return listPoints;
+  // }
+
+  //request to use the day list of meal
+  void DayDatabase() {
+    DatabaseProvider.db.getTodayFoods().then((foodList) {
+      BlocProvider.of<FoodBloc>(context).add(
+        SetFoods(foodList),
+      );
+    });
+  }
+
+  //request to use the week list of meal
+  void Database() {
+    switch (valueBotton) {
+      case 0:
+        DatabaseProvider.db.getWeekFoods().then((foodList) {
+          BlocProvider.of<FoodBloc>(context).add(
+            SetFoods(foodList),
+          );
+        });
+        break;
+      case 1:
+        DatabaseProvider.db.getMonthFoods().then((foodList) {
+          BlocProvider.of<FoodBloc>(context).add(
+            SetFoods(foodList),
+          );
+        });
+        break;
+      case 2:
+        DatabaseProvider.db.getTodayFoods().then((foodList) {
+          BlocProvider.of<FoodBloc>(context).add(
+            SetFoods(foodList),
+          );
+        });
+        break;
+    }
+  }
+
+// get a list of calories for the week
+  List<double> getSumWeek(List<Food> myList) {
+    int size = myList.length;
+    List<double> SumKcal = [];
+    int day = 0;
+    int dayselected = getDay(myList[day]);
+    firstDay = getWeekDay(myList[day]);
+    print('dayselected: $dayselected');
+    SumKcal = filled(0, 7);
+    for (int i = 0; i < size; i++) {
+      if (getDay(myList[i]) == dayselected) {
+        SumKcal[day] += myList[i].kal;
+      } else {
+        day += 1;
+        if (getDay(myList[i]) == (dayselected + 1)) {
+          dayselected = getDay(myList[i]);
+          SumKcal[day] += myList[i].kal;
+        } else
+          dayselected += 1;
+        // if (i + 1 < size) dayselected = getDay(myList[i + 1]);
+      }
+    }
+    print(SumKcal);
+    return SumKcal;
+  }
+
+//create a List of null
+  List<double> filled(double value, int size) {
+    List<double> liste = [];
+    for (int i = 0; i < size; i++) {
+      liste.add(value);
+    }
+    return liste;
+  }
+
+// get a list of calories for the month
+  List<double> getSumMonth(List<Food> myList) {
+    int size = myList.length;
+    List<double> SumKcal = [];
+    int month = 0;
+    int monthselected = getMonth(myList[month]);
+    print('AAAAAAAAAAA month selected:  $monthselected');
+    SumKcal = filled(0, 31);
+    for (int i = 0; i < size; i++) {
+      if (getMonth(myList[i]) == monthselected) {
+        SumKcal[month] += myList[i].kal;
+      } else {
+        if (month < 12) {
+          month += 1;
+        } else
+          month = 1;
+        if (i + 1 < size) monthselected = getMonth(myList[i + 1]);
+      }
+    }
+    return SumKcal;
+  }
+
+  int getDay(Food myFood) {
+    return DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).day;
+  }
+
+  int getMonth(Food myFood) {
+    return DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).month;
+  }
+
+  int getYear(Food myFood) {
+    return DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).year;
+  }
+
+  int getWeekDay(Food myFood) {
+    return DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).weekday;
+  }
+
+  // String getTime(Food myFood) {
+  //   return '${DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).hour} h ' +
+  //       '${DateTime.fromMillisecondsSinceEpoch(myFood.dateSinceEpoch).minute} min';
+  // }
 }

@@ -166,7 +166,7 @@ class DatabaseProvider {
     final db = await database;
     var myquery = await db.rawQuery('SELECT * FROM ' +
         TABLE_FOOD +
-        'WHERE ' +
+        ' WHERE ' +
         COLUMN_DATE +
         '>= ' +
         dateLastWeek.toString());
@@ -186,7 +186,7 @@ class DatabaseProvider {
     final db = await database;
     var myquery = await db.rawQuery('SELECT * FROM ' +
         TABLE_FOOD +
-        'WHERE ' +
+        ' WHERE ' +
         COLUMN_DATE +
         '>= ' +
         dateLastWeek.toString());
