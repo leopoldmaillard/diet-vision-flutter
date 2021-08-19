@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/events/set_food.dart';
 import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
@@ -6,6 +7,7 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/model/food.dart';
 import 'package:transfer_learning_fruit_veggies/events/delete_food.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HistoryMeal extends StatefulWidget {
   const HistoryMeal({Key? key}) : super(key: key);
@@ -32,6 +34,11 @@ class _HistoryMealState extends State<HistoryMeal> {
   void initState() {
     super.initState();
     retrieveDatabase();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   // execute a query to retrieve database store in db variable
@@ -86,12 +93,17 @@ class _HistoryMealState extends State<HistoryMeal> {
   }
 
   void deleteItem(Food food, int index) {
+    name = food.nameFood;
+    users
+        .add({'name': name})
+        .then((value) => print('User Added'))
+        .catchError((error) => print('Failed to Add a meal : $error'));
     DatabaseProvider.db.delete(food.id).then(
       (_) {
         BlocProvider.of<FoodBloc>(context).add(
           DeleteFood(index),
         );
-        Navigator.pop(context);
+        Navigator.of(context, rootNavigator: true).pop();
       },
     );
   }
@@ -105,7 +117,9 @@ class _HistoryMealState extends State<HistoryMeal> {
 
   Widget displayCancelButton() {
     return TextButton(
-      onPressed: () => Navigator.pop(context),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop();
+      },
       child: Text("Cancel"),
     );
   }
@@ -143,6 +157,8 @@ class _HistoryMealState extends State<HistoryMeal> {
     );
   }
 
+  CollectionReference users = Firestore.instance.collection('users');
+  var name = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
