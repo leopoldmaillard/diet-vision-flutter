@@ -17,6 +17,7 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/events/add_food.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transfer_learning_fruit_veggies/model/drink.dart';
 
 //JSON
 import 'package:transfer_learning_fruit_veggies/source/nutrition_table.dart';
@@ -576,6 +577,12 @@ class _SegmentationState extends State<Segmentation> {
         listAllIngredient.add(parseFoodData(k, v));
       }
     });
+    // String idButton;
+    // idButton = (int.parse(dropdownValue)).toString();
+    Map<dynamic, dynamic> dataJsonDrink;
+    dataJsonDrink =
+        myJson.firstWhere((element) => element["id"] == dropdownValue);
+    listAllIngredient.add(parseDrinkData(dataJsonDrink["name"]));
     return listAllIngredient;
   }
 
@@ -585,25 +592,60 @@ class _SegmentationState extends State<Segmentation> {
     Map<dynamic, dynamic> dataJson;
     dataJson =
         foodNutritionJson.firstWhere((element) => element["name"] == nameF);
-
-    Random myrand = Random();
     food.volEstim = volume;
-    food.volumicMass = roundDouble((dataJson["vm"] * 100), 2);
-    food.mass = roundDouble(
-        ((food.volEstim.toDouble() * food.volumicMass) ~/ 100).toDouble(), 2);
+    food.volumicMass = dataJson["vm"];
+    food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
     food.nutriscore = dataJson["nutriscore"].toString();
     food.kal = roundDouble((dataJson["cal"] * food.mass / 100), 2);
-    food.carbohydrates = roundDouble(myrand.nextDouble() * 100, 2);
-    food.protein = roundDouble(myrand.nextDouble() * 100, 2);
-    food.sugar = roundDouble(myrand.nextDouble() * 25, 2);
-    food.fat = roundDouble(myrand.nextDouble() * 30, 2);
+    food.fat = roundDouble((dataJson["fat"] * food.mass / 100), 2);
+    food.protein = roundDouble((dataJson["protein"] * food.mass / 100), 2);
+    food.sugar = roundDouble((dataJson["sugar"] * food.mass / 100), 2);
+    food.carbohydrates =
+        roundDouble((dataJson["carbohydrates"] * food.mass / 100), 2);
+
+    print("Food element  parsed");
     String blabla = food.toString();
+    return food;
+  }
+
+  Food parseDrinkData(String nameF) {
+    Food food = new Food(nameFood: nameF);
+    Map<dynamic, dynamic> dataJson;
+    dataJson =
+        drinkNutritionJson.firstWhere((element) => element["name"] == nameF);
+    print("the dataJson");
+    print(dataJson);
+    print(dataJson["vm"]);
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    drinkEnum.values.forEach((v) {
+      print('value: $v, index: ${v.index}');
+      if (v.index == int.parse(dropdownValue)) {
+        if (dataJson["name"] == "Select your drink  ") {
+          food.volEstim = 0;
+        } else {
+          food.volEstim = 250;
+        }
+        food.volumicMass = dataJson["vm"];
+        food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
+        food.nutriscore = dataJson["nutriscore"].toString();
+        food.kal = roundDouble((dataJson["cal"] * food.mass / 100), 2);
+        food.fat = roundDouble((dataJson["fat"] * food.mass / 100), 2);
+        food.protein = roundDouble((dataJson["protein"] * food.mass / 100), 2);
+        food.sugar = roundDouble((dataJson["sugar"] * food.mass / 100), 2);
+        food.carbohydrates =
+            roundDouble((dataJson["carbohydrates"] * food.mass / 100), 2);
+      }
+    });
+
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+    String blabla = food.toString();
+    print(blabla);
     return food;
   }
 
   Food computeMealStats(List<Food> listAllIngredient) {
     Food mealResults = new Food(nameFood: "");
-    mealResults.nameFood = "Meal " + mealResults.id.toString();
+    //mealResults.nameFood = "Meal " + mealResults.id.toString();
     for (int i = 0; i < listAllIngredient.length; i++) {
       mealResults.volEstim += listAllIngredient[i].volEstim;
       //mealResults.mass = listAllIngredient[i].volEstim;
@@ -616,6 +658,9 @@ class _SegmentationState extends State<Segmentation> {
       mealResults.mass += listAllIngredient[i].mass;
       mealResults.volumicMass += listAllIngredient[i].volumicMass;
     }
+    var currentDate = new DateTime.now();
+    mealResults.dateSinceEpoch = currentDate.millisecondsSinceEpoch;
+
     return mealResults;
   }
 
@@ -624,27 +669,6 @@ class _SegmentationState extends State<Segmentation> {
     double mod = pow(10.0, places).toDouble();
     return ((value * mod).round().toDouble() / mod);
   }
-  /*
-  double roundDouble(double value, int places){ 
-   double mod = pow(10.0, places); 
-   return ((value * mod).round().toDouble() / mod); 
-}
-
-main() {
-  double num1 = roundDouble(12.3412, 2);
-  // 12.34*/
-
-  /// some function to change
-  // void addElementToDatabase(List keyValue) {
-  //   int valuecm2 = (keyValue[1] * SURFACE2EUROS / COINPIXELS / 100).round();
-  //   String nameFood1 = keyValue[0] + ' : ' + valuecm2.toString() + 'cm²';
-  //   Food food = parseFoodData(nameFood1, valuecm2);
-  //   DatabaseProvider.db.insert(food).then(
-  //         (storedFood) => BlocProvider.of<FoodBloc>(context).add(
-  //           AddFood(storedFood),
-  //         ),
-  //       );
-  // }
 
   //keyvalue[0] = foodNAme
   //keyvalue[1] = volum in cm3
