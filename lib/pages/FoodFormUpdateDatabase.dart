@@ -178,7 +178,10 @@ class FoodFormState extends State<FoodForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Food Form")),
+      appBar: AppBar(
+        title: Text("Food Form"),
+        brightness: Brightness.dark,
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24),
         child: Form(

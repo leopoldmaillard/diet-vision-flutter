@@ -129,12 +129,15 @@ class _HistoryMealState extends State<HistoryMeal> {
 
   Widget displayUpdateButton(Food food, int index) {
     return TextButton(
-      onPressed: () => Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => FoodForm(food: food, foodIndex: index),
-        ),
-      ),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FoodForm(food: food, foodIndex: index),
+          ),
+        );
+      },
       child: Text("Update"),
     );
   }
