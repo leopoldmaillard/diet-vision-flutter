@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/events/set_food.dart';
 import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
-
+import 'package:transfer_learning_fruit_veggies/pages/FoodFormUpdateDatabase.dart';
 import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/model/food.dart';
@@ -45,6 +45,7 @@ class _HistoryMealState extends State<HistoryMeal> {
   void retrieveDatabase() {
     DatabaseProvider.db.getTodayFoods().then(
       (foodList) {
+        print("la foodlist d'aujourdhui: \n" + foodList.toString());
         BlocProvider.of<FoodBloc>(context).add(
           SetFoods(foodList),
         );
@@ -82,10 +83,12 @@ class _HistoryMealState extends State<HistoryMeal> {
   //Display a popup on which we can do actions on these items (update, delete..)
   AlertDialog displayPopup(Food food, int index) {
     return AlertDialog(
-      title: Text(food.nameFood),
+      title:
+          food.nameUpdated == '' ? Text(food.nameFood) : Text(food.nameUpdated),
       content: Text("ID ${food.id}"), //main content, image easily integratable
       elevation: 24.0,
       actions: <Widget>[
+        displayUpdateButton(food, index),
         displayDeleteButton(food, index),
         displayCancelButton(),
       ],
@@ -124,6 +127,17 @@ class _HistoryMealState extends State<HistoryMeal> {
     );
   }
 
+  Widget displayUpdateButton(Food food, int index) {
+    return TextButton(
+      onPressed: () => Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FoodForm(food: food, foodIndex: index),
+        ),
+      ),
+      child: Text("Update"),
+    );
+  }
   /* **************************************************************************/
   /* ****************************  General Design  ****************************/
   /* **************************************************************************/
