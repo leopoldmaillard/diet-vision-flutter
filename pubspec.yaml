@@ -51,6 +51,7 @@ dependencies:
   cloud_firestore_web: # ^1.0.0 # new
   firebase_core_web: # ^1.0.0 # new
   firebase_auth_web:
+  fluttertoast: ^8.0.7
 
 dev_dependencies:
   flutter_test:

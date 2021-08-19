@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:transfer_learning_fruit_veggies/fhome.dart';
+import 'package:transfer_learning_fruit_veggies/mainOriginal.dart';
 
 class VerifyScreen extends StatefulWidget {
   @override
@@ -39,7 +40,9 @@ class _VerifyScreenState extends State<VerifyScreen> {
         var user = await FirebaseAuth.instance.currentUser();
         if (user.isEmailVerified) {
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => FHomeScreen()));
+              // MaterialPageRoute(builder: (context) => FHomeScreen()));
+              MaterialPageRoute(builder: (context) => MyApp()));
+
           timer.cancel();
         }
       });
