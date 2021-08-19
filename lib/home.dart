@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/pages/camera_screen.dart';
 import 'package:transfer_learning_fruit_veggies/pages/geoloc.dart';
 import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
+import 'package:transfer_learning_fruit_veggies/pages/onboarding_screen.dart';
 import 'package:transfer_learning_fruit_veggies/pages/statistics.dart';
 import 'package:transfer_learning_fruit_veggies/pages/profile.dart';
 import 'package:geocoder/geocoder.dart';
@@ -105,6 +106,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         title: Text("Diet Vision"),
         elevation: 0.7,
         brightness: Brightness.dark,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.help),
+            onPressed: () {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (_) => OnBoardingScreen(cameras: widget.cameras)));
+            },
+          )
+        ],
       ),
       bottomNavigationBar: BottomAppBar(
         child: TabBar(

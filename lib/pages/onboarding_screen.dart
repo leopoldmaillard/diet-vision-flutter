@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:transfer_learning_fruit_veggies/home.dart';
 import 'package:camera/camera.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoardingScreen extends StatelessWidget {
   final List<CameraDescription> cameras;
@@ -28,14 +29,14 @@ class OnBoardingScreen extends StatelessWidget {
           PageViewModel(
             title: 'Take a first picture',
             body:
-                'Place a coin in front of your meal and snap a top-view picture of it. Try to match the coin with the circle area drawn on the screen, it will help determining the amount of food in your plate.',
+                'Place a coin between the plate and you and snap a top-view picture of your meal. Try to match the coin with the circle area drawn on the screen.',
             image: buildImage('assets/images/topView.png'),
             decoration: getPageDecoration(true, context),
           ),
           PageViewModel(
             title: 'Take a second picture',
             body:
-                'Move your phone & match again the new area with your coin. This will reveal a side-view of your dish. This second picture is required to estimate the volume of food in your plate.',
+                'Move your phone & match again the new area with your coin. This will reveal a 45° view of your dish. This second picture is required to estimate the volume of food in your plate.',
             image: buildImage('assets/images/45view.png'),
             decoration: getPageDecoration(true, context),
           ),
@@ -74,9 +75,13 @@ class OnBoardingScreen extends StatelessWidget {
         onChange: (index) => print('Page $index selected'),
       );
 
-  void goToHome(context) => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => Home(cameras: cameras)),
-      );
+  void goToHome(context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("firstLaunch", false);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => Home(cameras: cameras)),
+    );
+  }
 
   DotsDecorator getDotDecoration(BuildContext context) => DotsDecorator(
         color: Color(0xFFBDBDBD),
