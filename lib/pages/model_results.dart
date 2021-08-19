@@ -199,6 +199,7 @@ class _SegmentationState extends State<Segmentation> {
   var _outputPNG; // Mask
   var _outputRAW; // classic picture taken
   Map _outputClasses = Map();
+  Map classVolumeDistance = Map();
 
   List<List<List<int>>> _outputClassesVolume = [];
   List<List<List<int>>> _outputClassesSurface = [];
@@ -288,9 +289,36 @@ class _SegmentationState extends State<Segmentation> {
       _outputClassesVolume = outputClassesVolume;
       _outputClassesDistance = outputClassesDistance;
       _outputClassesHeight = outputClassesHeight;
+
+      var categories = classes.values.toList();
+      if (!widget.volume) {
+        _outputClasses.entries.forEach((e) {
+          int percent = ((e.value / OUTPUTSIZE) * 100).round();
+          if (percent > 1) {
+            int surface = (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
+            int index = categories.indexOf(e.key);
+            int color = pascalVOCLabelColors[index];
+
+            if (!(e.key == 'Background 🏞️' ||
+                e.key == 'Food Containers 🍽️' ||
+                e.key == 'Dining Tools 🍴')) {
+              surfaceSaved[e.key] = [surface, percent, color];
+            }
+          }
+        });
+      } else
+        surfaceSaved = widget.surfaces;
+
+      classVolumeName.forEach((element) {
+        classVolumeDistance[element] = [
+          widget.distances[VALUES.indexOf(element)], // distance
+          surfaceSaved[element][0]
+        ];
+      });
+      print(surfaceSaved);
+      print(classVolumeDistance);
       _loading = false;
     });
-    // print(_outputClasses);
 
     // List keyValue = maxClasse();
     // addElementToDatabase(keyValue);
@@ -533,8 +561,6 @@ class _SegmentationState extends State<Segmentation> {
   //     }
   //   });
 
-  //   print(thekey);
-  //   print(thevalue);
   //   return [thekey, thevalue];
   // }
 
@@ -566,9 +592,6 @@ class _SegmentationState extends State<Segmentation> {
     Map<dynamic, dynamic> dataJson;
     dataJson =
         foodNutritionJson.firstWhere((element) => element["name"] == nameF);
-    print("the dataJson");
-    print(dataJson);
-
     food.volEstim = volume;
     food.volumicMass = dataJson["vm"];
     food.mass = roundDouble((food.volEstim * food.volumicMass), 2);
@@ -582,7 +605,6 @@ class _SegmentationState extends State<Segmentation> {
 
     print("Food element  parsed");
     String blabla = food.toString();
-    print(blabla);
     return food;
   }
 
@@ -721,60 +743,43 @@ class _SegmentationState extends State<Segmentation> {
     Map outputFinal = Map(); // ['nameclass', volumeincm3, .....]
     List<dynamic> widSurfKey = widget.surfaces.keys.toList();
     List<dynamic> widSurfVal = widget.surfaces.values.toList();
-    final chips = <Widget>[];
     var categories = classes.values.toList();
     var mykeys = widget.distances.keys.toList();
     var dist = widget.distances.values.toList();
-    print("VOIIIICIIII LA DIST");
-    print(mykeys);
-    print(dist);
     double thickPixels, thickness, distCoinClass, thickPixelsReal;
-    //idxClass: index in the outputClasses of the current classe
-    //idxClassDIst: index in the widget.distance of the current classe
     int idxClass, idxClassDist; //, index, color, item, surf, volume;
-
     int index, color, item, surf = 0, volume;
-    // obtain the volume for each class segmented in the first/second picture
-    for (int i = 0; i < minMax.length; i++) {
+
+    Widget hey = ListView(
+        children: classVolumeDistance.entries.map((e) {
+      int i = classVolumeDistance.keys.toList().indexOf(e.key);
       thickPixels = (minMax[i][2].abs() - minMax[i][0].abs()).toDouble();
-      print(classVolumeName[i]);
-      idxClass = categories
-          .indexOf(classVolumeName[i]); // replace: classes.values.toList()
-      print(idxClass);
-      idxClassDist =
-          mykeys.indexOf(idxClass); // replace:widget.distances.keys.toList()
-      print(idxClassDist);
-      distCoinClass = dist[idxClassDist]; // replace:widget.distances.values
-      print(distCoinClass);
+      idxClass = categories.indexOf(e.key); // replace: classes.values.toList()
+
+      distCoinClass = e.value[0]; // replace:widget.distances.values
 
       thickPixelsReal =
           getPixelConsideringPerspective(thickPixels, distCoinClass);
       thickness = (thickPixelsReal * COINDIAMETERIRLCM / COINDIAMETERPIXELS);
 
       color = pascalVOCLabelColors[idxClass];
-      print("the color :");
-      print(color);
-      item = widSurfKey.indexOf(classVolumeName[i]);
-      print("the item");
-      print(item);
-      if ((item >= 0) && (item <= 24)) {
-        surf = widSurfVal[item]; //replace: widget.surfaces.values.toList();
-        volume = (thickness * surf).round();
-        //widSurfkey[i] cest le nameFood
-        outputFinal[classVolumeName[i].toString()] = volume;
-        if (idxClass != 0 && idxClass != 24 && idxClass != 23) {
-          chips.add(displayVolumeInfo(color, widSurfKey, thickness, volume, i));
-        }
-      }
-    }
-    print("the final output");
-    print(outputFinal);
+
+      item = widSurfKey.indexOf(e.key);
+
+      surf = e.value[1]; //replace: widget.surfaces.values.toList();
+      volume = (thickness * surf).round();
+      //widSurfkey[i] cest le nameFood
+      outputFinal[e.key] = volume;
+
+      return displayVolumeInfo(color, thickness, volume, i);
+    }).toList());
     List<Food> allIngredientParsed = parseAllIngredients(outputFinal);
     addElementToDatabaseAfterVolume(allIngredientParsed);
-    return ListView(children: chips);
+
+    return hey;
   }
 
-  ActionChip displayVolumeInfo(color, widSurfKey, thickness, volume, i) {
+  ActionChip displayVolumeInfo(color, thickness, volume, i) {
     return ActionChip(
       onPressed: () {
         setState(() {
@@ -791,7 +796,7 @@ class _SegmentationState extends State<Segmentation> {
         ),
       ),
       label: Text(
-        classVolumeName[i] +
+        classVolumeDistance.keys.elementAt(i) +
             '   ' +
             thickness.toStringAsFixed(1) +
             'cm | Vol. ' +
@@ -908,8 +913,17 @@ class _SegmentationState extends State<Segmentation> {
   }
 
   ActionChip displaySurfaceInfo(percent, surface, color, e) {
+    int i = surfaceSaved.keys.toList().indexOf(e.key);
     return ActionChip(
       onPressed: () {},
+      shape: StadiumBorder(
+        side: BorderSide(
+          color: i == _selectedClass
+              ? Theme.of(context).primaryColor
+              : Color(color),
+          width: 2.0,
+        ),
+      ),
       avatar: CircleAvatar(
         backgroundColor: Colors.white,
         child: Text(percent.toString() + "%",
@@ -925,23 +939,9 @@ class _SegmentationState extends State<Segmentation> {
 
   ListView surfaceList(categories) {
     return ListView(
-      children: _outputClasses.entries.map(
+      children: surfaceSaved.entries.map(
         (e) {
-          int percent = ((e.value / OUTPUTSIZE) * 100).round();
-          if (percent > 1) {
-            int surface = (e.value * SURFACE2EUROS / COINPIXELS / 100).round();
-            int index = categories.indexOf(e.key);
-            int color = pascalVOCLabelColors[index];
-            surfaceSaved[e.key] = surface;
-            if (e.key == 'Background 🏞️' ||
-                e.key == 'Food Containers 🍽️' ||
-                e.key == 'Dining Tools 🍴') {
-              return Container();
-            } else
-              return displaySurfaceInfo(percent, surface, color, e);
-          } else {
-            return Container();
-          }
+          return displaySurfaceInfo(e.value[1], e.value[0], e.value[2], e);
         },
       ).toList(),
     );
@@ -1003,11 +1003,70 @@ class _SegmentationState extends State<Segmentation> {
         Expanded(
           child: displaySurfaceOrVolume(widget.volume, categories),
         ),
+        _selectedClass != -1 ? dislayEditButtons(widget.volume) : Container(),
         displaySlider(widget.volume),
         displayGetVolumeEstimationButton(widget.volume),
         SizedBox(height: 25),
       ],
     );
+  }
+
+  Widget dislayEditButtons(bool volume) {
+    var categories = classes.values.toList();
+    var allClassesSet = Set.from(this.VALUES);
+    var representedSet = Set.from(classVolumeDistance.keys);
+    List<String> intersection =
+        List.from(allClassesSet.difference(representedSet));
+
+    return !volume
+        ? Container()
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ActionChip(
+                label: Text('Delete'),
+                avatar: Icon(Icons.delete),
+                onPressed: () {
+                  setState(() {
+                    String elem =
+                        classVolumeDistance.keys.elementAt(_selectedClass);
+                    classVolumeDistance.remove(elem);
+                    //surfaceSaved.remove(elem);
+                    _selectedClass = -1;
+                  });
+                },
+              ),
+              SizedBox(width: 15.0),
+              DropdownButton<String>(
+                value: classVolumeDistance.keys.elementAt(_selectedClass),
+                icon: const Icon(Icons.edit),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    // seems that we are obliged to create a new map
+                    Map newMap = Map();
+                    String elem =
+                        classVolumeDistance.keys.elementAt(_selectedClass);
+                    classVolumeDistance.forEach((key, value) {
+                      if (key == elem) {
+                        newMap[newValue!] = value;
+                      } else {
+                        newMap[key] = value;
+                      }
+                    });
+                    classVolumeDistance = newMap;
+                  });
+                },
+                items: (intersection +
+                        [classVolumeDistance.keys.elementAt(_selectedClass)])
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              )
+            ],
+          );
   }
 
   @override
