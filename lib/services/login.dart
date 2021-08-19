@@ -25,7 +25,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Log in'),
-          backgroundColor: Colors.purple,
+          backgroundColor: Color(0xff8C33FF),
+          brightness: Brightness.dark,
         ),
         body: Column(
           children: [
@@ -59,11 +60,11 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 RaisedButton(
-                    color: Theme.of(context).accentColor,
+                    color: Color(0xff8C33FF),
                     child: Text('Signin'),
                     onPressed: () => _signin(_email, _password)),
                 RaisedButton(
-                    color: Theme.of(context).accentColor,
+                    color: Color(0xff8C33FF),
                     child: Text('Signup'),
                     onPressed: () => _signup(_email, _password)),
               ],

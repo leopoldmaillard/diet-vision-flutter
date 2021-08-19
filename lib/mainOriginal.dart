@@ -7,6 +7,8 @@ import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
 import 'package:transfer_learning_fruit_veggies/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:transfer_learning_fruit_veggies/pages/onboarding_screen.dart';
 
 // List<CameraDescription> cameras = [];
 
@@ -17,22 +19,48 @@ import 'package:transfer_learning_fruit_veggies/main.dart';
 // }
 List<CameraDescription> cameras2 = cameras;
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool loading = true;
+  bool firstLaunch = true;
+
+  void getFirstLaunch() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      firstLaunch = prefs.getBool("firstLaunch") ?? true;
+      loading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    getFirstLaunch();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<FoodBloc>(
-      create: (context) => FoodBloc(),
-      child: MaterialApp(
-        routes: {
-          'mealHistory': (context) => HistoryMeal(),
-        },
-        title: "DietVision",
-        theme: new ThemeData(
-          primaryColor: new Color(0xff8C33FF),
-        ),
-        debugShowCheckedModeBanner: false,
-        home: new Home(cameras: cameras2),
-      ),
-    );
+    return loading
+        ? Container()
+        : BlocProvider<FoodBloc>(
+            create: (context) => FoodBloc(),
+            child: MaterialApp(
+              routes: {
+                'mealHistory': (context) => HistoryMeal(),
+              },
+              title: "DietVision",
+              theme: new ThemeData(
+                primaryColor: new Color(0xff8C33FF),
+              ),
+              debugShowCheckedModeBanner: false,
+              home: firstLaunch
+                  ? OnBoardingScreen(cameras: cameras2)
+                  : Home(cameras: cameras2),
+            ),
+          );
   }
 }
