@@ -36,7 +36,7 @@ After launching the app, the user traverses menu pages until he/she is asked to 
 
 The first picture is a top-view one and is used to detect food as well as to compute the surface it occupies. The fiducial coin is used as a reference object to get the right scale. It is placed between the user and the dish and the smartphone must be directly above it, in order to get the most correct top-view. The user has to make the coin match as closely as possible with the purple circle displayed at the bottom of the camera preview screen.
 
-![topview](assets/images/topView.png)
+<img src="assets/images/topView.png" alt="topview" width="450"/>
  
  After a few seconds, a list of detected food items is displayed along with their associated surface in square centimeters.
  
@@ -44,7 +44,7 @@ The first picture is a top-view one and is used to detect food as well as to com
  
 The purpose of the second picture is to estimate the volume of each food class detected in the first picture. The thickness of each food item must be obtained and to do so, the picture must be taken at a 45° angle. The coin should not be moved. Again, the user will match the coin with a purple ellipse (that corresponds to a circle viewed at an angle of 45°).
 
-![topside](assets/images/topside.png)![45view](assets/images/45view.png) !
+<img src="assets/images/topside.png" alt="topside" width="400"/> <img src="assets/images/45view.png" alt="45view" width="400"/>
 
 After this second picture has been taken, the food items list will be displayed again, with this time their volume estimation in cubic centimeters.
 
