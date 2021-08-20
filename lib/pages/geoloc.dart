@@ -153,7 +153,7 @@ class GeolocState extends State<Geoloc> {
                   getCurrentLocation();
                 });
               },
-              child: Text("C'est partiii!")),
+              child: Text("Click to see your Country")),
           Text(
             "Voici la latitude: $latitude et la longitude: $longitude",
             style: TextStyle(fontSize: 27),

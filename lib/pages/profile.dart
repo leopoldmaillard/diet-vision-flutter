@@ -17,6 +17,7 @@ class _ProfileState extends State<Profile> {
   double height = 170;
   double weight = 60;
   String country = "";
+  String countryCode = "";
   String name = "Full Name";
   String mail = "Email";
   String pass = "Password";
@@ -35,12 +36,16 @@ class _ProfileState extends State<Profile> {
   void loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      country = prefs.getString("country") ?? "France";
+      countryCode = prefs.getString("countryCode") ?? "US";
+      country = coinCountryJson
+          .firstWhere((element) => element["code"] == countryCode)["country"];
+      // country = prefs.getString("country") ?? "FRANCE";
+      print('This is my Country Code: $countryCode');
       print('this is my country: $country');
       // return the coin type based on the country of the user
       // eg. "euro", "us_dollar" etc.
       currency = coinCountryJson
-          .firstWhere((element) => element["country"] == country)["coin"];
+          .firstWhere((element) => element["code"] == countryCode)["coin"];
 
       coins = coinDiameterJson
           .where((element) => element["coin"] == currency)
@@ -197,7 +202,7 @@ class _ProfileState extends State<Profile> {
             });
           },
         ),
-        fancyText("Your country : " + country),
+        fancyText("Your country : $country, $countryCode"),
         Row(
           children: [
             fancyText("Chose your Fiducial Marker"),

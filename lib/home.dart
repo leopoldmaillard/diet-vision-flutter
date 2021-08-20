@@ -26,6 +26,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool showFab = true;
   String country = "";
+  String countryCode = "";
   String selectedCoin = "";
 
   @override
@@ -63,6 +64,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     final coordinates = new Coordinates(position.latitude, position.longitude);
     convertCoordinatesToAddress(coordinates).then((value) {
       setState(() {
+        countryCode = value.countryCode.toString();
         country = value.countryName.toString();
         setUserCountry();
       });
@@ -78,11 +80,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   void setUserCountry() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("country", country);
+    prefs.setString("countryCode", countryCode);
 
     // return the coin type based on the country of the user
     // eg. "euro", "us_dollar" etc.
     String currency = coinCountryJson
-        .firstWhere((element) => element["country"] == country)["coin"];
+        .firstWhere((element) => element["countryCode"] == countryCode)["coin"];
 
     List coins = coinDiameterJson
         .where((element) => element["coin"] == currency)
