@@ -54,7 +54,7 @@ When the volume estimation results are displayed, the user is given the possibil
 
 - Food item classification : in the event that the machine learning model misclassifies a food item, the user is able to adjust the selection by tapping on it and selecting the appropriate class. A food class can also be deleted from the selection.
 
-- Food item thickness : the estimated thickness of each food item can be visually adjusted thanks to a slider which moves on the picture the points that correspond to the ’minimum’ and the ’maximum’ position of the thickness. Note that we aim here at estimating the mean thickness of a food. If an item does not have a consistent thickness (e.g. a mashed potatoes portion), the system will ask the user to determine a mean value that will lead to an accurate volume estimation.
+- Food item thickness : the estimated thickness of each food item can be visually adjusted thanks to a slider which moves on the picture the points that correspond to the *minimum* and the *maximum* position of the thickness. Note that we aim here at estimating the mean thickness of a food. If an item does not have a consistent thickness (e.g. a mashed potatoes portion), the system will ask the user to determine a mean value that will lead to an accurate volume estimation.
 
 ## Known issues and potential improvements
 
