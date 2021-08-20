@@ -36,9 +36,11 @@ class _ProfileState extends State<Profile> {
   void loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      countryCode = prefs.getString("countryCode") ?? "US";
+      print("${prefs.getString("countryCode")}");
+      countryCode = prefs.getString("code") ?? "US";
       country = coinCountryJson
           .firstWhere((element) => element["code"] == countryCode)["country"];
+      prefs.setString("country", country);
       // country = prefs.getString("country") ?? "FRANCE";
       print('This is my Country Code: $countryCode');
       print('this is my country: $country');

@@ -79,13 +79,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   void setUserCountry() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("code", countryCode);
     prefs.setString("country", country);
-    prefs.setString("countryCode", countryCode);
-
     // return the coin type based on the country of the user
     // eg. "euro", "us_dollar" etc.
     String currency = coinCountryJson
-        .firstWhere((element) => element["countryCode"] == countryCode)["coin"];
+        .firstWhere((element) => element["code"] == countryCode)["coin"];
 
     List coins = coinDiameterJson
         .where((element) => element["coin"] == currency)
