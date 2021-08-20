@@ -233,7 +233,8 @@ class DatabaseProvider {
   /// we update this food.id by this value : food.toMap()
   Future<int> update(Food food) async {
     final db = await database;
-
+    print("food dans update" + food.nameUpdated);
+    print(food.toMap());
     return await db.update(
       TABLE_FOOD,
       food.toMap(),
