@@ -4,7 +4,7 @@
 
 By [Michael Hofmann](https://github.com/michaelof66), [Jessica Ramaux](https://github.com/JessieRamaux) & [Léopold Maillard](https://github.com/leopoldmaillard), under the supervision of [Prof. Dennis Shasha](https://cs.nyu.edu/~shasha/) (Courant Institute of Mathematical Sciences, New York University).
 
-A detailed technical report of this project can be found [here](). We strongly recommend to read if you want to understand the underlying mechanisms of the app.
+A detailed technical report of this project can be found [here]().
 
 ## Overview
 
