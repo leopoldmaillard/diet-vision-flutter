@@ -1,6 +1,6 @@
 # DietVision - An App for Image-based Food Identification and Volume Estimation
 
-![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
+![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white) ![ios](https://img.shields.io/badge/iOS-000000?style=for-the-badge&logo=ios&logoColor=white) ![android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 
 By [Michael Hofmann](https://github.com/michaelof66), [Jessica Ramaux](https://github.com/JessieRamaux) & [Léopold Maillard](https://github.com/leopoldmaillard), under the supervision of [Prof. Dennis Shasha](https://cs.nyu.edu/~shasha/) (Courant Institute of Mathematical Sciences, New York University).
 
