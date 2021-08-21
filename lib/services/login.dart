@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +8,7 @@ import 'resetPassword.dart';
 import 'verify.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:transfer_learning_fruit_veggies/mainOriginal.dart';
+import 'package:transfer_learning_fruit_veggies/main.dart';
 
 // This file is the design/screen part of the authentification part in an app
 
@@ -19,67 +21,95 @@ class _LoginScreenState extends State<LoginScreen> {
   // initialize mail+pwd = avoid null error
   String _email = '', _password = '';
   final auth = FirebaseAuth.instance;
+  CollectionReference users = Firestore.instance.collection('users');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Log in'),
-          backgroundColor: Color(0xff8C33FF),
-          brightness: Brightness.dark,
-        ),
-        body: Column(
-          children: [
-            // add a part to write the mail
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(hintText: 'Email'),
-                  onChanged: (value) {
-                    setState(() {
-                      _email = value.trim();
-                    });
-                  }),
-            ),
-
-            // add a part to write the mail
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                obscureText: true,
-                decoration: InputDecoration(hintText: 'Password'),
+      appBar: AppBar(
+        title: Text('Log in'),
+        backgroundColor: Color(0xff8C33FF),
+        brightness: Brightness.dark,
+      ),
+      body: Column(
+        children: [
+          // add a part to write the mail
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(hintText: 'Email'),
                 onChanged: (value) {
                   setState(() {
-                    _password = value.trim();
+                    _email = value.trim();
                   });
+                }),
+          ),
+
+          // add a part to write the mail
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              obscureText: true,
+              decoration: InputDecoration(hintText: 'Password'),
+              onChanged: (value) {
+                setState(() {
+                  _password = value.trim();
+                });
+              },
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xff8C33FF),
+                ),
+                child: Text('Signin'),
+                onPressed: () {
+                  _signin(_email, _password);
                 },
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                RaisedButton(
-                    color: Color(0xff8C33FF),
-                    child: Text('Signin'),
-                    onPressed: () => _signin(_email, _password)),
-                RaisedButton(
-                    color: Color(0xff8C33FF),
-                    child: Text('Signup'),
-                    onPressed: () => _signup(_email, _password)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                    child: Text('Forgot Password ?'),
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => ResetScreen())))
-              ],
-            )
-          ],
-        ));
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xff8C33FF),
+                  ),
+                  child: Text('Signup'),
+                  onPressed: () async {
+                    // await users.doc(_email).set({"meal": []});
+                    await users
+                        .document(_email)
+                        .collection("ListMeal")
+                        .document()
+                        .setData(
+                      {
+                        'TestData': "Data",
+                      },
+                    ).catchError(
+                            (error) => print('Failed to Add a meal : $error'));
+                    setState(() {
+                      mailUser = _email;
+                      print(
+                          "HEEEEEEELLLLLLLLLOOOOOOOOOOOO : user $_email registered");
+                    });
+                    _signup(_email, _password);
+                  }),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                      child: Text('Forgot Password ?'),
+                      onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (context) => ResetScreen())))
+                ],
+              )
+            ],
+          )
+        ],
+      ),
+    );
   }
 
   _signin(String _email, String _password) async {

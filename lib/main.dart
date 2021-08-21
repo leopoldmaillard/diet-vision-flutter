@@ -9,6 +9,7 @@ import 'services/widgets.dart';
 import 'package:camera/camera.dart';
 
 List<CameraDescription> cameras = [];
+String mailUser = '';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

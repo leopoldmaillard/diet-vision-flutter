@@ -48,9 +48,9 @@ dependencies:
   firebase_core:
   firebase_auth:
   cloud_firestore: # ^1.0.0 # new
-  cloud_firestore_web: # ^1.0.0 # new
-  firebase_core_web: # ^1.0.0 # new
-  firebase_auth_web:
+  # cloud_firestore_web: # ^1.0.0 # new
+  # firebase_core_web: # ^1.0.0 # new
+  # firebase_auth_web:
   fluttertoast: ^8.0.7
   introduction_screen: ^2.1.0
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:transfer_learning_fruit_veggies/events/set_food.dart';
+import 'package:transfer_learning_fruit_veggies/main.dart';
 import 'package:transfer_learning_fruit_veggies/services/local_storage_service.dart';
 import 'package:transfer_learning_fruit_veggies/pages/FoodFormUpdateDatabase.dart';
 import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
@@ -96,11 +97,17 @@ class _HistoryMealState extends State<HistoryMeal> {
   }
 
   void deleteItem(Food food, int index) {
-    name = food.nameFood;
-    users
-        .add({'name': name})
-        .then((value) => print('User Added'))
-        .catchError((error) => print('Failed to Add a meal : $error'));
+    // name = food.nameFood;
+    // Firestore.instance
+    //     .collection('users')
+    //     .document(mailUser)
+    //     .collection('meal')
+    //     .document(name)
+    //     .setData({'name': name});
+    // users
+    //     .add({'name': name})
+    //     .then((value) => print('User Added'))
+    //     .catchError((error) => print('Failed to Add a meal : $error'));
     DatabaseProvider.db.delete(food.id).then(
       (_) {
         BlocProvider.of<FoodBloc>(context).add(

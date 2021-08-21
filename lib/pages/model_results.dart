@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'dart:io';
 import 'package:tflite/tflite.dart';
 import 'package:image/image.dart' as IMG;
 import 'package:quiver/iterables.dart';
+import 'package:transfer_learning_fruit_veggies/main.dart';
 import 'package:transfer_learning_fruit_veggies/pages/second_picture.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 
@@ -843,6 +845,22 @@ class _SegmentationState extends State<Segmentation> {
                 AddFood(storedFood),
               ),
             );
+        print("AAAAAAAAAAAAAAAAAAAAAAAA $mailUser");
+        await Firestore.instance
+            .collection('users')
+            .document(mailUser)
+            .collection("ListMeal")
+            .document()
+            .setData(
+          {"mealINfo": finalMeal.toMap()},
+        ).catchError((error) => print('Failed to Add a meal : $error'));
+        // await Firestore.instance
+        //     .collection('users')
+        //     .document(mailUser)
+        //     .collection('meal')
+        //     .document(finalMeal.nameFood)
+        //     .setData({'name': finalMeal.nameFood}).catchError(
+        //         (error) => print('Failed to Add a meal : $error'));
         Navigator.pop(
             context, 'retour à prendre la photo de volume estimation');
         Navigator.pop(
