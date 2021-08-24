@@ -20,7 +20,7 @@ List<Map> drinkNutritionJson = [
   {
     "id": '2',
     "name": "Soda", //Coke in the database of nutrition
-    "cal": 42,
+    "cal": 42.0,
     "fat": 0.2,
     "protein": 0.0,
     "carbohydrates": 0.0,
@@ -48,7 +48,7 @@ List<Map> drinkNutritionJson = [
     "carbohydrates": 0.0,
     "sugar": 0.0,
     "nutriscore": "A",
-    "vm": 1
+    "vm": 1.0
   },
   {
     "id": '5',
@@ -98,7 +98,7 @@ List<Map> drinkNutritionJson = [
   {
     "id": '9',
     "name": "Vodka",
-    "cal": 231,
+    "cal": 231.0,
     "fat": 0.0,
     "protein": 0.0,
     "carbohydrates": 0.0,
