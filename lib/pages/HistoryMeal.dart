@@ -97,17 +97,6 @@ class _HistoryMealState extends State<HistoryMeal> {
   }
 
   void deleteItem(Food food, int index) {
-    // name = food.nameFood;
-    // Firestore.instance
-    //     .collection('users')
-    //     .document(mailUser)
-    //     .collection('meal')
-    //     .document(name)
-    //     .setData({'name': name});
-    // users
-    //     .add({'name': name})
-    //     .then((value) => print('User Added'))
-    //     .catchError((error) => print('Failed to Add a meal : $error'));
     DatabaseProvider.db.delete(food.id).then(
       (_) {
         BlocProvider.of<FoodBloc>(context).add(
