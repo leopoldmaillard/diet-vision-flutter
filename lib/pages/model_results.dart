@@ -847,7 +847,7 @@ class _SegmentationState extends State<Segmentation> {
             );
         print("AAAAAAAAAAAAAAAAAAAAAAAA $mailUser");
         await Firestore.instance
-            .collection('users')
+            .collection('usersDietVision')
             .document(mailUser)
             .collection("ListMeal")
             .document()

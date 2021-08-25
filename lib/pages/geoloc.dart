@@ -9,6 +9,7 @@ import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../source/coinDiameter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Geoloc extends StatefulWidget {
   @override
@@ -134,10 +135,9 @@ class GeolocState extends State<Geoloc> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    getCurrentLocation();
-    return new Center(
+  // https://grubmaster.net/#/
+  Widget displayCurrentLocation() {
+    return Center(
       child: Column(
         children: [
           Text('Vous voulez la position?'),
@@ -167,5 +167,71 @@ class GeolocState extends State<Geoloc> {
         ],
       ),
     );
+  }
+
+  Widget displayShaunWebsite() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          FractionallySizedBox(
+            widthFactor: 0.9,
+            child: Text(
+              "Do you want access to many various recipes depending on your nutritional needs?\nThen you Should Check out this Website :",
+              style: TextStyle(
+                  fontSize: 19,
+                  height: 1.5,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.purple),
+            ),
+          ),
+          //Text("Ou alors: ${_address.addressLine ?? '-'}"),
+          SizedBox(
+            height: 20,
+          ),
+          // Container(
+          //   child: new Image.asset(
+          //     'assets/images/shaunWebsite.png',
+          //     height: 60.0,
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
+          Container(
+            child: TextButton(
+              onPressed: launchURL,
+              child: new Image.asset(
+                'assets/images/shaunWebsite.png',
+                height: 80.0,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          // Text(
+          //   "vous êtes donc dans le pays: $country",
+          //   style: TextStyle(
+          //     fontSize: 20,
+          //     fontStyle: FontStyle.italic,
+          //     color: Colors.purple,
+          //   ),
+          // ),
+        ],
+      ),
+    );
+  }
+
+  // ignore: unused_element
+  launchURL() async {
+    const url = 'https://grubmaster.net/#/';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return displayShaunWebsite();
   }
 }

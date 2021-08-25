@@ -66,4 +66,5 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.firebaseui:firebase-ui-auth:7.2.0' // new: able to authentificate
+    implementation platform('com.google.firebase:firebase-bom:28.4.0')
 }

@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   var currentUser = FirebaseAuth.instance.currentUser();
   bool loadingState = false;
 
-  CollectionReference users = Firestore.instance.collection('users');
+  CollectionReference users = Firestore.instance.collection('usersDietVision');
   void initState() {
     super.initState();
     initLoad();

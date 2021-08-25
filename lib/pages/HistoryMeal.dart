@@ -170,7 +170,7 @@ class _HistoryMealState extends State<HistoryMeal> {
     );
   }
 
-  CollectionReference users = Firestore.instance.collection('users');
+  CollectionReference users = Firestore.instance.collection('usersDietVision');
   var name = '';
   @override
   Widget build(BuildContext context) {

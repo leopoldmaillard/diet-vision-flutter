@@ -53,6 +53,7 @@ dependencies:
   # firebase_auth_web:
   fluttertoast: ^8.0.7
   introduction_screen: ^2.1.0
+  url_launcher: ^6.0.5
 
 dev_dependencies:
   flutter_test:
