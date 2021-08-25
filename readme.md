@@ -58,6 +58,8 @@ When the volume estimation results are displayed, the user is given the possibil
 
 ## Known issues and potential improvements
 
+Head over to this repository's [issues](https://github.com/leopoldmaillard/diet-vision-flutter/issues) to track/report the current bugs and see the upcoming features of the app. Any contribution is welcomed.
+
 ## References
 
 Frank Po Wen Lo, Yingnan Sun, Jianing Qiu, and Benny Lo. Image-Based Food Classification and Volume Estimation for Dietary Assessment: A Review. *IEEE Journal of Biomedical and Health Informatics*, 24(7):1926–1939, 2020.
