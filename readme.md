@@ -58,7 +58,7 @@ When the volume estimation results are displayed, the user is given the possibil
 
 ## Known issues and potential improvements
 
-Head over to this repository's [issues](https://github.com/leopoldmaillard/diet-vision-flutter/issues) to track/report the current bugs and see the upcoming features of the app. Any contribution is welcomed.
+Head over to this repository's [issues](https://github.com/leopoldmaillard/diet-vision-flutter/issues) to track/report bugs and see/request the upcoming features of the app. Any contribution is welcomed.
 
 ## References
 
