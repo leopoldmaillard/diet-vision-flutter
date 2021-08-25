@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transfer_learning_fruit_veggies/main.dart';
 import '../source/coinDiameter.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -166,8 +167,8 @@ class _ProfileState extends State<Profile> {
           ),
         ),
         textfield(hintText: name, field: name, fieldName: "name"),
-        textfield(hintText: mail, field: mail, fieldName: "mail"),
-        textfield(hintText: "Password", field: pass, fieldName: "pass"),
+        textfield(hintText: mailUser, field: mail, fieldName: "mail"),
+        //textfield(hintText: "Password", field: pass, fieldName: "pass"),
         fancyText("How tall are you : " + height.toInt().toString() + " cm"),
         Slider(
           activeColor: Theme.of(context).primaryColor,

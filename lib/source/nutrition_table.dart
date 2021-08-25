@@ -2,21 +2,121 @@
 Database for this JSON:
 https://docs.google.com/spreadsheets/d/1X1sPuft4cAvtiTXAFU1oabpTz5xuHhgKZi5MVBJw578/edit#gid=0
 also taken from 
-https://docs.google.com/spreadsheets/d/1snqE6leDkZlL61qQ4g-vUmiFjizJyN1OCVAhwWWKSm4/edit#gid=2024304766
-*/
-/*
+https://docs.google.com/spreadsheets/d/1snqE6leDkZlL61qQ4g-vUmiFjizJyN1OCVAhwWWKSm4/edit#gid=,
 id, name, quantity(100ml), cal(cal/100ml), masse volumique: mv (g/ml) [1 cm^3 = 1 ml]
 */
 List<Map> drinkNutritionJson = [
-  {"id": '1', "name": "Coffee", "quantity": "100", "cal": "1", "mv": "1"},
-  {"id": '2', "name": "Coke", "quantity": "100", "cal": "42", "mv": "1.02"},
-  {"id": '3', "name": "IcedTea", "quantity": "100", "cal": "27", "mv": "1.03"},
-  {"id": '4', "name": "Water", "quantity": "100", "cal": "0", "mv": "1"},
-  {"id": '5', "name": "Beer", "quantity": "100", "cal": "43", "mv": "1"},
-  {"id": '6', "name": "Wine", "quantity": "100", "cal": "83", "mv": "0.99"},
-  {"id": '7', "name": "Whiskey", "quantity": "100", "cal": "250", "mv": "0.93"},
-  {"id": '8', "name": "Vodka", "quantity": "100", "cal": "231", "mv": "0.95"},
-  {"id": '9', "name": "Tea", "quantity": "100", "cal": "1000", "mv": "1"},
+  {
+    "id": '1',
+    "name": "Select your drink  ",
+    "cal": 0.0,
+    "fat": 0.0,
+    "protein": 0.0,
+    "carbohydrates": 0.0,
+    "sugar": 0.0,
+    "nutriscore": "A",
+    "vm": 0.0
+  },
+  {
+    "id": '2',
+    "name": "Soda", //Coke in the database of nutrition
+    "cal": 42.0,
+    "fat": 0.2,
+    "protein": 0.0,
+    "carbohydrates": 0.0,
+    "sugar": 10.6,
+    "nutriscore": "A",
+    "vm": 1.02
+  },
+  {
+    "id": '3',
+    "name": "Iced Tea",
+    "cal": 33,
+    "fat": 0.03,
+    "protein": 0.2,
+    "carbohydrates": 9.17,
+    "sugar": 7.2,
+    "nutriscore": "A",
+    "vm": 1.03
+  },
+  {
+    "id": '4',
+    "name": "Water",
+    "cal": 0.0,
+    "fat": 0.0,
+    "protein": 0.0,
+    "carbohydrates": 0.0,
+    "sugar": 0.0,
+    "nutriscore": "A",
+    "vm": 1.0
+  },
+  {
+    "id": '5',
+    "name": "Juice",
+    "cal": 48.0,
+    "fat": 0.12,
+    "protein": 0.68,
+    "carbohydrates": 11.45,
+    "sugar": 8.31,
+    "nutriscore": "A",
+    "glucide": "N/A",
+    "vm": 1.0
+  },
+  {
+    "id": '6',
+    "name": "Beer",
+    "cal": 43.0,
+    "fat": 0.0,
+    "protein": 0.46,
+    "carbohydrates": 3.55,
+    "sugar": 0.0,
+    "nutriscore": "A",
+    "vm": 1.0
+  },
+  {
+    "id": '7',
+    "name": "Wine",
+    "cal": 78.0,
+    "fat": 0.0,
+    "protein": 0.07,
+    "carbohydrates": 2.38,
+    "sugar": 3.8,
+    "nutriscore": "A",
+    "vm": 0.99
+  },
+  {
+    "id": '8',
+    "name": "Whiskey",
+    "cal": 250,
+    "fat": 0.0,
+    "protein": 0.0,
+    "carbohydrates": 0.1,
+    "sugar": 0.1,
+    "nutriscore": "A",
+    "vm": 0.93
+  },
+  {
+    "id": '9',
+    "name": "Vodka",
+    "cal": 231.0,
+    "fat": 0.0,
+    "protein": 0.0,
+    "carbohydrates": 0.0,
+    "sugar": 0.0,
+    "nutriscore": "A",
+    "vm": 0.95
+  },
+  {
+    "id": '10',
+    "name": "Tea",
+    "cal": 1.0,
+    "fat": 0.0,
+    "protein": 0.0,
+    "carbohydrates": 0.2,
+    "sugar": 0.0,
+    "nutriscore": "A",
+    "vm": 1.0
+  },
 ];
 
 //quantity: 100 g

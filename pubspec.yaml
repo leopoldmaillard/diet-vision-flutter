@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -23,13 +23,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  provider: # new
   image_picker: ^0.6.7+4
   tflite: ^1.1.1
   camera: ^0.8.1+3
-  graphic: ^0.3.0 # graphic 
+  graphic: ^0.3.0 # graphic
   fl_chart: ^0.36.2 # line chart
   #flutter_exif_rotation: ^0.4.1 #bug for rotation picture
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -40,11 +40,20 @@ dependencies:
   quiver: ^3.0.1
   flutter_exif_rotation: ^0.4.1
   flutter_dash: ^0.0.1
-  geolocator: ^6.2.1
+  geolocator:
   geocoder: ^0.2.1
   flutter_bloc: ^7.0.1
   shared_preferences: ^2.0.6
-  intl: ^0.16.1
+  intl:
+  firebase_core:
+  firebase_auth:
+  cloud_firestore: # ^1.0.0 # new
+  # cloud_firestore_web: # ^1.0.0 # new
+  # firebase_core_web: # ^1.0.0 # new
+  # firebase_auth_web:
+  fluttertoast: ^8.0.7
+  introduction_screen: ^2.1.0
+  url_launcher: ^6.0.5
 
 dev_dependencies:
   flutter_test:
@@ -57,7 +66,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -67,7 +75,6 @@ flutter:
   assets:
     - assets/
     - assets/images/
-
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

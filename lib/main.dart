@@ -1,36 +1,19 @@
-import 'dart:async';
+import 'package:firebase_core/firebase_core.dart'; // new
+import 'package:firebase_auth/firebase_auth.dart'; // new
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:transfer_learning_fruit_veggies/fapp.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'services/login.dart'; // new
+import 'services/widgets.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
-import 'package:transfer_learning_fruit_veggies/home.dart';
-
-import 'package:transfer_learning_fruit_veggies/bloc/food_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:transfer_learning_fruit_veggies/pages/HistoryMeal.dart';
 
 List<CameraDescription> cameras = [];
+String mailUser = '';
 
-Future<Null> main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
-  runApp(new MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider<FoodBloc>(
-      create: (context) => FoodBloc(),
-      child: MaterialApp(
-        routes: {
-          'mealHistory': (context) => HistoryMeal(),
-        },
-        title: "DietVision",
-        theme: new ThemeData(
-          primaryColor: new Color(0xff8C33FF),
-        ),
-        debugShowCheckedModeBanner: false,
-        home: new Home(cameras: cameras),
-      ),
-    );
-  }
+  // await Firebase.initializeApp();
+  runApp(FApp());
 }

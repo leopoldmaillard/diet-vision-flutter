@@ -1,21 +1,8 @@
 import 'package:flutter/material.dart';
 
-enum drinkEnum {
-  EMPTY,
-  NODRINK,
-  SODA,
-  ICEDTEAD,
-  WATER,
-  JUICE,
-  BEER,
-  WINE,
-  WHISKEY,
-  COCKTAIL
-}
-//initial value for beverage button
-String dropdownValue = "1";
+
 /* Json Format variable for the drop down List button of beverage */
-List<Map> _myJson = [
+List<Map> myJson = [
   {
     "id": '1',
     "image": "assets/images/beverage.png",
@@ -28,8 +15,23 @@ List<Map> _myJson = [
   {"id": '6', "image": "assets/images/beer.png", "name": "Beer"},
   {"id": '7', "image": "assets/images/wine.png", "name": "Wine"},
   {"id": '8', "image": "assets/images/whiskey.png", "name": "Whiskey"},
-  {"id": '9', "image": "assets/images/hard.png", "name": "Cocktail"},
+  {"id": '9', "image": "assets/images/hard.png", "name": "Vodka"},
 ];
+enum drinkEnum {
+  EMPTY,
+  NODRINK,
+  SODA,
+  ICEDTEAD,
+  WATER,
+  JUICE,
+  BEER,
+  WINE,
+  WHISKEY,
+  VODKA
+}
+
+//initial value for beverage button
+String dropdownValue = "1";
 
 /* Class for the Beverage Button, It's a child in the main page of camera */
 class DrinksButton extends StatefulWidget {
@@ -53,7 +55,8 @@ class _DrinksButtonState extends State<DrinksButton> {
             height: 25,
           ),
           Container(
-              margin: EdgeInsets.only(left: 10), child: Text(map["name"])),
+              margin: EdgeInsets.only(left: 10),
+              child: Text(map["name"] + " 25cl")),
         ],
       ),
     );
@@ -80,7 +83,7 @@ class _DrinksButtonState extends State<DrinksButton> {
           },
         );
       },
-      items: _myJson.map(
+      items: myJson.map(
         (Map map) {
           return displayImagesAndLabels(map);
         },
