@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
       style: ElevatedButton.styleFrom(
         primary: Color(0xff8C33FF),
       ),
-      child: Text('Signin'),
+      child: Text('Signin', style: TextStyle(color: Colors.white)),
       onPressed: () async {
         final prefs = await SharedPreferences.getInstance();
         setState(() {
@@ -96,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
         style: ElevatedButton.styleFrom(
           primary: Color(0xff8C33FF),
         ),
-        child: Text('Signup'),
+        child: Text('Signup', style: TextStyle(color: Colors.white)),
         onPressed: () async {
           // await users.doc(_email).set({"meal": []});
           mailUser = _email;
@@ -143,6 +143,9 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       debugShowCheckedModeBanner: false,
       home: new Scaffold(
+        appBar: AppBar(
+          brightness: Brightness.dark,
+        ),
         backgroundColor: new Color(0xff8C33FF),
         body: new Container(
           child: new Image.asset('assets/images/logoDietVision.png'),
@@ -155,7 +158,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget authentificationScreen() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Log in'),
+        title: Text(
+          'Log in',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Color(0xff8C33FF),
         brightness: Brightness.dark,
       ),
