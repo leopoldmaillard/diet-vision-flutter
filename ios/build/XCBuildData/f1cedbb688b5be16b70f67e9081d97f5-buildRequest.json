@@ -1,0 +1,60 @@
+{
+  "buildCommand" : "prepareForIndexing",
+  "configuredTargets" : [
+    {
+      "guid" : "9ab61bf2fb4dce04bb72c4ba087488e288a783a885d8b0b3beb2e9f90bde3f49"
+    }
+  ],
+  "continueBuildingAfterErrors" : true,
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "arm64",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : false,
+      "platform" : "iphoneos",
+      "sdk" : "iphoneos14.5",
+      "sdkVariant" : "iphoneos",
+      "supportedArchitectures" : [
+        "arm64e",
+        "arm64v8",
+        "arm64",
+        "armv8"
+      ],
+      "targetArchitecture" : "arm64"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "",
+      "buildProductsPath" : "",
+      "derivedDataPath" : "/Users/leopoldmaillard/Library/Developer/Xcode/DerivedData",
+      "indexDataStoreFolderPath" : "/Users/leopoldmaillard/Library/Developer/Xcode/DerivedData/Runner-emvjebcnvbylhsflobmckoojbyuc/Index/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/leopoldmaillard/Library/Developer/Xcode/DerivedData/Runner-emvjebcnvbylhsflobmckoojbyuc/Index/PrecompiledHeaders",
+      "pchPath" : ""
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "synthesized" : {
+        "table" : {
+          "ASSETCATALOG_FILTER_FOR_DEVICE_MODEL" : "iPhone11,8",
+          "ASSETCATALOG_FILTER_FOR_DEVICE_OS_VERSION" : "14.4.2",
+          "BUILD_ACTIVE_RESOURCES_ONLY" : "YES",
+          "ENABLE_PREVIEWS" : "NO",
+          "TARGET_DEVICE_IDENTIFIER" : "00008020-001544A43421002E",
+          "TARGET_DEVICE_MODEL" : "iPhone11,8",
+          "TARGET_DEVICE_OS_VERSION" : "14.4.2",
+          "TARGET_DEVICE_PLATFORM_NAME" : "iphoneos"
+        }
+      }
+    }
+  },
+  "qos" : "default",
+  "schemeCommand" : "launch",
+  "shouldCollectMetrics" : false,
+  "showNonLoggedProgress" : true,
+  "useDryRun" : true,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}
