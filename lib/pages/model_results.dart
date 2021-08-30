@@ -846,14 +846,24 @@ class _SegmentationState extends State<Segmentation> {
               ),
             );
         print("AAAAAAAAAAAAAAAAAAAAAAAA $mailUser");
+
         await Firestore.instance
             .collection('usersDietVision')
             .document(mailUser)
-            .collection("ListMeal")
-            .document()
-            .setData(
-          {"mealINfo": finalMeal.toMap()},
-        ).catchError((error) => print('Failed to Add a meal : $error'));
+            .setData({
+          "data": FieldValue.arrayUnion([finalMeal.toMap()])
+        }, merge: true).catchError(
+                (error) => print('Failed to Add a meal : $error'));
+
+        // await Firestore.instance
+        //     .collection('usersDietVision')
+        //     .document(mailUser)
+        //     .collection("ListMeal")
+        //     .document()
+        //     .setData(
+        //   {"mealINfo": finalMeal.toMap()},
+        // ).catchError((error) => print('Failed to Add a meal : $error'));
+
         // await Firestore.instance
         //     .collection('users')
         //     .document(mailUser)
