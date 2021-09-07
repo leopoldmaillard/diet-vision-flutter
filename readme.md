@@ -4,7 +4,7 @@
 
 By [Michael Hofmann](https://github.com/michaelof66), [Jessica Ramaux](https://github.com/JessieRamaux) & [Léopold Maillard](https://github.com/leopoldmaillard), under the supervision of [Prof. Dennis Shasha](https://cs.nyu.edu/~shasha/) (Courant Institute of Mathematical Sciences, New York University).
 
-**A detailed technical report of this project can be found [here]().**
+**A detailed technical report of this project can be found [here](https://cs.nyu.edu/media/publications/Diet_Vision_2021_Technical_Report_PKqc2Lj.pdf).**
 
 ## Overview
 
@@ -14,7 +14,7 @@ Our dietary assessment pipeline relies on a combination of a deep learning model
 
 ## Installation
 
-**Please note that you will need the Google Cloud API crendentials of the project to run it on your own device. Don't hesitate to contact us if you are interested.
+**Please note that you will need the Google Cloud API crendentials of the project to run it on your own device. Don't hesitate to contact us if you are interested.**
 
 We are targeting a release on the Apple App Store and the Google Play Store in order to ease the installation process and reach a larger audience. However, for now the app can be compiled and installed from the source code by following these few steps : 
 
