@@ -14,6 +14,8 @@ Our dietary assessment pipeline relies on a combination of a deep learning model
 
 ## Installation
 
+**Please note that you will need the Google Cloud API crendentials of the project to run it on your own device. Don't hesitate to contact us if you are interested.
+
 We are targeting a release on the Apple App Store and the Google Play Store in order to ease the installation process and reach a larger audience. However, for now the app can be compiled and installed from the source code by following these few steps : 
 
 - Follow the official [Flutter documentation](https://flutter.dev/docs/get-started/install) to properly set up the Flutter SDK on your system.
